@@ -13,5 +13,15 @@
       <groupId>openehr</groupId>
       <artifactId>openehr-rm-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>openehr</groupId>
+      <artifactId>openehr-rm-domain</artifactId>
+      <scope>provided</scope><!-- used from javadoc only -->
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <scope>provided</scope><!-- used from javadoc only -->
+    </dependency>
   </dependencies>
 </project>

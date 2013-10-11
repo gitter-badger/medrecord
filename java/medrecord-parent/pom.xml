@@ -40,6 +40,11 @@
     <dependencies>
       <!-- alphabetical ordering please -->
       <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>15.0</version>
+      </dependency>
+      <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.11</version>
@@ -53,6 +58,11 @@
       <dependency>
         <groupId>openehr</groupId>
         <artifactId>openehr-rm-core</artifactId>
+        <version>${openehr.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>openehr</groupId>
+        <artifactId>openehr-rm-domain</artifactId>
         <version>${openehr.version}</version>
       </dependency>
       <dependency>
