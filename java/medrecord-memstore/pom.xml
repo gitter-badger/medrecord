@@ -7,19 +7,16 @@
     <version>2.0.0-SNAPSHOT</version>
     <relativePath>../medrecord-parent</relativePath>
   </parent>
-  <artifactId>medrecord-spi</artifactId>
+  <artifactId>medrecord-memstore</artifactId>
   <dependencies>
     <dependency>
-      <groupId>openehr</groupId>
-      <artifactId>openehr-rm-core</artifactId>
+      <groupId>com.medvision360.medrecord</groupId>
+      <artifactId>medrecord-spi</artifactId>
     </dependency>
     <dependency>
-      <groupId>openehr</groupId>
-      <artifactId>openehr-rm-domain</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
+      <groupId>com.medvision360.medrecord</groupId>
+      <artifactId>medrecord-spi-tck</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

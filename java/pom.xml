@@ -14,5 +14,7 @@
     <module>medrecord-vendor</module>
     <module>medrecord-parent</module>
     <module>medrecord-spi</module>
+    <module>medrecord-spi-tck</module>
+    <module>medrecord-memstore</module>
   </modules>
 </project>

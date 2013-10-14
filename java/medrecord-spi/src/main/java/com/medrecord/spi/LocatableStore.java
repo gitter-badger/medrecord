@@ -80,6 +80,7 @@ public interface LocatableStore extends LocatableService, TransactionalService, 
      * Store a new locatable.
      * 
      * @param locatable the locatable to store.
+     * @return the stored locatable with any modified attributes modified.
      * @throws NullPointerException if any of the provided arguments are null.
      * @throws IllegalArgumentException if the provided locatable does not properly implement the rules of the 
      *   openehr object model.
@@ -88,12 +89,13 @@ public interface LocatableStore extends LocatableService, TransactionalService, 
      * @throws DuplicateException if a locatable already exists with the same uid.
      * @throws IOException if another error occurs interacting with storage.
      */
-    public void insert(Locatable locatable) throws DuplicateException, NotSupportedException, IOException;
+    public Locatable insert(Locatable locatable) throws DuplicateException, NotSupportedException, IOException;
 
     /**
      * Store a new version of an existing locatable.
      * 
      * @param locatable the locatable to store
+     * @return the stored locatable with any modified attributes modified.
      * @throws NullPointerException if any of the provided arguments are null.
      * @throws IllegalArgumentException if the provided locatable does not properly implement the rules of the 
      *   openehr object model.
@@ -102,7 +104,7 @@ public interface LocatableStore extends LocatableService, TransactionalService, 
      * @throws NotFoundException if the locatable cannot be found in storage.
      * @throws IOException if another error occurs interacting with storage.
      */
-    public void update(Locatable locatable) throws NotSupportedException, NotFoundException, IOException;
+    public Locatable update(Locatable locatable) throws NotSupportedException, NotFoundException, IOException;
 
     /**
      * Mark all versions of a {@link Locatable} as deleted.
