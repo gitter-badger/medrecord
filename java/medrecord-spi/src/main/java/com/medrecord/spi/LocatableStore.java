@@ -115,6 +115,37 @@ public interface LocatableStore extends LocatableService, TransactionalService, 
     public void delete(HierObjectID id) throws NotFoundException, IOException;
 
     /**
+     * Determine whether there is any version of the specified locatable in this store.
+     * 
+     * @param id the identifier of the locatable to check for. 
+     * @throws NullPointerException if any of the provided arguments are null.
+     * @return true if the locatable is stored, false otherwise.
+     * @throws IOException if another error occurs interacting with storage.
+     */
+    public boolean has(HierObjectID id) throws IOException;
+    
+    /**
+     * Determine whether the specified version of the specified locatable is stored in this store.
+     * 
+     * @param id the identifier of the locatable version to check for. 
+     * @throws NullPointerException if any of the provided arguments are null.
+     * @return true if the locatable version is stored, false otherwise.
+     * @return true if the locatable version is stored, false otherwise.
+     * @throws IOException if another error occurs interacting with storage.
+     */
+    public boolean has(ObjectVersionID id) throws IOException;
+    
+    /**
+     * Determine whether there is any version matching the specified locatable is in this store.
+     * 
+     * @param id the identifier of the locatable version to check for. 
+     * @throws NullPointerException if any of the provided arguments are null.
+     * @return true if the locatable is stored, false otherwise.
+     * @throws IOException if another error occurs interacting with storage.
+     */
+    public boolean hasAny(ObjectVersionID id) throws IOException;
+
+    /**
      * Mark a version of a {@link Locatable} as deleted. If this is the only version of the locatable,
      * that entire locatable is marked as deleted. Otherwise, if this is the current version of the locatable, 
      * the previous version becomes the current version. 

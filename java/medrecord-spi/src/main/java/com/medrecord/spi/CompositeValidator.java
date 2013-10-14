@@ -1,25 +1,26 @@
 package com.medrecord.spi;
 
-import com.medrecord.spi.LocatableValidator;
-import com.medrecord.spi.ValidationReport;
 import com.medrecord.spi.exceptions.NotSupportedException;
 import com.medrecord.spi.exceptions.ValidationException;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-public class CompositeValidator implements LocatableValidator {
-    private List<LocatableValidator> delegates = new ArrayList<>();
+import static com.google.common.base.Preconditions.checkNotNull;
+
+public class CompositeValidator implements LocatableValidator, CompositeService<LocatableValidator> {
+    private List<LocatableValidator> delegates = new LinkedList<>();
     
     public void addDelegate(LocatableValidator delegate) {
-        delegates.add(delegate);
+        delegates.add(checkNotNull(delegate, "delegate cannot be null"));
     }
 
     @Override
     public ValidationReport validate(Locatable locatable)
             throws NotSupportedException {
+        checkNotNull(locatable, "locatable cannot be null");
         ValidationReport result = null;
         for (LocatableValidator delegate : delegates) {
             if (delegate.supports(locatable)) {
@@ -39,6 +40,7 @@ public class CompositeValidator implements LocatableValidator {
     @Override
     public void check(Locatable locatable)
             throws ValidationException, NotSupportedException {
+        checkNotNull(locatable, "locatable cannot be null");
         ValidationReport report = validate(locatable);
         if (!report.isValid()) {
             throw new ValidationException(report);
@@ -47,6 +49,7 @@ public class CompositeValidator implements LocatableValidator {
 
     @Override
     public boolean supports(Locatable locatable) {
+        checkNotNull(locatable, "locatable cannot be null");
         for (LocatableValidator delegate : delegates) {
             if (delegate.supports(locatable)) {
                 return true;
@@ -57,6 +60,7 @@ public class CompositeValidator implements LocatableValidator {
 
     @Override
     public boolean supports(Archetyped archetyped) {
+        checkNotNull(archetyped, "archetyped cannot be null");
         for (LocatableValidator delegate : delegates) {
             if (delegate.supports(archetyped)) {
                 return true;

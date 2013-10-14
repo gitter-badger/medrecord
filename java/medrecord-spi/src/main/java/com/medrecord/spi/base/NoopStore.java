@@ -96,6 +96,24 @@ public class NoopStore implements VersioningStore, AuditedService {
     }
 
     @Override
+    public boolean has(HierObjectID id)
+            throws IOException {
+        throw new UnsupportedOperationException("todo implement NoopStore.has()");
+    }
+
+    @Override
+    public boolean has(ObjectVersionID id)
+            throws IOException {
+        throw new UnsupportedOperationException("todo implement NoopStore.has()");
+    }
+
+    @Override
+    public boolean hasAny(ObjectVersionID id)
+            throws IOException {
+        throw new UnsupportedOperationException("todo implement NoopStore.hasAny()");
+    }
+
+    @Override
     public Iterable<HierObjectID> list()
             throws IOException {
         throw new UnsupportedOperationException("todo implement NoopStore.list()");
