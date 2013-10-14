@@ -16,35 +16,35 @@ import org.openehr.rm.support.identification.ObjectVersionID;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 public class NoopStore implements VersioningStore, AuditedService {
     @Override
     public void setAuditInfo(AuditInfo auditInfo) {
-        throw new UnsupportedOperationException("todo implement NoopStore.setAuditInfo()");
     }
 
     @Override
     public Iterable<VersionedObject<? extends Locatable>> getVersionObjects(HierObjectID id)
             throws NotFoundException, IOException {
-        throw new UnsupportedOperationException("todo implement NoopStore.getVersionObjects()");
+        return new ArrayList<>();
     }
 
     @Override
     public void insert(VersionedObject<? extends Locatable> versionedLocatable)
             throws DuplicateException, NotSupportedException, IOException {
-        throw new UnsupportedOperationException("todo implement NoopStore.insert()");
+        throw new UnsupportedOperationException("todo implement NoopStore.queryVersionObjects()");
     }
 
     @Override
     public void update(VersionedObject<? extends Locatable> versionedLocatable)
             throws NotSupportedException, NotFoundException, IOException {
-        throw new UnsupportedOperationException("todo implement NoopStore.update()");
+        throw new UnsupportedOperationException("todo implement NoopStore.queryVersionObjects()");
     }
 
     @Override
     public Iterable<VersionedObject<? extends Locatable>> listVersionObjects(String XQuery)
             throws NotSupportedException, IOException, UnsupportedOperationException {
-        throw new UnsupportedOperationException("todo implement NoopStore.listVersionObjects()");
+        return new ArrayList<>();
     }
 
     @Override
@@ -68,17 +68,17 @@ public class NoopStore implements VersioningStore, AuditedService {
     @Override
     public Iterable<Locatable> getVersions(HierObjectID id)
             throws NotFoundException, IOException {
-        throw new UnsupportedOperationException("todo implement NoopStore.getVersions()");
+        return new ArrayList<>();
     }
 
     @Override
-    public void insert(Locatable locatable)
+    public Locatable insert(Locatable locatable)
             throws DuplicateException, NotSupportedException, IOException {
         throw new UnsupportedOperationException("todo implement NoopStore.insert()");
     }
 
     @Override
-    public void update(Locatable locatable)
+    public Locatable update(Locatable locatable)
             throws NotSupportedException, NotFoundException, IOException {
         throw new UnsupportedOperationException("todo implement NoopStore.update()");
     }
@@ -98,31 +98,46 @@ public class NoopStore implements VersioningStore, AuditedService {
     @Override
     public boolean has(HierObjectID id)
             throws IOException {
-        throw new UnsupportedOperationException("todo implement NoopStore.has()");
+        try {
+            get(id);
+            return true;
+        } catch(NotFoundException e) {
+            return false;
+        }
     }
 
     @Override
     public boolean has(ObjectVersionID id)
             throws IOException {
-        throw new UnsupportedOperationException("todo implement NoopStore.has()");
+        try {
+            get(id);
+            return true;
+        } catch(NotFoundException e) {
+            return false;
+        }
     }
 
     @Override
     public boolean hasAny(ObjectVersionID id)
             throws IOException {
-        throw new UnsupportedOperationException("todo implement NoopStore.hasAny()");
+        try {
+            get(id);
+            return true;
+        } catch(NotFoundException e) {
+            return false;
+        }
     }
 
     @Override
     public Iterable<HierObjectID> list()
             throws IOException {
-        throw new UnsupportedOperationException("todo implement NoopStore.list()");
+        return new ArrayList<>();
     }
 
     @Override
     public Iterable<ObjectVersionID> listVersions()
             throws IOException {
-        throw new UnsupportedOperationException("todo implement NoopStore.listVersions()");
+        return new ArrayList<>();
     }
 
     @Override
@@ -140,62 +155,56 @@ public class NoopStore implements VersioningStore, AuditedService {
     @Override
     public void initialize()
             throws IOException {
-        throw new UnsupportedOperationException("todo implement NoopStore.initialize()");
     }
 
     @Override
     public void clear()
             throws IOException {
-        throw new UnsupportedOperationException("todo implement NoopStore.clear()");
     }
 
     @Override
     public boolean supports(Locatable locatable) {
-        throw new UnsupportedOperationException("todo implement NoopStore.supports()");
+        return false;
     }
 
     @Override
     public boolean supports(Archetyped archetyped) {
-        throw new UnsupportedOperationException("todo implement NoopStore.supports()");
+        return false;
     }
 
     @Override
     public void verifyStatus()
             throws StatusException {
-        throw new UnsupportedOperationException("todo implement NoopStore.verifyStatus()");
     }
 
     @Override
     public String reportStatus()
             throws StatusException {
-        throw new UnsupportedOperationException("todo implement NoopStore.reportStatus()");
+        return "OK";
     }
 
     @Override
     public String getName() {
-        throw new UnsupportedOperationException("todo implement NoopStore.getName()");
+        return "NoopStore";
     }
 
     @Override
     public boolean supportsTransactions() {
-        throw new UnsupportedOperationException("todo implement NoopStore.supportsTransactions()");
+        return false;
     }
 
     @Override
     public void begin()
             throws TransactionException {
-        throw new UnsupportedOperationException("todo implement NoopStore.begin()");
     }
 
     @Override
     public void commit()
             throws TransactionException {
-        throw new UnsupportedOperationException("todo implement NoopStore.commit()");
     }
 
     @Override
     public void rollback()
             throws TransactionException {
-        throw new UnsupportedOperationException("todo implement NoopStore.rollback()");
     }
 }

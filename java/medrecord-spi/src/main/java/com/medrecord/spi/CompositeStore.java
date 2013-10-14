@@ -116,20 +116,19 @@ public class CompositeStore implements LocatableStore, CompositeService<Locatabl
     }
 
     @Override
-    public void insert(Locatable locatable)
+    public Locatable insert(Locatable locatable)
             throws DuplicateException, NotSupportedException, IOException {
         checkNotNull(locatable, "locatable cannot be null");
         for (LocatableStore delegate : delegates) {
             if (delegate.supports(locatable)) {
-                delegate.insert(locatable);
-                return;
+                return delegate.insert(locatable);
             }
         }
         throw new NotSupportedException(String.format("No delegate store supports the locatable %s", locatable));
     }
 
     @Override
-    public void update(Locatable locatable)
+    public Locatable update(Locatable locatable)
             throws NotSupportedException, NotFoundException, IOException {
         checkNotNull(locatable, "locatable cannot be null");
         UIDBasedID uidBasedID = locatable.getUid();
@@ -145,8 +144,7 @@ public class CompositeStore implements LocatableStore, CompositeService<Locatabl
         for (LocatableStore delegate : delegates) {
             boolean found = haveVersion ? delegate.has(hierObjectID) : delegate.hasAny(objectVersionID);
             if (found) {
-                delegate.update(locatable);
-                return;
+                return delegate.update(locatable);
             }
         }
         throw new NotFoundException(String.format("No delegate store contains the locatable %s", locatable));
