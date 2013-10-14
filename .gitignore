@@ -3,3 +3,11 @@
 *.war
 *.ear
 target
+
+# IDEA
+.gradle
+build/
+java/out
+*.iml
+*.iws
+*.ipr

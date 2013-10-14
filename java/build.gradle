@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        // required for buildlib
+        mavenLocal()
+
+        // required for license-gradle-plugin
+        mavenCentral()
+    }
+    dependencies {
+        // this is the medvision buildlib
+        classpath 'com.medvision360.buildlib:buildlib:latest.integration'
+
+        // plugin for updating the license headers
+        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.5.0'
+    }
+}
+
+allprojects {
+    // gradle can generate IDEA project files
+    // just run 'gradle idea' and open the project file in IDEA
+    apply plugin: 'idea'
+}
+
+subprojects {
+    group = 'com.medvision360.medrecord'
+    version = '2.0.0'
+
+    //
+    // Change version based on the build location.
+    // When build locally it adds '-SNAPSHOT' when build on Cloudbees it adds
+    // the build number.
+    //
+    apply plugin: 'medvision-version'
+
+
+    //
+    // use the medvision repos (cloudbees, repo.medvision360.org)
+    //
+    apply plugin: 'medvision-repo'
+
+
+    //
+    // update the license header on all files
+    // run 'gradle licenseFormatMain' to update the license headers
+    //
+    apply plugin: 'license'
+
+    license {
+        header rootProject.file('LICENSE.tpl')
+        ext {
+            year = Calendar.getInstance().get(Calendar.YEAR)
+        }
+    }
+
+    ext {
+        version = [
+                'commonsCli'         : '1.2',
+                'logback'            : '1.0.13',
+                'openEhr'            : '1.0.5-SNAPSHOT',
+                'slf4j'              : '1.7.5'
+        ]
+    }
+
+}
