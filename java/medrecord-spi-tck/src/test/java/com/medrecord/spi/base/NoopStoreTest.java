@@ -24,21 +24,6 @@ public class NoopStoreTest extends LocatableStoreTestBase {
     }
 
     @Override
-    protected Locatable makeLocatable(UIDBasedID uid, Pathable parent) throws Exception {
-        Archetyped archetypeDetails = new Archetyped(
-                new ArchetypeID("openehr-unittest-ADMIN_ENTRY.date.v2"),
-                "1.4");        
-        List<Element> items = new ArrayList<Element>();
-        items.add(new Element(("at0001"), "header", new DvText("date")));
-        items.add(new Element(("at0002"), "value",	new DvDate("2008-05-17")));
-        ItemList itemList = new ItemList("at0003", "item list", items);        
-        AdminEntry adminEntry = new AdminEntry(makeUID(), "at0004", new DvText("admin entry"),
-        		archetypeDetails, null, null, null, lang, encoding, 
-        		subject(), provider(), null, null, itemList, ts);
-        return adminEntry;
-    }
-
-    @Override
     public void testBasicCRUD()
             throws Exception {
         try {
