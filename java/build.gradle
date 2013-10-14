@@ -15,9 +15,13 @@ buildscript {
     }
 }
 
+// The IDEA plugin picks up sourceCompatibility from the Java plugin so
+// make sure the root project has a proper Java configuration.
+apply plugin: 'medvision-java'
+
 allprojects {
-    // gradle can generate IDEA project files
-    // just run 'gradle idea' and open the project file in IDEA
+    // Gradle can generate IDEA project files.
+    // Run 'gradle idea' and open the project file in IDEA.
     apply plugin: 'idea'
 }
 
@@ -25,24 +29,18 @@ subprojects {
     group = 'com.medvision360.medrecord'
     version = '2.0.0'
 
-    //
     // Change version based on the build location.
     // When build locally it adds '-SNAPSHOT' when build on Cloudbees it adds
     // the build number.
-    //
     apply plugin: 'medvision-version'
 
 
-    //
-    // use the medvision repos (cloudbees, repo.medvision360.org)
-    //
+    // Use the MEDvision360 repos (cloudbees, repo.medvision360.org)
     apply plugin: 'medvision-repo'
 
 
-    //
-    // update the license header on all files
+    // Update the license header on all files
     // run 'gradle licenseFormatMain' to update the license headers
-    //
     apply plugin: 'license'
 
     license {
@@ -53,8 +51,11 @@ subprojects {
     }
 
     ext {
+        // Version numbers of dependencies.
         version = [
                 'commonsCli'         : '1.2',
+                'commonsLang3'       : '3.1',
+                'junit'              : '4.11',
                 'logback'            : '1.0.13',
                 'openEhr'            : '1.0.5-SNAPSHOT',
                 'slf4j'              : '1.7.5'
