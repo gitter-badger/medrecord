@@ -35,4 +35,20 @@ public class NoopStoreTest extends XQueryStoreTestBase {
             super.testQueryNullArgumentsThrowNPE();
         } catch(UnsupportedOperationException e) {}
     }
+
+    @Override
+    public void testBasicVersioning()
+            throws Exception {
+        try {
+            super.testBasicVersioning();
+        } catch(UnsupportedOperationException e) {}
+    }
+
+    @Override
+    public void testUnknownIDThrowsNotFound()
+            throws Exception {
+        try {
+            super.testUnknownIDThrowsNotFound();
+        } catch(UnsupportedOperationException e) {}
+    }
 }
