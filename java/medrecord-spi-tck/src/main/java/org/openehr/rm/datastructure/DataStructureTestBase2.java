@@ -36,6 +36,7 @@ import org.openehr.rm.support.identification.TerminologyID;
 
 import java.util.List;
 
+@SuppressWarnings("UnusedDeclaration")
 public class DataStructureTestBase2 extends TestCase {
 
 	public DataStructureTestBase2(String test) {

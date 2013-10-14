@@ -26,88 +26,34 @@ import java.util.Set;
  * @author Rong Chen
  * @version 1.0
  */
+@SuppressWarnings({"UnusedDeclaration", "Convert2Diamond"})
 public class TestTerminologyAccess implements TerminologyAccess {
 
-    /* fields */
-    /**
-     * Returns all codes under grouper groupID of this terminology
-     *
-     * @param groupID
-     * @return Set of CodePhrase for given group ID, empty set
-     *         returned if not found
-     * @throws IllegalArgumentException if groupID null or empty
-     */
     public Set<CodePhrase> codesForGroupId(String groupID) {
-        return null;  // todo: implement this method
+        return null;
     }
 
-    /**
-     * Return all codes under grouper whose name of given
-     * name and language from this terminology.
-     *
-     * @param name
-     * @param language
-     * @return Set of CodePhrase for given group name,
-     *         empty set returned if not found
-     * @throws IllegalArgumentException if name,language null or empty
-     */
     public Set<CodePhrase> codesForGroupName(String name, String language) {
-        
-        return CODES;  // todo: implement this method
+        return CODES;
     }
 
-    /**
-     * Returns all rubric of given code and language
-     *
-     * @param code
-     * @param language
-     * @return rubric of given code and language or null if not found
-     * @throws IllegalArgumentException if code,language null or empty
-     */
     public String rubricForCode(String code, String language) {
-        return null;  // todo: implement this method
+        return null;
     }
 
-    /**
-     * Return true if the code is under grouper of given name
-     * and language
-     *
-     * @param code
-     * @param name
-     * @param language
-     * @return true if the code exists
-     * @throws IllegalArgumentException if code or name or language
-     *                                  null
-     */
     public boolean hasCodeForGroupName(CodePhrase code, String name,
                                        String language) {
         return true;
     }
 
-    /**
-     * Returns identification of this TerminologyAccess
-     * 
-     * @return ID not null or empty
-     */
     public String id() {
-        return null;  // todo: implement this method
+        return null;
     }
 
-    /**
-     * Returns all codes known in this terminology
-     *
-     * @return a <code>Set</code> of <code>CodePhrase</code>
-     */
     public Set<CodePhrase> allCodes() {
-        return null;  // todo: implement this method
+        return null;
     }
 
-    /**
-     * Return true if this codeset contains given codePhrase
-     *
-     * @param code
-     * @return true if has
-     */
     public boolean has(CodePhrase code) {
         return true;
     }

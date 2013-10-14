@@ -25,60 +25,24 @@ import java.util.Map;
  */
 public class TestTerminologyService implements TerminologyService {
 
-    /**
-     * Create a new instance of test terminology service
-     *
-     * @return
-     */
     public static TestTerminologyService getInstance() {
         return new TestTerminologyService();
     }
 
-
-    /**
-     * Returns a TerminologyAccess of given name
-     * 
-     * @param name not empty and known to this service
-     * @return terminology
-     * @throws IllegalArgumentException if name null, empty
-     *                                  or unknown to this terminology service
-     */
     public TerminologyAccess terminology(String name) {
         return new TestTerminologyAccess();
     }
 
-    /**
-     * Returns a CodeSetAccess of given name
-     * 
-     * @param name not empty and known to this service
-     * @return codeSet
-     * @throws IllegalArgumentException if name is null, empty
-     *                                  or unknown to this terminology service
-     */
     public CodeSetAccess codeSet(String name) {
         return new TestCodeSetAccess();
     }
 
-    /**
-     * Returns ture if terminology of given name known by this service
-     *
-     * @param name not empty
-     * @return true if has given terminology
-     * @throws IllegalArgumentException if name is null or empty
-     */
     public boolean hasTerminology(String name) {
-        return false;  // todo: implement this method
+        return false;
     }
 
-    /**
-     * Returns true if code set of given name known by this service
-     *
-     * @param name not empty
-     * @return true if has given codeset
-     * @throws IllegalArgumentException if name is null or empty
-     */
     public boolean hasCodeSet(String name) {
-        return false;  // todo: implement this method
+        return false;
     }
 
 
@@ -88,19 +52,16 @@ public class TestTerminologyService implements TerminologyService {
 
 
 	public List<String> terminologyIdentifiers() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 
 	public List<String> codeSetIdentifiers() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 
 	public Map<String, String> openehrCodeSets() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

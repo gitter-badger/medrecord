@@ -27,6 +27,7 @@ import java.util.Set;
  * @author Rong Chen
  * @version 1.0
  */
+@SuppressWarnings({"Convert2Diamond", "UnusedDeclaration"})
 public class TestCodeSetAccess implements CodeSetAccess {
 
     /* fields */

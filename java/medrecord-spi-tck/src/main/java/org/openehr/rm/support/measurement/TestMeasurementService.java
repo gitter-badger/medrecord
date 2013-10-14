@@ -20,39 +20,17 @@ package org.openehr.rm.support.measurement;
  * @author Rong Chen
  * @version 1.0
  */
+@SuppressWarnings("UnusedDeclaration")
 public class TestMeasurementService implements MeasurementService {
 
-    /* fields */
-    /**
-     * Returns True if the units string according to
-     * the HL7 UCUM specification.
-     *
-     * @param units
-     * @return true if units valid
-     * @throws IllegalArgumentException if units null
-     */
     public boolean isValidUnitsString(String units) {
 	return true;
     }
 
-    /**
-     * Return True if two units strings correspond to the same
-     * measured property.
-     *
-     * @param units1
-     * @param units2
-     * @return true if two units equal
-     * @throws IllegalArgumentException if units1 or units2 null
-     */
     public boolean unitsEquivalent(String units1, String units2) {
 	return true;
     }
 
-    /**
-     * Return a new instance of test measurement service
-     *
-     * @return
-     */
     public static MeasurementService getInstance() {
 	return new TestMeasurementService();
     }

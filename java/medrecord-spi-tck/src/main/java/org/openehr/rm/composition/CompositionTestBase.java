@@ -49,6 +49,7 @@ import java.util.List;
  * @author Rong Chen
  * @version 1.0
  */
+@SuppressWarnings({"UnusedDeclaration", "Convert2Diamond"})
 public class CompositionTestBase extends DataStructureTestBase2 {
 
 	public CompositionTestBase(String test) {
