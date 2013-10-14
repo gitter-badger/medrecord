@@ -19,7 +19,7 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class CompositeStore implements LocatableStore, CompositeService<LocatableStore> {
+public class CompositeStore implements XQueryStore, CompositeService<LocatableStore> {
     private List<LocatableStore> delegates = new LinkedList<>();
     private String name;
 
@@ -240,7 +240,9 @@ public class CompositeStore implements LocatableStore, CompositeService<Locatabl
         checkNotNull(XQuery, "XQuery cannot be null");
         List<Iterable<Locatable>> all = new LinkedList<>();
         for (LocatableStore delegate : delegates) {
-            all.add(delegate.list(XQuery));
+            if (delegate instanceof XQueryStore) {
+                all.add(((XQueryStore)delegate).list(XQuery));
+            }
         }
         Iterable<Locatable> result = Iterables.concat(all);
         return result;
@@ -252,7 +254,9 @@ public class CompositeStore implements LocatableStore, CompositeService<Locatabl
         checkNotNull(XQuery, "XQuery cannot be null");
         checkNotNull(os, "os cannot be null");
         for (LocatableStore delegate : delegates) {
-            delegate.query(XQuery, os);
+            if (delegate instanceof XQueryStore) {
+                ((XQueryStore)delegate).query(XQuery, os);
+            }
         }
     }
 

@@ -16,7 +16,6 @@ import org.openehr.rm.support.identification.UIDBasedID;
 import org.openehr.rm.support.identification.VersionTreeID;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -180,21 +179,6 @@ public class MemLocatableStore implements LocatableStore {
     public Iterable<ObjectVersionID> listVersions()
             throws IOException {
         return ImmutableSet.copyOf(versions.keySet());
-    }
-
-    @Override
-    public Iterable<Locatable> list(String XQuery)
-            throws NotSupportedException, IOException {
-        checkNotNull(XQuery, "XQuery cannot be null");
-        throw new UnsupportedOperationException("todo implement MemLocatableStore.list()");
-    }
-
-    @Override
-    public void query(String XQuery, OutputStream os)
-            throws NotSupportedException, IOException {
-        checkNotNull(XQuery, "XQuery cannot be null");
-        checkNotNull(os, "os cannot be null");
-        throw new UnsupportedOperationException("todo implement MemLocatableStore.query()");
     }
 
     @Override

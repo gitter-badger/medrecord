@@ -2,21 +2,10 @@ package com.medrecord.spi.base;
 
 import com.medrecord.spi.LocatableStore;
 import com.medrecord.spi.tck.LocatableStoreTestBase;
-import org.openehr.rm.common.archetyped.Archetyped;
-import org.openehr.rm.common.archetyped.Locatable;
-import org.openehr.rm.common.archetyped.Pathable;
-import org.openehr.rm.composition.content.entry.AdminEntry;
-import org.openehr.rm.datastructure.itemstructure.ItemList;
-import org.openehr.rm.datastructure.itemstructure.representation.Element;
-import org.openehr.rm.datatypes.quantity.datetime.DvDate;
-import org.openehr.rm.datatypes.text.DvText;
-import org.openehr.rm.support.identification.ArchetypeID;
-import org.openehr.rm.support.identification.UIDBasedID;
+import com.medrecord.spi.tck.XQueryStoreTestBase;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class NoopStoreTest extends LocatableStoreTestBase {
+public class NoopStoreTest extends XQueryStoreTestBase {
+    // this test is mostly here to just check the TCK 'wiring' is ok
 
     @Override
     protected LocatableStore getStore() throws Exception {
@@ -32,10 +21,18 @@ public class NoopStoreTest extends LocatableStoreTestBase {
     }
 
     @Override
-    public void testNullArguments()
+    public void testBasicNullArgumentsThrowNPE()
             throws Exception {
         try {
-            super.testNullArguments();
+            super.testBasicNullArgumentsThrowNPE();
+        } catch(UnsupportedOperationException e) {}
+    }
+
+    @Override
+    public void testQueryNullArgumentsThrowNPE()
+            throws Exception {
+        try {
+            super.testQueryNullArgumentsThrowNPE();
         } catch(UnsupportedOperationException e) {}
     }
 }

@@ -3,6 +3,7 @@ package com.medrecord.spi.base;
 import com.medrecord.spi.AuditInfo;
 import com.medrecord.spi.AuditedService;
 import com.medrecord.spi.VersioningStore;
+import com.medrecord.spi.XQueryStore;
 import com.medrecord.spi.exceptions.DuplicateException;
 import com.medrecord.spi.exceptions.NotFoundException;
 import com.medrecord.spi.exceptions.NotSupportedException;
@@ -18,7 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-public class NoopStore implements VersioningStore, AuditedService {
+public class NoopStore implements VersioningStore, XQueryStore, AuditedService {
     @Override
     public void setAuditInfo(AuditInfo auditInfo) {
     }
@@ -164,12 +165,12 @@ public class NoopStore implements VersioningStore, AuditedService {
 
     @Override
     public boolean supports(Locatable locatable) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean supports(Archetyped archetyped) {
-        return false;
+        return true;
     }
 
     @Override
