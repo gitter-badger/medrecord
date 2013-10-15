@@ -2,8 +2,29 @@ package com.medvision360.medrecord.spi.exceptions;
 
 import com.medvision360.medrecord.spi.ValidationReport;
 
+@SuppressWarnings("UnusedDeclaration")
 public class ValidationException extends RecordException {
     private ValidationReport report;
+
+    public ValidationException() {
+        super();
+    }
+
+    public ValidationException(String message) {
+        super(message);
+    }
+
+    public ValidationException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ValidationException(Throwable cause) {
+        super(cause);
+    }
+
+    public ValidationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 
     public ValidationException(ValidationReport report) {
         this.report = report;

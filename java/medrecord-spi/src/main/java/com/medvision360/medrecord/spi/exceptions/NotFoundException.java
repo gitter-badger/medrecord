@@ -1,5 +1,6 @@
 package com.medvision360.medrecord.spi.exceptions;
 
+@SuppressWarnings("UnusedDeclaration")
 public class NotFoundException extends RecordException {
     public NotFoundException() {
     }

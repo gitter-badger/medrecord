@@ -1,5 +1,6 @@
 package com.medvision360.medrecord.spi.exceptions;
 
+@SuppressWarnings("UnusedDeclaration")
 public class TransactionException extends RecordException {
     public TransactionException() {
     }
