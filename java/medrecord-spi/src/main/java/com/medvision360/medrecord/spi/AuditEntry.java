@@ -1,8 +1,9 @@
-/*
- * author:      "Leo Simons <leo@medvision360.com>"
- * support:     "MEDvision360 <support@medvision360.com>"
- * copyright:   "Copyright (c) 2004 Acode HB, Sweden, Copyright (c) 2013 MEDvision360, The Netherlands"
- * license:     "See notice at bottom of class"
+/**
+ * This file is part of MEDrecord
+ *
+ * @copyright Copyright 2013 by MEDvision360. All rights reserved.
+ * @author Leo Simons <leo@medvision360.com>
+ * @author Ralph van Etten <ralph@medvision360.com>
  */
 package com.medvision360.medrecord.spi;
 
