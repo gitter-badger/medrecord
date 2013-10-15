@@ -1,0 +1,23 @@
+repositories {
+    // required for buildlib
+    mavenLocal()
+
+    // required for license-gradle-plugin
+    mavenCentral()
+    
+    maven {
+      url 'http://files.basex.org/maven'
+    }
+}
+
+// some standard settings for Java applications (language level etc)
+apply plugin: 'medvision-java'
+
+description = 'MEDvision360 MEDrecord BaseX Backend'
+
+dependencies {
+    compile project(':medrecord-spi')
+    compile "org.basex:basex:${ext.version.basex}"
+
+    testCompile project(':medrecord-spi-tck')
+}

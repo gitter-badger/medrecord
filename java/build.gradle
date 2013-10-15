@@ -60,7 +60,8 @@ subprojects {
                 'junit'              : '4.11',
                 'logback'            : '1.0.13',
                 'openEhr'            : '1.0.5-SNAPSHOT',
-                'slf4j'              : '1.7.5'
+                'slf4j'              : '1.7.5',
+                'basex'              : '7.7.2'
         ]
     }
 
