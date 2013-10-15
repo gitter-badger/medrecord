@@ -6,12 +6,12 @@ MEDrecord is a medical record server
 Contents
 ========
 
-- medrecord-jcg      : Java Client Generator
-- medrecord-memstore :
-- medrecord-parent   :
-- medrecord-spi      :
-- medrecord-spi-tck  :
-- medrecord-vendor   : Vendor libraries not found in an offical Maven repo
+- java/medrecord-jcg      : Java Client Generator
+- java/medrecord-memstore : MEDrecord memory based backend
+- java/medrecord-parent   :
+- java/medrecord-spi      : MEDrecord Service Progamming API
+- java/medrecord-spi-tck  : MEDrecord SPI Test Compatibility Kit
+- java/medrecord-vendor   : Vendor libraries not found in an offical Maven repo
 
 Getting started
 ===============

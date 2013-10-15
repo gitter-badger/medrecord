@@ -1,0 +1,10 @@
+// some standard settings for Java applications (language level etc)
+apply plugin: 'medvision-java'
+
+description = 'MEDvision360 MEDrecord Service Provider Interface'
+
+dependencies {
+    compile "com.google.guava:guava:${ext.version.guava}"
+    compile "openehr:openehr-rm-core:${ext.version.openEhr}"
+    compile "openehr:openehr-rm-domain:${ext.version.openEhr}"
+}

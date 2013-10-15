@@ -1,0 +1,10 @@
+// some standard settings for Java applications (language level etc)
+apply plugin: 'medvision-java'
+
+description = 'MEDvision360 MEDrecord Memstore Backend'
+
+dependencies {
+    compile project(':medrecord-spi')
+
+    testCompile project(':medrecord-spi-tck')
+}

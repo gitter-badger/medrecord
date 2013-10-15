@@ -1,3 +1,6 @@
 include(
-  'medrecord-jcg'
+        'medrecord-jcg',
+        'medrecord-memstore',
+        'medrecord-spi',
+        'medrecord-spi-tck'
 )

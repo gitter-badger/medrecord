@@ -1,0 +1,15 @@
+// some standard settings for Java applications (language level etc)
+apply plugin: 'medvision-java'
+
+// do not update the license on code which we do not own
+import nl.javadude.gradle.plugins.license.License
+tasks.withType(License).each { licenseTask ->
+    licenseTask.exclude 'org/openehr/rm/**'
+}
+
+description = 'MEDvision360 MEDrecord Service Provider Interface Test Compatibility Kit'
+
+dependencies {
+    compile project(':medrecord-spi')
+    compile "junit:junit:${ext.version.junit}"
+}
