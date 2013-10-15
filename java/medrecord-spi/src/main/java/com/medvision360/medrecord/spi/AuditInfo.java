@@ -1,7 +1,8 @@
 /**
  * This file is part of MEDrecord
  *
- * @copyright Copyright 2013 by MEDvision360. All rights reserved.
+ * @copyright Copyright (c) 2004 Acode HB, Sweden, Copyright (c) 2013 MEDvision360, The Netherlands.
+ *   Licensed under the MPL 1.1/GPL 2.0/LGPL 2.1.
  * @author Leo Simons <leo@medvision360.com>
  * @author Ralph van Etten <ralph@medvision360.com>
  */
