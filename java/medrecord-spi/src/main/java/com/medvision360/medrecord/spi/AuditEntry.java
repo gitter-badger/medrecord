@@ -31,6 +31,7 @@ import org.openehr.rm.support.terminology.TerminologyService;
  * @author Leo Simons
  */
 public class AuditEntry extends RMObject {
+    private static final long serialVersionUID = 0x130L; 
     
     private transient TerminologyService terminologyService;
 

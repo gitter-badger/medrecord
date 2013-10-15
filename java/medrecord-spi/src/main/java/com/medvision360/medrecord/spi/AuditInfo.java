@@ -28,6 +28,7 @@ import org.openehr.rm.support.terminology.TerminologyService;
  * @author Leo Simons
  */
 public class AuditInfo extends RMObject {
+    private static final long serialVersionUID = 0x130L;
     
     @FullConstructor
     public AuditInfo(@Attribute(name = "systemId", required = true) String systemId,

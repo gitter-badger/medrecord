@@ -22,6 +22,7 @@ package org.openehr.rm.support.measurement;
  */
 @SuppressWarnings("UnusedDeclaration")
 public class TestMeasurementService implements MeasurementService {
+    private static final long serialVersionUID = 0x130L;
 
     public boolean isValidUnitsString(String units) {
 	return true;

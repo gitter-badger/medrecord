@@ -11,6 +11,8 @@ import com.medvision360.medrecord.spi.ValidationReport;
 
 @SuppressWarnings("UnusedDeclaration")
 public class ValidationException extends RecordException {
+    private static final long serialVersionUID = 0x130L;
+    
     private ValidationReport report;
 
     public ValidationException() {
