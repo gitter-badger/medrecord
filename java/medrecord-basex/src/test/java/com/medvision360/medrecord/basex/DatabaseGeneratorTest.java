@@ -33,22 +33,25 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
     LocatableSerializer serializer = new MockLocatableSerializer();
     String name = "BaseXLocatableStoreTest";
     String path = "unittest";
-    int numLocatables = 10000;
+    int numLocatables = 2;
     
     protected LocatableStore getStore() throws Exception
     {
-        return new BaseXLocatableStore(
+        BaseXLocatableStore store = new BaseXLocatableStore(
                 ctx,
                 parser,
                 serializer,
                 name,
                 path
         );
+        return store;
     }
     
     @SuppressWarnings("UnusedDeclaration")
-    public void disabledTestInsertLotsOfObjects() throws Exception
+    public void testInsertLotsOfObjects() throws Exception
     {
+        // initial version of code had an inline optimize()
+        //
         // numLocatables = 1000...
         // Leo's macbook pro: about 36 inserts per second
         //   for $x in collection() return $x
@@ -67,9 +70,42 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
         //                       or //archetype_id/value='openehr-unittest-ADMIN_ENTRY.date.v2'
         //      ---> 50ms in basex GUI
 
-        // numLocatables = 10000...
+        // numLocatables = 10000...doesn't finish in reasonable time
         
+        // concurrent optimize(), optimize once per second
+        //
+        // numLocatables | inserts per second
+        //          100  |  135
+        //          200  |  170
+        //          500  |  200
+        //         1000  |  220
+        //         2000  |  220
+        //         5000  |  140
+        //        10000  |   75
         
+        // concurrent optimize(), optimize every 30 seconds
+        //
+        // numLocatables | inserts per second
+        //          100  |  135
+        //          200  |  175
+        //          500  |  220
+        //         1000  |  245
+        //         2000  |  230
+        //         5000  |  150
+        //        10000  |   85
+        
+        // no optimize() at all
+        //
+        // numLocatables | inserts per second
+        //          100  |  135
+        //          200  |  175
+        //          500  |  220
+        //         1000  |  250
+        //         2000  |  235
+        //         5000  |  150
+        //        10000  |   85
+        
+        // so for now we're optimizing once every 5 seconds, iff the index needs updating
         
         int i = 0;
         List<Locatable> data = new ArrayList<>();
