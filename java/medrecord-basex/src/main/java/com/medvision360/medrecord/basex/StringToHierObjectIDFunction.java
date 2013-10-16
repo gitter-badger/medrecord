@@ -1,7 +1,6 @@
 package com.medvision360.medrecord.basex;
 
 import com.google.common.base.Function;
-import com.sun.istack.internal.Nullable;
 import org.openehr.rm.support.identification.HierObjectID;
 
 class StringToHierObjectIDFunction implements Function<String, HierObjectID>
@@ -13,7 +12,7 @@ class StringToHierObjectIDFunction implements Function<String, HierObjectID>
     }
     
     @Override
-    public HierObjectID apply(@Nullable String input)
+    public HierObjectID apply(String input)
     {
         if (input == null)
         {

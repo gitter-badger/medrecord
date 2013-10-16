@@ -1,7 +1,6 @@
 package com.medvision360.medrecord.basex;
 
 import com.google.common.base.Function;
-import com.sun.istack.internal.Nullable;
 import org.openehr.rm.support.identification.ObjectVersionID;
 
 class StringToObjectVersionIDFunction implements Function<String, ObjectVersionID>
@@ -13,7 +12,7 @@ class StringToObjectVersionIDFunction implements Function<String, ObjectVersionI
     }
     
     @Override
-    public ObjectVersionID apply(@Nullable String input)
+    public ObjectVersionID apply(String input)
     {
         if (input == null)
         {
