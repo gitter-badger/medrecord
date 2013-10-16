@@ -1,9 +1,11 @@
 include(
         'medrecord-basex',
+        'medrecord-client-archetyped',
         'medrecord-jcg',
-        'medrecord-jcg-client',
-        'medrecord-jcg-tck',
         'medrecord-memstore',
         'medrecord-spi',
         'medrecord-spi-tck'
 )
+
+project(':medrecord-client-archetyped').projectDir = new File(rootDir, 'medrecord-client/medrecord-client-archetyped')
+
