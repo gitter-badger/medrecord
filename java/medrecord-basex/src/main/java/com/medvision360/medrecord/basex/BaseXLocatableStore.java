@@ -5,8 +5,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.Iterables;
 import com.medvision360.medrecord.basex.cmd.Exists;
@@ -42,6 +43,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BaseXLocatableStore extends AbstractLocatableStore
 {
+    // BASIC STRUCTURE
+    // ---------------
     // one store = one database
     // name is used as database name
     // note basex does not have hierarchical collections
@@ -56,15 +59,39 @@ public class BaseXLocatableStore extends AbstractLocatableStore
     //      <medrecord_locatable_versions>
     //         <medrecord_locatable_version .../>
     //      </medrecord_locatable_versions>
-    //   /{m_path}/ocatables/hpath({HierObjectID})
+    //   /{m_path}/locatables/hPath({HierObjectID})
     //      <{rmTypeName} archetype_id="...." .../>
     //   /{m_path}/locatable_versions/{ObjectVersionID}
     //      <{rmTypeName} archetype_id="...." .../>
     // faithfully uses Command objects to lock around BaseX, so _should_ be thread-safe
+    //
+    // XQueries that want to operate on a sub-collection need to specify the dbName in the path, i.e.
+    //    collection("{dbName}/{m_path}/locatables/hPath({HierObjectID}")
+    //
+    // TODO For this reason we should reconsider this setup, to have a distinct database for versions, i.e.
+    //
+    //   /{dbName}_locatables/{m_path}/hPath({HierObjectID})
+    //   /{dbName}_locatable_versions/{m_path}/version
+    //   /{dbName}_locatable_versions/{m_path}/{ObjectVersionID}
 
+    // TRANSACTIONS
+    // ------------
     // BaseX only exposes transactions via XQuery Update:
     //   https://mailman.uni-konstanz.de/pipermail/basex-talk/2010-August/000567.html
+    // so unfortunately we don't support them here. Clients could try to use XQuery Update to get somewhat atomic
+    // operations, but that won't help with keeping version info in sync.
     
+    // INDEX OPTIMIZATION
+    // ------------------
+    // see http://docs.basex.org/wiki/Indexes#Index_Construction
+    //   for details about the BaseX index construction/optimization step.
+    // Basics:
+    //   * we force UPDINDEX to true on the BaseX context so it tries to keep indexes updated
+    //   * we run a scheduler that periodically invokes optimize (with intervals of 5 seconds)
+    //   * we keep our own 'dirty' flag to check whether to invoke the optimizer, since the BaseX Optimize command will
+    //     always do _some_ work even if nothing has changed, which is not what we want
+    //   * we register a shutdown hook to get rid of the schedule on shutdown
+    //   * we always run optimize immediately when opening a database (i.e. on app startup)
     
     private final static String NAME_REGEX = "^[a-zA-Z][a-zA-Z0-9\\._-]+$";
     private final static String PATH_REGEX = "^[a-zA-Z0-9\\._-]+(?:/[a-zA-Z0-9\\._-]+)*$";
@@ -96,6 +123,8 @@ public class BaseXLocatableStore extends AbstractLocatableStore
     private LocatableSerializer m_serializer;
     private String m_path;
     private boolean m_initialized = false;
+    private boolean m_dirty = false;
+    ScheduledThreadPoolExecutor optimizeExecutor = null;
 
     public BaseXLocatableStore(Context ctx, LocatableParser parser, LocatableSerializer serializer,
             String name, String path)
@@ -103,10 +132,13 @@ public class BaseXLocatableStore extends AbstractLocatableStore
         super(name);
         m_systemId = new HierObjectID(name);
         m_ctx = checkNotNull(ctx, "ctx cannot be null");
+        // todo results in ArrayIndexOutOfBoundsException m_ctx.prop.set("UPDINDEX", "true");
         m_parser = checkNotNull(parser, "parser cannot be null");
         m_serializer = checkNotNull(serializer, "serializer cannot be null");
         checkArgument(name.matches(NAME_REGEX), "name has to match regex %s", NAME_REGEX);
         setPath(name, path);
+
+        startConcurrentOptimizer();
     }
 
     private void setPath(String name, String path)
@@ -257,12 +289,6 @@ public class BaseXLocatableStore extends AbstractLocatableStore
         ListDocs cmd = new ListDocs(fullPath("locatable_versions"));
         cmd.execute(m_ctx);
         Iterable<String> resultStrings = cmd.list();
-        Iterator<String> it = resultStrings.iterator();
-        while (it.hasNext())
-        {
-            String next = it.next();
-            System.out.println("locatable_version = " + next);
-        }
         Iterable<ObjectVersionID> result = Iterables.transform(resultStrings,
                 StringToObjectVersionIDFunction.getInstance());
         return result;
@@ -278,7 +304,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore
         
         if(!dbExists()) {
             createDb();
-            optimize();
+            optimizeNow();
         }
     }
 
@@ -351,9 +377,65 @@ public class BaseXLocatableStore extends AbstractLocatableStore
         new DropDB(m_name).execute(m_ctx);
     }
     
-    private void optimize() throws BaseXException
+    private void optimize()
+    {
+        m_dirty = true;
+    }
+
+    private void optimizeNow() throws BaseXException
     {
         new Optimize().execute(m_ctx);
+    }
+    
+    private void startConcurrentOptimizer()
+    {
+        optimizeExecutor = new ScheduledThreadPoolExecutor(1);
+        optimizeExecutor.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run()
+            {
+                if (!m_initialized)
+                {
+                    return;
+                }
+                
+                if (m_dirty)
+                {
+                    try
+                    {
+                        optimizeNow();
+                    }
+                    catch (BaseXException e)
+                    {
+                        // too bad
+                    }
+                    m_dirty = false;
+                }
+            }
+        }, 10, 5, TimeUnit.SECONDS);
+        
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run()
+            {
+                if (optimizeExecutor != null)
+                {
+                    optimizeExecutor.shutdown();
+                    try
+                    {
+                        boolean terminated = optimizeExecutor.awaitTermination(5, TimeUnit.SECONDS);
+                        if (!terminated)
+                        {
+                            optimizeExecutor.shutdownNow();
+                        }
+                    }
+                    catch (InterruptedException e)
+                    {
+                        // yessir
+                    }
+                }
+            }
+        });
     }
     
     private String path(UIDBasedID id)
@@ -441,6 +523,8 @@ public class BaseXLocatableStore extends AbstractLocatableStore
 
     private boolean has(String path) throws BaseXException
     {
+        // note this does not invoke ensureNotDirty(), so with concurrent optimize,
+        // insert()/update()/delete() may be a little, err, dirty
         Exists cmd = new Exists(path);
         cmd.execute(m_ctx);
         return cmd.exists();
@@ -485,9 +569,10 @@ public class BaseXLocatableStore extends AbstractLocatableStore
         cmd = new Replace(ovidPath);
         cmd.setInput(is);
 
+        os = new ByteArrayOutputStream();
         try
         {
-            cmd.execute(m_ctx);
+            cmd.execute(m_ctx, os);
         }
         finally
         {
@@ -499,9 +584,10 @@ public class BaseXLocatableStore extends AbstractLocatableStore
         cmd = new Replace(path);
         cmd.setInput(is);
 
+        os = new ByteArrayOutputStream();
         try
         {
-            cmd.execute(m_ctx);
+            cmd.execute(m_ctx, os);
         }
         finally
         {
