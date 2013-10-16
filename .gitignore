@@ -4,9 +4,14 @@
 *.ear
 target
 
-# IDEA
+# generated sources
+java/medrecord-client/medrecord-client-archetyped/src-generated
+
+# gradle
 .gradle
 build/
+
+# IDEA
 java/out
 *.iml
 *.iws
