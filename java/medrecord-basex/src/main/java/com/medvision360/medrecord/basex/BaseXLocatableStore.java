@@ -132,8 +132,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore
         super(name);
         m_systemId = new HierObjectID(name);
         m_ctx = checkNotNull(ctx, "ctx cannot be null");
-        m_ctx.mprop.set("UPDINDEX", "true");
-        m_ctx.mprop.set("MAXLEN", "200");
+        // todo results in ArrayIndexOutOfBoundsException m_ctx.prop.set("UPDINDEX", "true");
         m_parser = checkNotNull(parser, "parser cannot be null");
         m_serializer = checkNotNull(serializer, "serializer cannot be null");
         checkArgument(name.matches(NAME_REGEX), "name has to match regex %s", NAME_REGEX);
@@ -570,9 +569,10 @@ public class BaseXLocatableStore extends AbstractLocatableStore
         cmd = new Replace(ovidPath);
         cmd.setInput(is);
 
+        os = new ByteArrayOutputStream();
         try
         {
-            cmd.execute(m_ctx);
+            cmd.execute(m_ctx, os);
         }
         finally
         {
@@ -584,9 +584,10 @@ public class BaseXLocatableStore extends AbstractLocatableStore
         cmd = new Replace(path);
         cmd.setInput(is);
 
+        os = new ByteArrayOutputStream();
         try
         {
-            cmd.execute(m_ctx);
+            cmd.execute(m_ctx, os);
         }
         finally
         {
