@@ -9,7 +9,7 @@ package com.medvision360.medrecord.spi.tck;
 
 import com.medvision360.medrecord.spi.XQueryStore;
 
-public abstract class XQueryStoreTestBase extends LocatableStoreTestBase {
+public abstract class XQueryStoreTestBase extends LocatableStoreTCKTestBase {
     protected XQueryStore xQueryStore;
 
     @Override

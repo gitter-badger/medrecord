@@ -1,17 +1,12 @@
 package com.medvision360.medrecord.basex;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import com.medvision360.medrecord.spi.LocatableParser;
 import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.spi.LocatableStore;
-import com.medvision360.medrecord.spi.tck.LocatableStoreTestBase;
+import com.medvision360.medrecord.spi.tck.LocatableStoreTCKTestBase;
 import org.basex.core.Context;
-import org.openehr.rm.common.archetyped.Archetyped;
-import org.openehr.rm.common.archetyped.Locatable;
 
-public class BaseXLocatableStoreTest extends LocatableStoreTestBase
+public class BaseXLocatableStoreTest extends LocatableStoreTCKTestBase
 {
     Context ctx;
 
@@ -29,82 +24,8 @@ public class BaseXLocatableStoreTest extends LocatableStoreTestBase
         ctx.close();
     }
 
-    LocatableParser parser = new LocatableParser() {
-        @Override
-        public Locatable parse(InputStream is)
-        {
-            throw new UnsupportedOperationException("todo implement .parse()");
-        }
-
-        @Override
-        public Locatable parse(InputStream is, String encoding)
-        {
-            throw new UnsupportedOperationException("todo implement .parse()");
-        }
-
-        @Override
-        public String getMimeType()
-        {
-            throw new UnsupportedOperationException("todo implement .getMimeType()");
-        }
-
-        @Override
-        public String getFormat()
-        {
-            throw new UnsupportedOperationException("todo implement .getFormat()");
-        }
-
-        @Override
-        public boolean supports(Locatable locatable)
-        {
-            throw new UnsupportedOperationException("todo implement .supports()");
-        }
-
-        @Override
-        public boolean supports(Archetyped archetyped)
-        {
-            throw new UnsupportedOperationException("todo implement .supports()");
-        }
-    };
-    
-    LocatableSerializer serializer = new LocatableSerializer() {
-        @Override
-        public void serialize(Locatable locatable, OutputStream os)
-        {
-            throw new UnsupportedOperationException("todo implement .serialize()");
-        }
-
-        @Override
-        public void serialize(Locatable locatable, OutputStream os, String encoding)
-        {
-            throw new UnsupportedOperationException("todo implement .serialize()");
-        }
-
-        @Override
-        public String getMimeType()
-        {
-            throw new UnsupportedOperationException("todo implement .getMimeType()");
-        }
-
-        @Override
-        public String getFormat()
-        {
-            throw new UnsupportedOperationException("todo implement .getFormat()");
-        }
-
-        @Override
-        public boolean supports(Locatable locatable)
-        {
-            throw new UnsupportedOperationException("todo implement .supports()");
-        }
-
-        @Override
-        public boolean supports(Archetyped archetyped)
-        {
-            throw new UnsupportedOperationException("todo implement .supports()");
-        }
-    };
-    
+    LocatableParser parser = new MockLocatableParser();
+    LocatableSerializer serializer = new MockLocatableSerializer();
     String name = "BaseXLocatableStoreTest";
     String path = "unittest";
     
@@ -119,4 +40,5 @@ public class BaseXLocatableStoreTest extends LocatableStoreTestBase
                 path
         );
     }
+
 }

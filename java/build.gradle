@@ -61,7 +61,9 @@ subprojects {
                 'logback'            : '1.0.13',
                 'openEhr'            : '1.0.5-SNAPSHOT',
                 'slf4j'              : '1.7.5',
-                'basex'              : '7.7.2'
+                'basex'              : '7.7.2',
+                'jdom'               : '2.0.2',
+                'jaxen'              : '1.1.4'
         ]
     }
 

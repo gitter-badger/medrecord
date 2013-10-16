@@ -8,18 +8,15 @@
 package com.medvision360.medrecord.memstore;
 
 import com.google.common.collect.ImmutableSet;
-import com.medvision360.medrecord.spi.LocatableStore;
+import com.medvision360.medrecord.spi.base.AbstractLocatableStore;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
 import com.medvision360.medrecord.spi.exceptions.StatusException;
-import com.medvision360.medrecord.spi.exceptions.TransactionException;
-import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.ObjectVersionID;
 import org.openehr.rm.support.identification.UID;
-import org.openehr.rm.support.identification.UIDBasedID;
 import org.openehr.rm.support.identification.VersionTreeID;
 
 import java.io.IOException;
@@ -32,15 +29,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class MemLocatableStore implements LocatableStore {
-    private String name;
+public class MemLocatableStore extends AbstractLocatableStore
+{
     private HierObjectID systemId;
     private Map<HierObjectID, Locatable> storage = new ConcurrentHashMap<>();
     private Map<ObjectVersionID, Locatable> versions = new ConcurrentHashMap<>();
     private long v = 1; // VersionTreeID: version cannot start with 0
 
     public MemLocatableStore(String name) {
-        this.name = checkNotNull(name, "name cannot be null");
+        super(name);
         this.systemId = new HierObjectID(name);
     }
 
@@ -128,12 +125,7 @@ public class MemLocatableStore implements LocatableStore {
         Set<Map.Entry<ObjectVersionID, Locatable>> entrySet = versions.entrySet();
         for (Map.Entry<ObjectVersionID, Locatable> entry : entrySet) {
             Locatable locatable = entry.getValue();
-            HierObjectID hierObjectID;
-            try {
-                hierObjectID = getHierObjectID(locatable);
-            } catch (NotSupportedException e) {
-                throw new IOException(e);
-            }
+            HierObjectID hierObjectID = getHierObjectID(locatable);
             if (hierObjectID.equals(id)) {
                 ObjectVersionID objectVersionID = entry.getKey();
                 toDelete.add(objectVersionID);
@@ -201,18 +193,6 @@ public class MemLocatableStore implements LocatableStore {
     }
 
     @Override
-    public boolean supports(Locatable locatable) {
-        checkNotNull(locatable, "locatable cannot be null");
-        return true;
-    }
-
-    @Override
-    public boolean supports(Archetyped archetyped) {
-        checkNotNull(archetyped, "archetyped cannot be null");
-        return true;
-    }
-
-    @Override
     public void verifyStatus()
             throws StatusException {
     }
@@ -223,88 +203,45 @@ public class MemLocatableStore implements LocatableStore {
         return String.format(String.format("%s locatables stored", storage.size()));
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public boolean supportsTransactions() {
-        return false;
-    }
-
-    @Override
-    public void begin()
-            throws TransactionException {
-    }
-
-    @Override
-    public void commit()
-            throws TransactionException {
-    }
-
-    @Override
-    public void rollback()
-            throws TransactionException {
-    }
-
     ///
     /// Helpers
     ///
 
-    private NotFoundException notFound(Object obj) {
-        return new NotFoundException(String.format("Locatable %s not found", obj));
-    }
-
-    private DuplicateException duplicate(HierObjectID hierObjectID) {
-        return new DuplicateException(String.format("Locatable %s already exists", hierObjectID));
-    }
-
-    private void ensureNotFound(HierObjectID hierObjectID)
+    protected void ensureNotFound(HierObjectID hierObjectID)
             throws DuplicateException {
         if (storage.containsKey(hierObjectID)) {
             throw duplicate(hierObjectID);
         }
     }
 
-    private void ensureFound(HierObjectID hierObjectID)
+    protected void ensureFound(HierObjectID hierObjectID)
             throws NotFoundException {
         if (!storage.containsKey(hierObjectID)) {
             throw notFound(hierObjectID);
         }
     }
 
-    private void ensureFound(ObjectVersionID id)
+    protected void ensureFound(ObjectVersionID id)
             throws NotFoundException {
         if (!versions.containsKey(id)) {
             throw notFound(id);
         }
     }
 
-    private VersionTreeID nextVersion() {
+    protected VersionTreeID nextVersion() {
         return new VersionTreeID("" + v++);
     }
 
-    private ObjectVersionID newObjectVersionID(UID uid) {
+    protected ObjectVersionID newObjectVersionID(UID uid) {
         return new ObjectVersionID(uid, systemId, nextVersion());
     }
 
     private void storeVersion(Locatable locatable)
-            throws NotSupportedException {
+    {
         HierObjectID hierObjectID = getHierObjectID(locatable);
         UID uid = hierObjectID.root();
         ObjectVersionID objectVersionID = newObjectVersionID(uid);
         versions.put(objectVersionID, locatable);
-    }
-
-    private HierObjectID getHierObjectID(Locatable locatable)
-            throws NotSupportedException {
-        UIDBasedID uidBasedID = locatable.getUid();
-        if (!(uidBasedID instanceof HierObjectID)) {
-            throw new NotSupportedException(String.format("Locatable uid should be a HierObjectID, not %s",
-                    uidBasedID.getClass().getSimpleName()));
-        }
-        return (HierObjectID) uidBasedID;
     }
 
 }
