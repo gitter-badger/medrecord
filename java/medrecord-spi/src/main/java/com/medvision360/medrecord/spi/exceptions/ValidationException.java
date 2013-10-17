@@ -14,7 +14,7 @@ public class ValidationException extends RecordException
 {
     private static final long serialVersionUID = 0x130L;
 
-    private ValidationReport report;
+    private ValidationReport m_report;
 
     public ValidationException()
     {
@@ -43,36 +43,36 @@ public class ValidationException extends RecordException
 
     public ValidationException(ValidationReport report)
     {
-        this.report = report;
+        this.m_report = report;
     }
 
     public ValidationException(String message, ValidationReport report)
     {
         super(message);
-        this.report = report;
+        m_report = report;
     }
 
     public ValidationException(String message, Throwable cause, ValidationReport report)
     {
         super(message, cause);
-        this.report = report;
+        m_report = report;
     }
 
     public ValidationException(Throwable cause, ValidationReport report)
     {
         super(cause);
-        this.report = report;
+        m_report = report;
     }
 
     public ValidationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace,
             ValidationReport report)
     {
         super(message, cause, enableSuppression, writableStackTrace);
-        this.report = report;
+        m_report = report;
     }
 
     public ValidationReport getReport()
     {
-        return report;
+        return m_report;
     }
 }

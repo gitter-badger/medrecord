@@ -17,7 +17,7 @@ import org.basex.util.list.IntList;
  */
 public class ListDocs extends Command
 {
-    private Iterable<String> result;
+    private Iterable<String> m_result;
 
     public ListDocs(String path)
     {
@@ -34,7 +34,7 @@ public class ListDocs extends Command
         }
 
         IntList il = context.data().resources.docs(path, false);
-        result = preListToStringIterable(il);
+        m_result = preListToStringIterable(il);
 
         return true;
     }
@@ -54,6 +54,6 @@ public class ListDocs extends Command
 
     public Iterable<String> list()
     {
-        return result;
+        return m_result;
     }
 }

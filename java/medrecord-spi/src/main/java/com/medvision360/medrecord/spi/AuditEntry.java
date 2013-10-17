@@ -35,7 +35,7 @@ public class AuditEntry extends RMObject
 {
     private static final long serialVersionUID = 0x130L;
 
-    private transient TerminologyService terminologyService;
+    private transient TerminologyService m_terminologyService;
 
     @FullConstructor
     public AuditEntry(@Attribute(name = "systemId", required = true) String systemId,
@@ -75,7 +75,7 @@ public class AuditEntry extends RMObject
         this.auditTime = auditTime;
         this.auditType = auditType;
         this.description = description;
-        this.terminologyService = terminologyService;
+        m_terminologyService = terminologyService;
     }
 
     public String getSystemId()
@@ -166,7 +166,7 @@ public class AuditEntry extends RMObject
 
     public AuditDetails toDetails()
     {
-        return new AuditDetails(systemId, committer, auditTime, getChangeType(), description, terminologyService);
+        return new AuditDetails(systemId, committer, auditTime, getChangeType(), description, m_terminologyService);
     }
 
     private DvCodedText getChangeType()
@@ -181,7 +181,7 @@ public class AuditEntry extends RMObject
                 auditType.getLanguage(),
                 auditType.getEncoding(),
                 definingCode,
-                terminologyService
+                m_terminologyService
         );
 
         return result;

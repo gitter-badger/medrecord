@@ -127,7 +127,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     private String m_path;
     private boolean m_initialized = false;
     private boolean m_dirty = false;
-    ScheduledThreadPoolExecutor optimizeExecutor = null;
+    ScheduledThreadPoolExecutor m_optimizeExecutor = null;
 
     public BaseXLocatableStore(Context ctx, LocatableParser parser, LocatableSerializer serializer,
             LocatableSelector locatableSelector, String name, String path)
@@ -428,8 +428,8 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
 
     private void startConcurrentOptimizer()
     {
-        optimizeExecutor = new ScheduledThreadPoolExecutor(1);
-        optimizeExecutor.scheduleWithFixedDelay(new Runnable()
+        m_optimizeExecutor = new ScheduledThreadPoolExecutor(1);
+        m_optimizeExecutor.scheduleWithFixedDelay(new Runnable()
         {
             @Override
             public void run()
@@ -459,15 +459,15 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
             @Override
             public void run()
             {
-                if (optimizeExecutor != null)
+                if (m_optimizeExecutor != null)
                 {
-                    optimizeExecutor.shutdown();
+                    m_optimizeExecutor.shutdown();
                     try
                     {
-                        boolean terminated = optimizeExecutor.awaitTermination(5, TimeUnit.SECONDS);
+                        boolean terminated = m_optimizeExecutor.awaitTermination(5, TimeUnit.SECONDS);
                         if (!terminated)
                         {
-                            optimizeExecutor.shutdownNow();
+                            m_optimizeExecutor.shutdownNow();
                         }
                     }
                     catch (InterruptedException e)

@@ -5,11 +5,11 @@ import org.openehr.rm.support.identification.ObjectVersionID;
 
 class StringToObjectVersionIDFunction implements Function<String, ObjectVersionID>
 {
-    private static final StringToObjectVersionIDFunction instance = new StringToObjectVersionIDFunction();
+    private static final StringToObjectVersionIDFunction INSTANCE = new StringToObjectVersionIDFunction();
 
     public static StringToObjectVersionIDFunction getInstance()
     {
-        return instance;
+        return INSTANCE;
     }
 
     @Override
