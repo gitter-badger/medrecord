@@ -13,7 +13,8 @@ import org.openehr.rm.support.identification.UIDBasedID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbstractLocatableStore implements LocatableStore {
+public abstract class AbstractLocatableStore implements LocatableStore
+{
     protected String m_name;
     protected LocatableSelector m_locatableSelector;
 
@@ -23,62 +24,75 @@ public abstract class AbstractLocatableStore implements LocatableStore {
         m_locatableSelector = checkNotNull(locatableSelector, "locatableSelector cannot be null");
     }
 
-    protected AbstractLocatableStore(String name) {
+    protected AbstractLocatableStore(String name)
+    {
         this(name, LocatableSelectorBuilder.any());
     }
 
     @Override
-    public boolean supports(Locatable test) {
+    public boolean supports(Locatable test)
+    {
         checkNotNull(test, "locatable cannot be null");
         return m_locatableSelector.supports(test);
     }
 
     @Override
-    public boolean supports(Archetyped test) {
+    public boolean supports(Archetyped test)
+    {
         checkNotNull(test, "archetyped cannot be null");
         return m_locatableSelector.supports(test);
     }
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return m_name;
     }
 
     @Override
-    public boolean supportsTransactions() {
+    public boolean supportsTransactions()
+    {
         return false;
     }
 
     @Override
     public void begin()
-            throws TransactionException {
+            throws TransactionException
+    {
     }
 
     @Override
     public void commit()
-            throws TransactionException {
+            throws TransactionException
+    {
     }
 
     @Override
     public void rollback()
-            throws TransactionException {
+            throws TransactionException
+    {
     }
 
-    protected NotFoundException notFound(Object obj) {
+    protected NotFoundException notFound(Object obj)
+    {
         return new NotFoundException(String.format("Locatable %s not found", obj));
     }
 
-    protected NotFoundException notFound(Object obj, Throwable cause) {
+    protected NotFoundException notFound(Object obj, Throwable cause)
+    {
         return new NotFoundException(String.format("Locatable %s not found", obj), cause);
     }
 
-    protected DuplicateException duplicate(Object obj) {
+    protected DuplicateException duplicate(Object obj)
+    {
         return new DuplicateException(String.format("Locatable %s already exists", obj));
     }
 
-    protected HierObjectID getHierObjectID(Locatable locatable) {
+    protected HierObjectID getHierObjectID(Locatable locatable)
+    {
         UIDBasedID uidBasedID = locatable.getUid();
-        if (!(uidBasedID instanceof HierObjectID)) {
+        if (!(uidBasedID instanceof HierObjectID))
+        {
             return new HierObjectID(uidBasedID.getValue());
         }
         return (HierObjectID) uidBasedID;

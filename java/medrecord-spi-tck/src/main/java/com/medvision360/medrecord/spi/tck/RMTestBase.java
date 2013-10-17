@@ -25,38 +25,43 @@ public class RMTestBase extends CompositionTestBase
     {
         super(null);
     }
-    
-    protected void assertEqualish(Locatable orig, Locatable other) {
+
+    protected void assertEqualish(Locatable orig, Locatable other)
+    {
         assertEquals(orig.getUid(), other.getUid());
         assertEquals(orig.getArchetypeNodeId(), other.getArchetypeNodeId());
         assertEquals(orig.getName(), other.getName());
         assertEquals(orig.getArchetypeDetails(), other.getArchetypeDetails());
     }
 
-    protected HierObjectID makeUID() {
+    protected HierObjectID makeUID()
+    {
         return new HierObjectID(makeUUID());
     }
-    
-    protected String makeUUID() {
+
+    protected String makeUUID()
+    {
         return UUID.randomUUID().toString();
     }
-    
-    protected ObjectVersionID makeOVID(HierObjectID hierObjectID) {
+
+    protected ObjectVersionID makeOVID(HierObjectID hierObjectID)
+    {
         return new ObjectVersionID(hierObjectID.root(), new HierObjectID("medrecord.spi.tck"), new VersionTreeID("1"));
     }
 
-    protected Locatable makeLocatable(UIDBasedID uid, Pathable parent) throws Exception {
+    protected Locatable makeLocatable(UIDBasedID uid, Pathable parent) throws Exception
+    {
         Archetyped archetypeDetails = new Archetyped(
                 new ArchetypeID("unittest-EHR-ADMIN_ENTRY.date.v2"),
-                "1.4");        
+                "1.4");
         List<Element> items = new ArrayList<>();
         items.add(new Element(("at0001"), "header", new DvText("date")));
-        items.add(new Element(("at0002"), "value",	new DvDate("2008-05-17")));
-        ItemList itemList = new ItemList("at0003", "item list", items);        
+        items.add(new Element(("at0002"), "value", new DvDate("2008-05-17")));
+        ItemList itemList = new ItemList("at0003", "item list", items);
         AdminEntry adminEntry = new AdminEntry(uid, "at0004", new DvText("admin entry"),
-        		archetypeDetails, null, null, parent, lang, encoding, 
-        		subject(), provider(), null, null, itemList, ts);
+                archetypeDetails, null, null, parent, lang, encoding,
+                subject(), provider(), null, null, itemList, ts);
         return adminEntry;
     }
-    
+
 }

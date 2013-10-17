@@ -7,58 +7,70 @@
  */
 package com.medvision360.medrecord.spi;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
 import com.medvision360.medrecord.spi.exceptions.ValidationException;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class CompositeValidator implements LocatableValidator, CompositeService<LocatableValidator> {
+public class CompositeValidator implements LocatableValidator, CompositeService<LocatableValidator>
+{
     private List<LocatableValidator> delegates = new LinkedList<>();
-    
-    public void addDelegate(LocatableValidator delegate) {
+
+    public void addDelegate(LocatableValidator delegate)
+    {
         delegates.add(checkNotNull(delegate, "delegate cannot be null"));
     }
 
     @Override
     public ValidationReport validate(Locatable locatable)
-            throws NotSupportedException {
+            throws NotSupportedException
+    {
         checkNotNull(locatable, "locatable cannot be null");
         ValidationReport result = null;
-        for (LocatableValidator delegate : delegates) {
-            if (delegate.supports(locatable)) {
+        for (LocatableValidator delegate : delegates)
+        {
+            if (delegate.supports(locatable))
+            {
                 result = mergeReports(result, delegate.validate(locatable));
             }
         }
-        if (result == null) {
+        if (result == null)
+        {
             throw new NotSupportedException("None of the delegates support this locatable");
         }
         return result;
     }
 
-    private ValidationReport mergeReports(ValidationReport result, ValidationReport validate) {
+    private ValidationReport mergeReports(ValidationReport result, ValidationReport validate)
+    {
         throw new UnsupportedOperationException("todo: implement CompositeValidator.mergeReports()"); // todo
     }
 
     @Override
     public void check(Locatable locatable)
-            throws ValidationException, NotSupportedException {
+            throws ValidationException, NotSupportedException
+    {
         checkNotNull(locatable, "locatable cannot be null");
         ValidationReport report = validate(locatable);
-        if (!report.isValid()) {
+        if (!report.isValid())
+        {
             throw new ValidationException(report);
         }
     }
 
     @Override
-    public boolean supports(Locatable test) {
+    public boolean supports(Locatable test)
+    {
         checkNotNull(test, "locatable cannot be null");
-        for (LocatableValidator delegate : delegates) {
-            if (delegate.supports(test)) {
+        for (LocatableValidator delegate : delegates)
+        {
+            if (delegate.supports(test))
+            {
                 return true;
             }
         }
@@ -66,10 +78,13 @@ public class CompositeValidator implements LocatableValidator, CompositeService<
     }
 
     @Override
-    public boolean supports(Archetyped test) {
+    public boolean supports(Archetyped test)
+    {
         checkNotNull(test, "archetyped cannot be null");
-        for (LocatableValidator delegate : delegates) {
-            if (delegate.supports(test)) {
+        for (LocatableValidator delegate : delegates)
+        {
+            if (delegate.supports(test))
+            {
                 return true;
             }
         }

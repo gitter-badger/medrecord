@@ -15,7 +15,7 @@ import org.openehr.rm.support.identification.HierObjectID;
 public class DatabaseGeneratorTest extends LocatableStoreTestBase
 {
     Context ctx;
-    
+
     @Override
     public void setUp() throws Exception
     {
@@ -35,7 +35,7 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
     String name = "DatabaseGeneratorTest";
     String path = "unittest";
     int numLocatables = 2;
-    
+
     protected LocatableStore getStore() throws Exception
     {
         BaseXLocatableStore store = new BaseXLocatableStore(
@@ -48,7 +48,7 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
         );
         return store;
     }
-    
+
     @SuppressWarnings("UnusedDeclaration")
     public void testInsertLotsOfObjects() throws Exception
     {
@@ -73,7 +73,7 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
         //      ---> 50ms in basex GUI
 
         // numLocatables = 10000...doesn't finish in reasonable time
-        
+
         // concurrent optimize(), optimize once per second
         //
         // numLocatables | inserts per second
@@ -84,7 +84,7 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
         //         2000  |  220
         //         5000  |  140
         //        10000  |   75
-        
+
         // concurrent optimize(), optimize every 30 seconds
         //
         // numLocatables | inserts per second
@@ -95,7 +95,7 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
         //         2000  |  230
         //         5000  |  150
         //        10000  |   85
-        
+
         // no optimize() at all
         //
         // numLocatables | inserts per second
@@ -106,7 +106,7 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
         //         2000  |  235
         //         5000  |  150
         //        10000  |   85
-        
+
         // concurrent optimize(), optimize every 5 seconds
         //
         //            documents  |               seconds  |            per second
@@ -157,10 +157,10 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
         //   java.lang.ArrayIndexOutOfBoundsException: 6
         //       at org.basex.util.Compress.pull(Compress.java:156)
         // todo a concurrency issue with UPDINDEX? Maybe we're holding on to an IntList where we shouldn't??
-        
+
         int i = 0;
         List<Locatable> data = new ArrayList<>();
-        while(i < numLocatables)
+        while (i < numLocatables)
         {
             i++;
             HierObjectID uid = new HierObjectID(makeUUID());
@@ -171,12 +171,12 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
         System.out.println("// Insert test");
         System.out.println("// -----------");
         System.out.println(String.format("// %20s  |  %20s  |  %20s", "documents", "seconds", "per second"));
-        
+
         long start = System.nanoTime();
         i = 0;
         try
         {
-            while(i < numLocatables)
+            while (i < numLocatables)
             {
                 Locatable locatable = data.get(i);
                 i++;
@@ -189,7 +189,7 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
                 {
 //                    System.out.println();
                     long end = System.nanoTime();
-                    double duration = (end - start)/1000.0/1000.0/1000.0;
+                    double duration = (end - start) / 1000.0 / 1000.0 / 1000.0;
                     double per_second = i / duration;
                     System.out.println(String.format("// %20d  |  %20.2f  |  %20.2f", i, duration, per_second));
                     if (per_second < 20)
@@ -204,9 +204,9 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
         finally
         {
             long end = System.nanoTime();
-            double duration = (end - start)/1000.0/1000.0/1000.0;
+            double duration = (end - start) / 1000.0 / 1000.0 / 1000.0;
             double per_second = i / duration;
-            System.out.println(String.format("// inserted %d locatables in %.2f seconds (%.2f per second)", i, 
+            System.out.println(String.format("// inserted %d locatables in %.2f seconds (%.2f per second)", i,
                     duration, per_second));
         }
     }

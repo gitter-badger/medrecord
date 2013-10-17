@@ -7,40 +7,47 @@
  */
 package com.medvision360.medrecord.spi.base;
 
+import java.io.OutputStream;
+
 import com.medvision360.medrecord.spi.LocatableSerializer;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 
-import java.io.OutputStream;
-
-public class NoopSerializer implements LocatableSerializer {
+public class NoopSerializer implements LocatableSerializer
+{
     @Override
-    public void serialize(Locatable locatable, OutputStream os) {
+    public void serialize(Locatable locatable, OutputStream os)
+    {
         throw new UnsupportedOperationException("todo implement NoopSerializer.serialize()");
     }
 
     @Override
-    public void serialize(Locatable locatable, OutputStream os, String encoding) {
+    public void serialize(Locatable locatable, OutputStream os, String encoding)
+    {
         throw new UnsupportedOperationException("todo implement NoopSerializer.serialize()");
     }
 
     @Override
-    public String getMimeType() {
+    public String getMimeType()
+    {
         throw new UnsupportedOperationException("todo implement NoopSerializer.getMimeType()");
     }
 
     @Override
-    public String getFormat() {
+    public String getFormat()
+    {
         throw new UnsupportedOperationException("todo implement NoopSerializer.getFormat()");
     }
 
     @Override
-    public boolean supports(Locatable test) {
+    public boolean supports(Locatable test)
+    {
         throw new UnsupportedOperationException("todo implement NoopSerializer.supports()");
     }
 
     @Override
-    public boolean supports(Archetyped test) {
+    public boolean supports(Archetyped test)
+    {
         throw new UnsupportedOperationException("todo implement NoopSerializer.supports()");
     }
 }

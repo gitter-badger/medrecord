@@ -16,19 +16,20 @@ package org.openehr.rm.support.identification;
 
 /**
  * TestTerminologyID
- * 
+ *
  * @author Rong Chen
  * @version 1.0
  */
-public class TestTerminologyID {
+public class TestTerminologyID
+{
 
     /* fields */
     public static final TerminologyID LANGUAGE;
     public static final TerminologyID CHARSET;
     public static final TerminologyID SNOMEDCT;
 
-
-    static {
+    static
+    {
         LANGUAGE = new TerminologyID("language-test");
 
         CHARSET = new TerminologyID("charset-test");

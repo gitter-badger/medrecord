@@ -3,6 +3,7 @@ apply plugin: 'medvision-java'
 
 // do not update the license on code which we do not own
 import nl.javadude.gradle.plugins.license.License
+
 tasks.withType(License).each { licenseTask ->
     licenseTask.exclude 'com/medvision360/medrecord/spi/AuditEntry.java'
     licenseTask.exclude 'com/medvision360/medrecord/spi/AuditInfo.java'

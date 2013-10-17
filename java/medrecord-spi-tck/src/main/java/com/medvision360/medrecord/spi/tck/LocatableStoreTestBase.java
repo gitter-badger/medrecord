@@ -15,38 +15,43 @@ import org.openehr.rm.ehr.EHRStatus;
 import org.openehr.rm.support.identification.ArchetypeID;
 
 
-public abstract class LocatableStoreTestBase extends RMTestBase {
+public abstract class LocatableStoreTestBase extends RMTestBase
+{
     protected LocatableStore store;
     protected EHRStatus parent;
     protected PartySelf subject;
-    
+
     @Override
     public void setUp()
-            throws Exception {
+            throws Exception
+    {
         super.setUp();
         store = getStore();
         store.clear();
         store.initialize();
-        
+
         subject = subject();
         ItemStructure otherDetails = list("EHRStatus details");
         Archetyped arch = new Archetyped(new ArchetypeID("unittest-EHR-EHRSTATUS.ehrstatus.v1"), "1.4");
         parent = new EHRStatus(makeUID(), "at0001", text("EHR Status"),
                 arch, null, null, null, subject, true, true, otherDetails);
-        if (store.supportsTransactions()) {
+        if (store.supportsTransactions())
+        {
             store.begin();
         }
     }
 
     @Override
     public void tearDown()
-            throws Exception {
+            throws Exception
+    {
         super.tearDown();
-        if (store.supportsTransactions()) {
+        if (store.supportsTransactions())
+        {
             store.rollback();
         }
     }
-    
+
     protected abstract LocatableStore getStore()
             throws Exception;
 }

@@ -14,29 +14,32 @@
  */
 package org.openehr.rm.support.terminology;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.openehr.rm.datatypes.basic.DvState;
 import org.openehr.rm.datatypes.text.CodePhrase;
 import org.openehr.rm.datatypes.text.DvCodedText;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * TestCodeSetAccess
- * 
+ *
  * @author Rong Chen
  * @version 1.0
  */
 @SuppressWarnings({"Convert2Diamond", "UnusedDeclaration"})
-public class TestCodeSetAccess implements CodeSetAccess {
+public class TestCodeSetAccess implements CodeSetAccess
+{
 
     /* fields */
+
     /**
      * Returns identification of this Terminology
      *
      * @return ID not null or empty
      */
-    public String id() {
+    public String id()
+    {
         return null;  // todo: implement this method
     }
 
@@ -45,15 +48,18 @@ public class TestCodeSetAccess implements CodeSetAccess {
      *
      * @return Set of DvCodePhrase
      */
-    public Set<CodePhrase> allCodes() {
+    public Set<CodePhrase> allCodes()
+    {
         return allCodes;  // todo: implement this method
     }
 
-    public boolean hasCode(CodePhrase code) {
+    public boolean hasCode(CodePhrase code)
+    {
         return true;//allCodes.contains(code);
     }
 
-    public boolean hasLang(CodePhrase lang) {
+    public boolean hasLang(CodePhrase lang)
+    {
         return true;//allCodes.contains(lang);
     }
 
@@ -62,21 +68,22 @@ public class TestCodeSetAccess implements CodeSetAccess {
             "iso-8859-1");
     public static final CodePhrase NULL_FLAVOUR = new CodePhrase("test",
             "unanswered");
-    
+
     static final Set<CodePhrase> allCodes;
-    
-    static {
+
+    static
+    {
         allCodes = new HashSet<CodePhrase>();
         allCodes.add(ENGLISH);
         allCodes.add(LATIN_1);
-        allCodes.add(NULL_FLAVOUR);        
+        allCodes.add(NULL_FLAVOUR);
     }
-    
+
     // change type
     public static final DvCodedText AMENDMENT = new DvCodedText("creation",
             ENGLISH, LATIN_1, new CodePhrase("test", "creation"),
             TestTerminologyService.getInstance());
-    
+
     public static final DvCodedText SETTING = new DvCodedText("setting",
             ENGLISH, LATIN_1, new CodePhrase("test", "setting_code"),
             TestTerminologyService.getInstance());
@@ -84,7 +91,7 @@ public class TestCodeSetAccess implements CodeSetAccess {
     public static final DvCodedText ISM_ACTIVE = new DvCodedText("ism states",
             ENGLISH, LATIN_1, new CodePhrase("test", "active"),
             TestTerminologyService.getInstance());
-    
+
     // composition category
     public static final DvCodedText EVENT = new DvCodedText("event",
             ENGLISH, LATIN_1, new CodePhrase("test", "event"),
@@ -93,7 +100,7 @@ public class TestCodeSetAccess implements CodeSetAccess {
     public static final DvCodedText PERSISTENT = new DvCodedText("persistent",
             ENGLISH, LATIN_1, new CodePhrase("test", "persistent"),
             TestTerminologyService.getInstance());
-    
+
     // lifecycle state
     public static final DvState DRAFT = new DvState(new DvCodedText("draft",
             new CodePhrase("test", "draft"), ENGLISH, LATIN_1,

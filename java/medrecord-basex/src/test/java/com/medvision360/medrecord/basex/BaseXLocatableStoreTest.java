@@ -29,7 +29,7 @@ public class BaseXLocatableStoreTest extends LocatableStoreTCKTestBase
     LocatableSerializer serializer = new MockLocatableSerializer();
     String name = "BaseXLocatableStoreTest";
     String path = "unittest";
-    
+
     @Override
     protected LocatableStore getStore() throws Exception
     {

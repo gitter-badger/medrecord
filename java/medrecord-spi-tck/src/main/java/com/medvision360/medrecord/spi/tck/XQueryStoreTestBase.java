@@ -9,26 +9,37 @@ package com.medvision360.medrecord.spi.tck;
 
 import com.medvision360.medrecord.spi.XQueryStore;
 
-public abstract class XQueryStoreTestBase extends LocatableStoreTCKTestBase {
+public abstract class XQueryStoreTestBase extends LocatableStoreTCKTestBase
+{
     protected XQueryStore xQueryStore;
 
     @Override
     public void setUp()
-            throws Exception {
+            throws Exception
+    {
         super.setUp();
-        
+
         xQueryStore = (XQueryStore) store;
     }
 
-    public void testQueryNullArgumentsThrowNPE() throws Exception {
-        try {
+    public void testQueryNullArgumentsThrowNPE() throws Exception
+    {
+        try
+        {
             xQueryStore.list(null);
             fail("Null argument should throw NPE");
-        } catch(NullPointerException e) {}
+        }
+        catch (NullPointerException e)
+        {
+        }
 
-        try {
+        try
+        {
             xQueryStore.query("<result/>", null);
             fail("Null argument should throw NPE");
-        } catch(NullPointerException e) {}
+        }
+        catch (NullPointerException e)
+        {
+        }
     }
 }

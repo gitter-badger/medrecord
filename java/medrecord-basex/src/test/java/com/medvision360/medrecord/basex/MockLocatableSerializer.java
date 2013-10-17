@@ -25,11 +25,11 @@ class MockLocatableSerializer implements LocatableSerializer
         String rmEntity = locatable.getArchetypeDetails().getArchetypeId().rmEntity();
         Element root = new Element(rmEntity);
         root.setAttribute("archetype_node_id", locatable.getArchetypeNodeId());
-        
+
         set(root, "/uid/value", locatable.getUid().getValue());
         set(root, "/archetype_id/value", locatable.getArchetypeDetails().getArchetypeId().getValue());
         set(root, "/name/value", locatable.getName().getValue());
-        
+
         Document d = new Document(root);
 
         Format format = Format.getPrettyFormat();
@@ -45,12 +45,14 @@ class MockLocatableSerializer implements LocatableSerializer
         for (int i = 0; i < paths.length; i++)
         {
             String pathPart = paths[i].trim();
-            if (pathPart.isEmpty()) {
+            if (pathPart.isEmpty())
+            {
                 continue;
             }
-            
+
             Element newElement = element.getChild(pathPart);
-            if (newElement == null) {
+            if (newElement == null)
+            {
                 newElement = new Element(pathPart);
             }
             currentElement.addContent(newElement);

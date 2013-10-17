@@ -14,59 +14,68 @@
  */
 package org.openehr.rm.support.terminology;
 
-import org.openehr.rm.datatypes.text.CodePhrase;
-import org.openehr.rm.support.identification.TestTerminologyID;
-
 import java.util.HashSet;
 import java.util.Set;
 
+import org.openehr.rm.datatypes.text.CodePhrase;
+import org.openehr.rm.support.identification.TestTerminologyID;
+
 /**
  * TestTerminologyAccess
- * 
+ *
  * @author Rong Chen
  * @version 1.0
  */
 @SuppressWarnings({"UnusedDeclaration", "Convert2Diamond"})
-public class TestTerminologyAccess implements TerminologyAccess {
+public class TestTerminologyAccess implements TerminologyAccess
+{
 
-    public Set<CodePhrase> codesForGroupId(String groupID) {
+    public Set<CodePhrase> codesForGroupId(String groupID)
+    {
         return null;
     }
 
-    public Set<CodePhrase> codesForGroupName(String name, String language) {
+    public Set<CodePhrase> codesForGroupName(String name, String language)
+    {
         return CODES;
     }
 
-    public String rubricForCode(String code, String language) {
+    public String rubricForCode(String code, String language)
+    {
         return null;
     }
 
     public boolean hasCodeForGroupName(CodePhrase code, String name,
-                                       String language) {
+            String language)
+    {
         return true;
     }
 
-    public String id() {
+    public String id()
+    {
         return null;
     }
 
-    public Set<CodePhrase> allCodes() {
+    public Set<CodePhrase> allCodes()
+    {
         return null;
     }
 
-    public boolean has(CodePhrase code) {
+    public boolean has(CodePhrase code)
+    {
         return true;
     }
-    
-    public boolean hasCodeForGroupId(String groupId, CodePhrase code) {
-		return true;
-	}
-    
+
+    public boolean hasCodeForGroupId(String groupId, CodePhrase code)
+    {
+        return true;
+    }
+
     public static final CodePhrase RELATIONS = new CodePhrase("test", "family_code");
     public static final CodePhrase SETTING = new CodePhrase("test", "setting_code");
     public static final CodePhrase FUNCTION = new CodePhrase(TestTerminologyID.SNOMEDCT, "meanCode");
     public static final CodePhrase REVISION = new CodePhrase(TestTerminologyID.SNOMEDCT, "revisionCode");
-    public static final CodePhrase CHANGE = new CodePhrase(TestTerminologyID.SNOMEDCT, 
+    public static final CodePhrase CHANGE = new CodePhrase(TestTerminologyID.SNOMEDCT,
             "changeTypeCode");
     public static final CodePhrase ACTIVE = new CodePhrase("test", "active");
     public static final CodePhrase CREATION = new CodePhrase("openehr", "249");
@@ -77,12 +86,14 @@ public class TestTerminologyAccess implements TerminologyAccess {
             "iso-8859-1");
     public static final CodePhrase NULL_FLAVOUR = new CodePhrase("test",
             "unanswered");
-	public static final CodePhrase SOME_STATE = null;
-	public static final CodePhrase SOME_TRANSITION = null;
-    
-    
-    static Set<CodePhrase> CODES; 
-    static {
+    public static final CodePhrase SOME_STATE = null;
+    public static final CodePhrase SOME_TRANSITION = null;
+
+
+    static Set<CodePhrase> CODES;
+
+    static
+    {
         CODES = new HashSet<CodePhrase>();
         CODES.add(FUNCTION);
         CODES.add(REVISION);
@@ -92,11 +103,11 @@ public class TestTerminologyAccess implements TerminologyAccess {
         CODES.add(CHANGE);
         CODES.add(RELATIONS);
         CODES.add(CREATION);
-        CODES.add(ENGLISH); 
+        CODES.add(ENGLISH);
         CODES.add(ACTIVE);
         CODES.add(NULL_FLAVOUR);
-    }       
-    
+    }
+
 }
 
 /*

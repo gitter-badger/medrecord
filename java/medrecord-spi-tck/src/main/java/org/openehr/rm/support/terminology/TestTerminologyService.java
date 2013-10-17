@@ -23,47 +23,57 @@ import java.util.Map;
  * @author Rong Chen
  * @version 1.0
  */
-public class TestTerminologyService implements TerminologyService {
+public class TestTerminologyService implements TerminologyService
+{
 
-    public static TestTerminologyService getInstance() {
+    public static TestTerminologyService getInstance()
+    {
         return new TestTerminologyService();
     }
 
-    public TerminologyAccess terminology(String name) {
+    public TerminologyAccess terminology(String name)
+    {
         return new TestTerminologyAccess();
     }
 
-    public CodeSetAccess codeSet(String name) {
+    public CodeSetAccess codeSet(String name)
+    {
         return new TestCodeSetAccess();
     }
 
-    public boolean hasTerminology(String name) {
+    public boolean hasTerminology(String name)
+    {
         return false;
     }
 
-    public boolean hasCodeSet(String name) {
+    public boolean hasCodeSet(String name)
+    {
         return false;
     }
 
 
-	public CodeSetAccess codeSetForId(OpenEHRCodeSetIdentifiers name) {
-		return new TestCodeSetAccess();
-	}
+    public CodeSetAccess codeSetForId(OpenEHRCodeSetIdentifiers name)
+    {
+        return new TestCodeSetAccess();
+    }
 
 
-	public List<String> terminologyIdentifiers() {
-		return null;
-	}
+    public List<String> terminologyIdentifiers()
+    {
+        return null;
+    }
 
 
-	public List<String> codeSetIdentifiers() {
-		return null;
-	}
+    public List<String> codeSetIdentifiers()
+    {
+        return null;
+    }
 
 
-	public Map<String, String> openehrCodeSets() {
-		return null;
-	}
+    public Map<String, String> openehrCodeSets()
+    {
+        return null;
+    }
 }
 
 /*

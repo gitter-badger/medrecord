@@ -22,7 +22,7 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
 {
     List<Context> ctx;
     CompositeStore store;
-    
+
     @Override
     public void setUp() throws Exception
     {
@@ -44,18 +44,18 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
     LocatableSerializer serializer = new MockLocatableSerializer();
     String name = "MultiDatabaseTest";
     String path = "unittest";
-    
+
     protected LocatableStore getStore() throws Exception
     {
         store = new CompositeStore(name);
-        
+
         LocatableSelector specialistECG = LocatableSelectorBuilder
                 .start()
                 .requireRMVersion("1.4")
                 .matchArchetypeId("^openEHR-EHR-OBSERVATION.ecg.v[12](?:draft)?$")
                 .build();
         store.addDelegate(getStore("MultiDatabaseTestECG", specialistECG));
-        
+
         LocatableSelector basicEHR = LocatableSelectorBuilder
                 .start()
                 .requireRMVersion("1.4")
@@ -84,12 +84,12 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
 
         return store;
     }
-    
+
     protected LocatableStore getStore(String name, LocatableSelector locatableSelector)
     {
         Context c = new Context();
         ctx.add(c);
-        
+
         return new BaseXLocatableStore(
                 c,
                 parser,
@@ -99,43 +99,43 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
                 path
         );
     }
-    
+
     public void testUsingCompositeStoreWithMultipleBaseXDatabaseBackends() throws Exception
     {
         Archetyped personType = new Archetyped(new ArchetypeID("unittest-DEMOGRAPHIC-PERSON.person.v1"), "1.4");
         Archetyped ehrStatusType = new Archetyped(new ArchetypeID("unittest-EHR-EHRSTATUS.ehrstatus.v1"), "1.4");
         Archetyped ecgType = new Archetyped(new ArchetypeID("openEHR-EHR-OBSERVATION.ecg.v1"), "1.4");
-        Archetyped medicationListType = new Archetyped(new ArchetypeID("unittest-EHR-COMPOSITION.medication_list.v1"), 
+        Archetyped medicationListType = new Archetyped(new ArchetypeID("unittest-EHR-COMPOSITION.medication_list.v1"),
                 "1.4");
-        Archetyped adminEntryType = new Archetyped(new ArchetypeID("unittest-EHR-ADMIN_ENTRY.status.v1"), 
+        Archetyped adminEntryType = new Archetyped(new ArchetypeID("unittest-EHR-ADMIN_ENTRY.status.v1"),
                 "1.4");
-        
+
         assertTrue(store.supports(personType));
         assertTrue(store.supports(ehrStatusType));
         assertTrue(store.supports(ecgType));
         assertTrue(store.supports(medicationListType));
         assertTrue(store.supports(adminEntryType));
-        
+
         Locatable person = makeLocatable(personType, "Jane Doe");
         person = store.insert(person);
         person.set("/name/value", "Jane Doe-GotMarried");
         store.update(person);
-        
+
         Locatable ehrStatus = makeLocatable(ehrStatusType, "TEST_EHR");
         ehrStatus = store.insert(ehrStatus);
         ehrStatus.set("/name/value", "TEST_EHR_MODIFIED");
         store.update(ehrStatus);
-        
+
         Locatable ecg = makeLocatable(ecgType, "My First Heartrate");
         ecg = store.insert(ecg);
         ecg.set("/name/value", "My Second Heartrate");
         store.update(ecg);
-        
+
         Locatable medicationList = makeLocatable(medicationListType, "My asperin addiction");
         medicationList = store.insert(medicationList);
         medicationList.set("/name/value", "I'm off the asperin");
         store.update(medicationList);
-        
+
         Locatable adminEntry = makeLocatable(adminEntryType, "test approved");
         adminEntry = store.insert(adminEntry);
         adminEntry.set("/name/value", "test finished");
@@ -155,8 +155,9 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
         //System.out.println("Query result:");
         //System.out.println(resultString);
     }
- 
-    protected Locatable makeLocatable(Archetyped archetypeDetails, String name) throws Exception {
+
+    protected Locatable makeLocatable(Archetyped archetypeDetails, String name) throws Exception
+    {
         HierObjectID uid = makeUID();
         DvText dvName = new DvText(name);
 

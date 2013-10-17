@@ -20,6 +20,8 @@
  */
 package org.openehr.rm.datastructure;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 import org.openehr.rm.datastructure.itemstructure.ItemStructure;
 import org.openehr.rm.datastructure.itemstructure.representation.Cluster;
@@ -34,87 +36,100 @@ import org.openehr.rm.datatypes.text.DvCodedText;
 import org.openehr.rm.datatypes.text.DvText;
 import org.openehr.rm.support.identification.TerminologyID;
 
-import java.util.List;
-
 @SuppressWarnings("UnusedDeclaration")
-public class DataStructureTestBase2 extends TestCase {
+public class DataStructureTestBase2 extends TestCase
+{
 
-	public DataStructureTestBase2(String test) {
-		super(test);
-	}
+    public DataStructureTestBase2(String test)
+    {
+        super(test);
+    }
 
-	/**
-	 * The fixture set up called before every test method.
-	 */
-	protected void setUp() throws Exception {
-	}
+    /**
+     * The fixture set up called before every test method.
+     */
+    protected void setUp() throws Exception
+    {
+    }
 
-	/**
-	 * The fixture clean up called after every test method.
-	 */
-	protected void tearDown() throws Exception {
-	}
+    /**
+     * The fixture clean up called after every test method.
+     */
+    protected void tearDown() throws Exception
+    {
+    }
 
-	// create a cluster
-	protected Cluster cluster(String archetypeNodeId, String name,
-			List<Item> items) {
-		return new Cluster(archetypeNodeId, text(name), items);
-	}
+    // create a cluster
+    protected Cluster cluster(String archetypeNodeId, String name,
+            List<Item> items)
+    {
+        return new Cluster(archetypeNodeId, text(name), items);
+    }
 
-	// create an element by same name, value and code
-	protected Element element(String name) {
-		return element(name, name, name, name);
-	}
+    // create an element by same name, value and code
+    protected Element element(String name)
+    {
+        return element(name, name, name, name);
+    }
 
-	// create an element by name and code
-	protected Element element(String name, String code) {
-		return element(name, name, code, code);
-	}
+    // create an element by name and code
+    protected Element element(String name, String code)
+    {
+        return element(name, name, code, code);
+    }
 
-	// create an element by name and value
-	protected Element element(String name, DataValue value) {
-		return new Element("at001", text(name), value);
-	}
+    // create an element by name and value
+    protected Element element(String name, DataValue value)
+    {
+        return new Element("at001", text(name), value);
+    }
 
-	// create an element by name, and ratio
-	protected Element element(String name, double numerator, double denominator) {
-		return element(name, proportion(numerator, denominator));
-	}
+    // create an element by name, and ratio
+    protected Element element(String name, double numerator, double denominator)
+    {
+        return element(name, proportion(numerator, denominator));
+    }
 
-	// create an element with text value
-	protected Element element(String archetypeNodeId, String name, String value) {
-		return new Element(archetypeNodeId, text(name), text(value));
-	}
+    // create an element with text value
+    protected Element element(String archetypeNodeId, String name, String value)
+    {
+        return new Element(archetypeNodeId, text(name), text(value));
+    }
 
-	// create an element with codedText value
-	protected Element element(String archetypeNodeId, String name,
-			String value, String code) {
-		return new Element(archetypeNodeId, text(name), codedText(value, code));
-	}
+    // create an element with codedText value
+    protected Element element(String archetypeNodeId, String name,
+            String value, String code)
+    {
+        return new Element(archetypeNodeId, text(name), codedText(value, code));
+    }
 
-	// create an element with quanity value
-	protected Element element(String archetypeNodeId, String name, double value) {
-		return new Element(archetypeNodeId, text(name), new DvQuantity(value));
-	}
+    // create an element with quanity value
+    protected Element element(String archetypeNodeId, String name, double value)
+    {
+        return new Element(archetypeNodeId, text(name), new DvQuantity(value));
+    }
 
-	// create a text
-	protected DvText text(String value) {
-		return new DvText(value);
-	}
+    // create a text
+    protected DvText text(String value)
+    {
+        return new DvText(value);
+    }
 
-	// create a codeText
-	protected DvCodedText codedText(String value, String code) {
-		CodePhrase codePhrase = new CodePhrase(new TerminologyID("SNOMED CT"),
-				code);
-		return new DvCodedText(value, codePhrase);
-	}
+    // create a codeText
+    protected DvCodedText codedText(String value, String code)
+    {
+        CodePhrase codePhrase = new CodePhrase(new TerminologyID("SNOMED CT"),
+                code);
+        return new DvCodedText(value, codePhrase);
+    }
 
-	// create a quantityRatio
-	protected DvProportion proportion(double numerator, double denominator) {
-		return new DvProportion(numerator, denominator, ProportionKind.FRACTION, 0);
-	}
+    // create a quantityRatio
+    protected DvProportion proportion(double numerator, double denominator)
+    {
+        return new DvProportion(numerator, denominator, ProportionKind.FRACTION, 0);
+    }
 
-	protected static final String sep = ItemStructure.PATH_SEPARATOR;
+    protected static final String sep = ItemStructure.PATH_SEPARATOR;
 }
 /*
  *  ***** BEGIN LICENSE BLOCK *****

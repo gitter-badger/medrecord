@@ -13,7 +13,7 @@ import org.basex.core.Perm;
 public class Exists extends Command
 {
     private boolean result;
-    
+
     public Exists(String path)
     {
         super(Perm.READ, true, path);
@@ -23,20 +23,22 @@ public class Exists extends Command
     protected boolean run() throws IOException
     {
         String path = args[0];
-        if (path.startsWith("/")) {
+        if (path.startsWith("/"))
+        {
             path = path.substring(1);
         }
-        
+
         result = context.data().resources.doc(path) != -1;
-        
+
         return true;
     }
 
     @Override
-    public void databases(final LockResult lr) {
+    public void databases(final LockResult lr)
+    {
         lr.read.add(DBLocking.CTX);
     }
-  
+
     public boolean exists()
     {
         return result;

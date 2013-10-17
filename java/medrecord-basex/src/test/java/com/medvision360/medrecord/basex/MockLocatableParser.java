@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.google.common.io.CharStreams;
 import com.medvision360.medrecord.spi.LocatableParser;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -41,14 +40,14 @@ class MockLocatableParser implements LocatableParser
         {
             throw new IOException(e);
         }
-        
+
         HierObjectID uid = new HierObjectID(xpath(d, "//uid/value", Filters.element()));
         String archetypeNodeId = xpath(d, "//@archetype_node_id", Filters.attribute());
         DvText name = new DvText(xpath(d, "//name/value", Filters.element()));
         Archetyped archetypeDetails = new Archetyped(xpath(d, "//archetype_id/value", Filters.element()), "1.4");
-        
+
         Locatable locatable = new MockLocatable(uid, archetypeNodeId, name, archetypeDetails, null, null, null);
-        
+
         return locatable;
     }
 
@@ -84,11 +83,13 @@ class MockLocatableParser implements LocatableParser
         {
             return null;
         }
-        if (value instanceof Element) {
-            return ((Element)value).getValue();
+        if (value instanceof Element)
+        {
+            return ((Element) value).getValue();
         }
-        if (value instanceof Attribute) {
-            return ((Attribute)value).getValue();
+        if (value instanceof Attribute)
+        {
+            return ((Attribute) value).getValue();
         }
         return value.toString();
     }

@@ -6,11 +6,12 @@ import org.openehr.rm.support.identification.ObjectVersionID;
 class StringToObjectVersionIDFunction implements Function<String, ObjectVersionID>
 {
     private static final StringToObjectVersionIDFunction instance = new StringToObjectVersionIDFunction();
-    
-    public static StringToObjectVersionIDFunction getInstance() {
+
+    public static StringToObjectVersionIDFunction getInstance()
+    {
         return instance;
     }
-    
+
     @Override
     public ObjectVersionID apply(String input)
     {

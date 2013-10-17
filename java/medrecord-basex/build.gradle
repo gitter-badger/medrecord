@@ -4,9 +4,9 @@ repositories {
 
     // required for license-gradle-plugin
     mavenCentral()
-    
+
     maven {
-      url 'http://files.basex.org/maven'
+        url 'http://files.basex.org/maven'
     }
 }
 

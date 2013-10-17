@@ -14,7 +14,7 @@ import org.openehr.rm.support.identification.UIDBasedID;
 class MockLocatable extends Locatable
 {
     private static final long serialVersionUID = 0x130L;
-    
+
     MockLocatable(UIDBasedID uid, String archetypeNodeId,
             DvText name, Archetyped archetypeDetails,
             FeederAudit feederAudit,

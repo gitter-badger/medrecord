@@ -83,7 +83,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     //   https://mailman.uni-konstanz.de/pipermail/basex-talk/2010-August/000567.html
     // so unfortunately we don't support them here. Clients could try to use XQuery Update to get somewhat atomic
     // operations, but that won't help with keeping version info in sync.
-    
+
     // INDEX OPTIMIZATION
     // ------------------
     // see http://docs.basex.org/wiki/Indexes#Index_Construction
@@ -95,7 +95,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     //     always do _some_ work even if nothing has changed, which is not what we want
     //   * we register a shutdown hook to get rid of the schedule on shutdown
     //   * we always run optimize immediately when opening a database (i.e. on app startup)
-    
+
     private final static String NAME_REGEX = "^[a-zA-Z][a-zA-Z0-9\\._-]+$";
     private final static String PATH_REGEX = "^[a-zA-Z0-9\\._-]+(?:/[a-zA-Z0-9\\._-]+)*$";
     private final static String ABOUT_INITIAL = "<LocatableStore/>";
@@ -105,8 +105,8 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     private final static String VERSION_INITIAL = VERSION_PRE + "1" + VERSION_POST;
     private final static String VERSIONS_Q =
             "for $x in collection(\"%s\")" +
-            "  /*[ //uid/value/text()='%s' ]" +
-            "  return concat(base-uri($x),\"\n\")";
+                    "  /*[ //uid/value/text()='%s' ]" +
+                    "  return concat(base-uri($x),\"\n\")";
     // with the above query we do N+1 queries to retrieve all locatable versions. We could optimize with a query like
     // the below, but, we would then be pretty much locked into use of XML (rather than also supporting JSON and 
     // whatnot if BaseX is configured that way), and, we would have to figure out how to parse the XML partially and 
@@ -119,7 +119,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
 //            " return $x" +
 //            "}" +
 //            "</locatables>";
-    
+
     private HierObjectID m_systemId;
     private Context m_ctx;
     private LocatableParser m_parser;
@@ -148,13 +148,16 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     {
         m_path = checkNotNull(path, "path cannot be null");
         checkArgument(name.matches(PATH_REGEX), "path has to match regex %s", PATH_REGEX);
-        if (!m_path.startsWith("/")) {
+        if (!m_path.startsWith("/"))
+        {
             m_path = "/" + m_path;
         }
-        if (!m_path.endsWith("/")) {
+        if (!m_path.endsWith("/"))
+        {
             m_path = m_path + "/";
         }
-        if ("//".equals(m_path)) {
+        if ("//".equals(m_path))
+        {
             m_path = "/";
         }
     }
@@ -181,9 +184,10 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     public Iterable<Locatable> getVersions(HierObjectID id) throws NotFoundException, IOException
     {
         checkNotNull(id, "id cannot be null");
-        
+
         String path = fullPath(id);
-        if (!has(path)) {
+        if (!has(path))
+        {
             throw notFound(id);
         }
         String query = String.format(VERSIONS_Q, dbPath(fullPath("locatable_versions")), id.getValue());
@@ -207,7 +211,8 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     {
         checkNotNull(locatable, "locatable cannot be null");
         String path = fullPath(locatable);
-        if (has(path)) {
+        if (has(path))
+        {
             throw duplicate(locatable);
         }
         Locatable result = replace(locatable, path);
@@ -219,7 +224,8 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     {
         checkNotNull(locatable, "locatable cannot be null");
         String path = fullPath(locatable);
-        if (!has(path)) {
+        if (!has(path))
+        {
             throw notFound(locatable);
         }
         Locatable result = replace(locatable, path);
@@ -231,10 +237,11 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     {
         checkNotNull(id, "id cannot be null");
         String path = fullPath(id);
-        if (!has(path)) {
+        if (!has(path))
+        {
             throw notFound(id);
         }
-        
+
         delete(path);
     }
 
@@ -243,10 +250,11 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     {
         checkNotNull(id, "id cannot be null");
         String path = fullPath(id);
-        if (!has(path)) {
+        if (!has(path))
+        {
             throw notFound(id);
         }
-        
+
         delete(path);
     }
 
@@ -285,7 +293,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
                 StringToHierObjectIDFunction.getInstance());
         return result;
     }
-    
+
     @Override
     public Iterable<ObjectVersionID> listVersions() throws IOException
     {
@@ -300,12 +308,14 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     @Override
     public void initialize() throws IOException
     {
-        if (m_initialized) {
+        if (m_initialized)
+        {
             return;
         }
         m_initialized = true;
-        
-        if(!dbExists()) {
+
+        if (!dbExists())
+        {
             createDb();
             optimizeNow();
         }
@@ -314,7 +324,8 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     @Override
     public void clear() throws IOException
     {
-        if (dbExists()) {
+        if (dbExists())
+        {
             dropDb();
         }
         m_initialized = false;
@@ -366,17 +377,20 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     ///
     /// Helpers
     ///
-    
-    private <T extends Throwable> T wrap(T e, Object argument) throws NotFoundException {
-        if (e instanceof NotFoundException) {
-            throw (NotFoundException)e;
+
+    private <T extends Throwable> T wrap(T e, Object argument) throws NotFoundException
+    {
+        if (e instanceof NotFoundException)
+        {
+            throw (NotFoundException) e;
         }
         String message = e.getMessage();
         if (
                 message != null && (
-                message.contains("not found") ||
-                message.contains("yields no documents")
-        )) {
+                        message.contains("not found") ||
+                                message.contains("yields no documents")
+                ))
+        {
             throw notFound(argument, e);
         }
         return e;
@@ -385,7 +399,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     private void createDb() throws BaseXException
     {
         new CreateDB(m_name).execute(m_ctx);
-        String root = m_path.substring(0, m_path.length()-1);
+        String root = m_path.substring(0, m_path.length() - 1);
         new Add(root, ABOUT_INITIAL).execute(m_ctx);
         new Add(fullPath(VERSION_PATH), VERSION_INITIAL).execute(m_ctx);
     }
@@ -401,7 +415,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     {
         new DropDB(m_name).execute(m_ctx);
     }
-    
+
     private void optimize()
     {
         m_dirty = true;
@@ -411,11 +425,12 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     {
         new Optimize().execute(m_ctx);
     }
-    
+
     private void startConcurrentOptimizer()
     {
         optimizeExecutor = new ScheduledThreadPoolExecutor(1);
-        optimizeExecutor.scheduleWithFixedDelay(new Runnable() {
+        optimizeExecutor.scheduleWithFixedDelay(new Runnable()
+        {
             @Override
             public void run()
             {
@@ -423,7 +438,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
                 {
                     return;
                 }
-                
+
                 if (m_dirty)
                 {
                     try
@@ -438,8 +453,9 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
                 }
             }
         }, 10, 5, TimeUnit.SECONDS);
-        
-        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+        Runtime.getRuntime().addShutdownHook(new Thread()
+        {
             @Override
             public void run()
             {
@@ -462,26 +478,27 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
             }
         });
     }
-    
+
     private String path(UIDBasedID id)
     {
-        return "locatables/"+hPath(id);
+        return "locatables/" + hPath(id);
     }
 
     private String path(ObjectVersionID id)
     {
-        return "locatable_versions/"+id.getValue();
+        return "locatable_versions/" + id.getValue();
     }
 
     private String path(Locatable locatable)
     {
-        return "locatables/"+hPath(locatable.getUid());
+        return "locatables/" + hPath(locatable.getUid());
     }
 
-    private String fullPath(String path) {
+    private String fullPath(String path)
+    {
         return m_path + path;
     }
-    
+
     private String fullPath(UIDBasedID id)
     {
         return fullPath(path(id));
@@ -506,11 +523,15 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
         return m_name + "/" + path;
     }
 
-    private String hPath(UIDBasedID uidBasedID) {
+    private String hPath(UIDBasedID uidBasedID)
+    {
         String v = uidBasedID.getValue();
-        if (v.length() < 6) {
-            return "00/00/"+v;
-        } else {
+        if (v.length() < 6)
+        {
+            return "00/00/" + v;
+        }
+        else
+        {
             return String.format(
                     "%s/%s/%s",
                     v.substring(0, 2),
@@ -531,10 +552,10 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
         xml = xml.replace(VERSION_PRE, "");
         xml = xml.replace(VERSION_POST, "");
         long version = Long.parseLong(xml);
-        VersionTreeID result = new VersionTreeID(""+version);
-        
+        VersionTreeID result = new VersionTreeID("" + version);
+
         version++;
-        
+
         Replace replace = new Replace(fullPath(VERSION_PATH), VERSION_PRE + version + VERSION_POST);
         replace.execute(m_ctx);
 
@@ -586,7 +607,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
         byte[] buffer = os.toByteArray();
         ByteArrayInputStream is;
         Replace cmd;
-        
+
         // store the locatable as a new version
         ObjectVersionID ovid = newObjectVersionID(locatable.getUid().root());
         String ovidPath = fullPath(ovid);
@@ -603,7 +624,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
         {
             optimize();
         }
-        
+
         // store the locatable
         is = new ByteArrayInputStream(buffer);
         cmd = new Replace(path);
@@ -621,7 +642,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
 
         return locatable;
     }
-    
+
     private void delete(String path) throws IOException
     {
         Delete cmd = new Delete(path);

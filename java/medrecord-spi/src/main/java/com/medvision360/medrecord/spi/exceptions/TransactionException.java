@@ -8,26 +8,32 @@
 package com.medvision360.medrecord.spi.exceptions;
 
 @SuppressWarnings("UnusedDeclaration")
-public class TransactionException extends RecordException {
+public class TransactionException extends RecordException
+{
     private static final long serialVersionUID = 0x130L;
-    
-    public TransactionException() {
+
+    public TransactionException()
+    {
     }
 
-    public TransactionException(String message) {
+    public TransactionException(String message)
+    {
         super(message);
     }
 
-    public TransactionException(String message, Throwable cause) {
+    public TransactionException(String message, Throwable cause)
+    {
         super(message, cause);
     }
 
-    public TransactionException(Throwable cause) {
+    public TransactionException(Throwable cause)
+    {
         super(cause);
     }
 
     public TransactionException(String message, Throwable cause, boolean enableSuppression,
-                                boolean writableStackTrace) {
+            boolean writableStackTrace)
+    {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

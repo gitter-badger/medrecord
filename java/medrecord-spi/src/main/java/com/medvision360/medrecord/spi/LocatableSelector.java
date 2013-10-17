@@ -17,7 +17,7 @@ public interface LocatableSelector
 {
     /**
      * Checks whether this service knows how to deal with this particular locatable.
-     * 
+     *
      * @param test the locatable to check for support.
      * @return true if this locatable is (most likely) supported by this service, false otherwise.
      * @throws NullPointerException if any of the provided arguments are null.
@@ -26,7 +26,7 @@ public interface LocatableSelector
 
     /**
      * Checks whether this service knows how to deal with locatables of this particular type.
-     * 
+     *
      * @param test the type to check for support.
      * @return true if this type of locatable is (most likely) supported by this service, false otherwise.
      * @throws NullPointerException if any of the provided arguments are null.

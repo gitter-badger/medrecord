@@ -8,25 +8,31 @@
 package com.medvision360.medrecord.spi.exceptions;
 
 @SuppressWarnings("UnusedDeclaration")
-public class DuplicateException extends RecordException {
+public class DuplicateException extends RecordException
+{
     private static final long serialVersionUID = 0x130L;
-    
-    public DuplicateException() {
+
+    public DuplicateException()
+    {
     }
 
-    public DuplicateException(String message) {
+    public DuplicateException(String message)
+    {
         super(message);
     }
 
-    public DuplicateException(String message, Throwable cause) {
+    public DuplicateException(String message, Throwable cause)
+    {
         super(message, cause);
     }
 
-    public DuplicateException(Throwable cause) {
+    public DuplicateException(Throwable cause)
+    {
         super(cause);
     }
 
-    public DuplicateException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public DuplicateException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
+    {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

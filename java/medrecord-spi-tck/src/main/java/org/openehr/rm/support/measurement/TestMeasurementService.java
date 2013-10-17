@@ -21,30 +21,36 @@ package org.openehr.rm.support.measurement;
  * @version 1.0
  */
 @SuppressWarnings("UnusedDeclaration")
-public class TestMeasurementService implements MeasurementService {
+public class TestMeasurementService implements MeasurementService
+{
     private static final long serialVersionUID = 0x130L;
 
-    public boolean isValidUnitsString(String units) {
-	return true;
+    public boolean isValidUnitsString(String units)
+    {
+        return true;
     }
 
-    public boolean unitsEquivalent(String units1, String units2) {
-	return true;
+    public boolean unitsEquivalent(String units1, String units2)
+    {
+        return true;
     }
 
-    public static MeasurementService getInstance() {
-	return new TestMeasurementService();
+    public static MeasurementService getInstance()
+    {
+        return new TestMeasurementService();
     }
 
     @Override
-    public boolean unitsComparable(String units1, String units2) {
-	return true;
+    public boolean unitsComparable(String units1, String units2)
+    {
+        return true;
     }
 
     @Override
     public int compare(String units1, Double value1, String units2,
-	    Double value2) {
-	return 0;
+            Double value2)
+    {
+        return 0;
     }
 }
 

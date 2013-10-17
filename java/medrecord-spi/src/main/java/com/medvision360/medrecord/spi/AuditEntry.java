@@ -24,42 +24,50 @@ import org.openehr.rm.support.identification.TerminologyID;
 import org.openehr.rm.support.terminology.TerminologyService;
 
 /**
- * This is a variant of {@link AuditDetails} that has an auditType rather than a changeType, and so can properly be
- * used to describe audit log entries that are not actually changes (for example, it can describe <em>access</em>). 
- * Use {@link #toDetails()} to convert to an equivalent {@link AuditDetails} where possible.
+ * This is a variant of {@link AuditDetails} that has an auditType rather than a changeType, and so can properly be used
+ * to describe audit log entries that are not actually changes (for example, it can describe <em>access</em>). Use
+ * {@link #toDetails()} to convert to an equivalent {@link AuditDetails} where possible.
  *
  * @author Rong Chen
  * @author Leo Simons
  */
-public class AuditEntry extends RMObject {
-    private static final long serialVersionUID = 0x130L; 
-    
+public class AuditEntry extends RMObject
+{
+    private static final long serialVersionUID = 0x130L;
+
     private transient TerminologyService terminologyService;
 
     @FullConstructor
     public AuditEntry(@Attribute(name = "systemId", required = true) String systemId,
-                      @Attribute(name = "committer", required = true) PartyProxy committer,
-                      @Attribute(name = "auditTime", required = true) DvDateTime auditTime,
-                      @Attribute(name = "auditType", required = true) DvCodedText auditType,
-                      @Attribute(name = "description") DvText description,
-                      @Attribute(name = "terminologyService", system = true) TerminologyService terminologyService) {
-        if (StringUtils.isEmpty(systemId)) {
+            @Attribute(name = "committer", required = true) PartyProxy committer,
+            @Attribute(name = "auditTime", required = true) DvDateTime auditTime,
+            @Attribute(name = "auditType", required = true) DvCodedText auditType,
+            @Attribute(name = "description") DvText description,
+            @Attribute(name = "terminologyService", system = true) TerminologyService terminologyService)
+    {
+        if (StringUtils.isEmpty(systemId))
+        {
             throw new IllegalArgumentException("empty systemId");
         }
-        if (committer == null) {
+        if (committer == null)
+        {
             throw new IllegalArgumentException("null committer");
         }
-        if (auditTime == null) {
+        if (auditTime == null)
+        {
             throw new IllegalArgumentException("null auditTime");
         }
-        if (auditType == null) {
+        if (auditType == null)
+        {
             throw new IllegalArgumentException("null auditType");
         }
-        if (terminologyService == null) {
+        if (terminologyService == null)
+        {
             throw new IllegalArgumentException("null terminologyService");
         }
         if (!terminologyService.terminology("medrecord") //TerminologyService.OPENEHR)
-                .codesForGroupName("audit type", "en").contains(auditType.getDefiningCode())) {
+                .codesForGroupName("audit type", "en").contains(auditType.getDefiningCode()))
+        {
             throw new IllegalArgumentException("unknown change type: " + auditType.getDefiningCode());
         }
         this.systemId = systemId;
@@ -70,56 +78,70 @@ public class AuditEntry extends RMObject {
         this.terminologyService = terminologyService;
     }
 
-    public String getSystemId() {
+    public String getSystemId()
+    {
         return systemId;
     }
 
-    public PartyProxy getCommitter() {
+    public PartyProxy getCommitter()
+    {
         return committer;
     }
 
-    public DvDateTime getAuditTime() {
+    public DvDateTime getAuditTime()
+    {
         return auditTime;
     }
 
-    public DvCodedText getAuditType() {
+    public DvCodedText getAuditType()
+    {
         return auditType;
     }
 
-    public DvText getDescription() {
+    public DvText getDescription()
+    {
         return description;
     }
 
     // POJO start
-    protected AuditEntry() {
+    protected AuditEntry()
+    {
     }
 
-    void setSystemId(String systemId) {
+    void setSystemId(String systemId)
+    {
         this.systemId = systemId;
     }
 
-    void setAuditType(DvCodedText auditType) {
+    void setAuditType(DvCodedText auditType)
+    {
         this.auditType = auditType;
     }
 
-    void setDescription(DvText description) {
+    void setDescription(DvText description)
+    {
         this.description = description;
     }
 
-    void setCommitter(PartyProxy committer) {
+    void setCommitter(PartyProxy committer)
+    {
         this.committer = committer;
     }
 
-    void setAuditTime(DvDateTime auditTime) {
+    void setAuditTime(DvDateTime auditTime)
+    {
         this.auditTime = auditTime;
     }
     // POJO end
 
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
             return true;
         }
-        if (!(o instanceof AuditEntry)) {
+        if (!(o instanceof AuditEntry))
+        {
             return false;
         }
 
@@ -129,7 +151,8 @@ public class AuditEntry extends RMObject {
                 ai.auditTime).append(auditType, ai.auditType).append(description, ai.description).isEquals();
     }
 
-    public int hashCode() {
+    public int hashCode()
+    {
         return new HashCodeBuilder(5, 23).append(systemId).append(committer).append(auditTime).append(auditType).append(
                 description).toHashCode();
     }
@@ -140,14 +163,16 @@ public class AuditEntry extends RMObject {
     private DvDateTime auditTime;
     private DvCodedText auditType;
     private DvText description;
-    
-    public AuditDetails toDetails() {
+
+    public AuditDetails toDetails()
+    {
         return new AuditDetails(systemId, committer, auditTime, getChangeType(), description, terminologyService);
     }
-    
-    private DvCodedText getChangeType() {
+
+    private DvCodedText getChangeType()
+    {
         CodePhrase definingCode = new CodePhrase(new TerminologyID(TerminologyService.OPENEHR), auditType.getCode());
-        
+
         DvCodedText result = new DvCodedText(
                 auditType.getValue(),
                 null, // todo get the term mapping for audit type 
@@ -158,7 +183,7 @@ public class AuditEntry extends RMObject {
                 definingCode,
                 terminologyService
         );
-        
+
         return result;
     }
 }

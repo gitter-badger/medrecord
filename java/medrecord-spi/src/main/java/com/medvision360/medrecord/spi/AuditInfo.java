@@ -21,27 +21,32 @@ import org.openehr.rm.datatypes.text.DvText;
 import org.openehr.rm.support.terminology.TerminologyService;
 
 /**
- * This is a variant of {@link AuditInfo} that has no auditType or description. It's used to in the {@link 
- * AuditedService} API to set audit information on a set of operations while avoiding the repetition of the same 
- * details again and again.
+ * This is a variant of {@link AuditInfo} that has no auditType or description. It's used to in the {@link
+ * AuditedService} API to set audit information on a set of operations while avoiding the repetition of the same details
+ * again and again.
  *
  * @author Rong Chen
  * @author Leo Simons
  */
-public class AuditInfo extends RMObject {
+public class AuditInfo extends RMObject
+{
     private static final long serialVersionUID = 0x130L;
-    
+
     @FullConstructor
     public AuditInfo(@Attribute(name = "systemId", required = true) String systemId,
-                      @Attribute(name = "committer", required = true) PartyProxy committer,
-                      @Attribute(name = "auditTime", required = true) DvDateTime auditTime) {
-        if (StringUtils.isEmpty(systemId)) {
+            @Attribute(name = "committer", required = true) PartyProxy committer,
+            @Attribute(name = "auditTime", required = true) DvDateTime auditTime)
+    {
+        if (StringUtils.isEmpty(systemId))
+        {
             throw new IllegalArgumentException("empty systemId");
         }
-        if (committer == null) {
+        if (committer == null)
+        {
             throw new IllegalArgumentException("null committer");
         }
-        if (auditTime == null) {
+        if (auditTime == null)
+        {
             throw new IllegalArgumentException("null auditTime");
         }
         this.systemId = systemId;
@@ -49,40 +54,50 @@ public class AuditInfo extends RMObject {
         this.auditTime = auditTime;
     }
 
-    public String getSystemId() {
+    public String getSystemId()
+    {
         return systemId;
     }
 
-    public PartyProxy getCommitter() {
+    public PartyProxy getCommitter()
+    {
         return committer;
     }
 
-    public DvDateTime getAuditTime() {
+    public DvDateTime getAuditTime()
+    {
         return auditTime;
     }
 
     // POJO start
-    protected AuditInfo() {
+    protected AuditInfo()
+    {
     }
 
-    void setSystemId(String systemId) {
+    void setSystemId(String systemId)
+    {
         this.systemId = systemId;
     }
 
-    void setCommitter(PartyProxy committer) {
+    void setCommitter(PartyProxy committer)
+    {
         this.committer = committer;
     }
 
-    void setAuditTime(DvDateTime auditTime) {
+    void setAuditTime(DvDateTime auditTime)
+    {
         this.auditTime = auditTime;
     }
     // POJO end
 
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
             return true;
         }
-        if (!(o instanceof AuditInfo)) {
+        if (!(o instanceof AuditInfo))
+        {
             return false;
         }
 
@@ -92,7 +107,8 @@ public class AuditInfo extends RMObject {
                 ai.auditTime).isEquals();
     }
 
-    public int hashCode() {
+    public int hashCode()
+    {
         return new HashCodeBuilder(5, 23).append(systemId).append(committer).append(auditTime).toHashCode();
     }
 
@@ -100,8 +116,9 @@ public class AuditInfo extends RMObject {
     private String systemId;
     private PartyProxy committer;
     private DvDateTime auditTime;
-    
-    public AuditEntry toEntry(DvCodedText auditType, DvText description, TerminologyService terminologyService) {
+
+    public AuditEntry toEntry(DvCodedText auditType, DvText description, TerminologyService terminologyService)
+    {
         return new AuditEntry(systemId, committer, auditTime, auditType, description, terminologyService);
     }
 }

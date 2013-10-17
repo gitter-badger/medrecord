@@ -16,7 +16,7 @@ import static org.basex.core.Text.NAME_INVALID_X;
 public class ExistsDB extends Command
 {
     private boolean result;
-    
+
     public ExistsDB(String name)
     {
         super(Perm.READ, false, name);
@@ -26,21 +26,22 @@ public class ExistsDB extends Command
     protected boolean run() throws IOException
     {
         final String name = args[0];
-        if(!Databases.validName(name))
+        if (!Databases.validName(name))
         {
             return error(NAME_INVALID_X, name);
         }
-        
+
         result = context.mprop.dbexists(name);
-        
+
         return true;
     }
 
     @Override
-    public void databases(final LockResult lr) {
+    public void databases(final LockResult lr)
+    {
         lr.read.add(DBLocking.CTX);
     }
-  
+
     public boolean exists()
     {
         return result;
