@@ -6,6 +6,8 @@ import com.medvision360.medrecord.spi.LocatableParser;
 import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.spi.tck.LocatableConverterTCKTestBase;
 import org.openehr.am.archetype.Archetype;
+import org.openehr.rm.support.measurement.TestMeasurementService;
+import org.openehr.rm.support.terminology.TestTerminologyService;
 
 public class PVConverterTest extends LocatableConverterTCKTestBase
 {
@@ -24,7 +26,7 @@ public class PVConverterTest extends LocatableConverterTCKTestBase
     @Override
     protected LocatableParser getParser() throws Exception
     {
-        return new PVParser(m_archetypeStore);
+        return new PVParser(new TestTerminologyService(), new TestMeasurementService());
     }
 
     @Override

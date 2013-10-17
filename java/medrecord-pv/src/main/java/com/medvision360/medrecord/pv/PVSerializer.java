@@ -92,7 +92,7 @@ public class PVSerializer implements LocatableSerializer
 
         jg.writeStartObject();
             jg.writeStringField("uid", uid);
-            jg.writeStringField("rmEntity", rmEntity);
+            jg.writeStringField("rm_entity", rmEntity);
             jg.writeStringField("archetype_id", archetypeIdString);
             jg.writeStringField("archetype_node_id", archetypeNodeId);
             jg.writeObjectFieldStart("contents");
