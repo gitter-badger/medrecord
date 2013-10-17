@@ -3,6 +3,7 @@ package com.medvision360.medrecord.basex;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,9 @@ import com.medvision360.medrecord.basex.cmd.ExistsDB;
 import com.medvision360.medrecord.basex.cmd.GetDoc;
 import com.medvision360.medrecord.basex.cmd.ListDocs;
 import com.medvision360.medrecord.spi.LocatableParser;
+import com.medvision360.medrecord.spi.LocatableSelector;
 import com.medvision360.medrecord.spi.LocatableSerializer;
+import com.medvision360.medrecord.spi.XQueryStore;
 import com.medvision360.medrecord.spi.base.AbstractLocatableStore;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
@@ -41,7 +44,7 @@ import org.openehr.rm.support.identification.VersionTreeID;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class BaseXLocatableStore extends AbstractLocatableStore
+public class BaseXLocatableStore extends AbstractLocatableStore implements XQueryStore
 {
     // BASIC STRUCTURE
     // ---------------
@@ -127,9 +130,9 @@ public class BaseXLocatableStore extends AbstractLocatableStore
     ScheduledThreadPoolExecutor optimizeExecutor = null;
 
     public BaseXLocatableStore(Context ctx, LocatableParser parser, LocatableSerializer serializer,
-            String name, String path)
+            LocatableSelector locatableSelector, String name, String path)
     {
-        super(name);
+        super(name, locatableSelector);
         m_systemId = new HierObjectID(name);
         m_ctx = checkNotNull(ctx, "ctx cannot be null");
         // todo results in ArrayIndexOutOfBoundsException m_ctx.prop.set("UPDINDEX", "true");
@@ -337,7 +340,29 @@ public class BaseXLocatableStore extends AbstractLocatableStore
             throw new StatusException("Cannot get status from BaseX: " + e.getMessage(), e);
         }
     }
-    
+
+    @Override
+    public String toString()
+    {
+        return String.format("[%s:%s]", this.getClass().getSimpleName(), getName());
+    }
+
+    @Override
+    public Iterable<Locatable> list(String XQuery) throws NotSupportedException, IOException
+    {
+        checkNotNull(XQuery, "XQuery cannot be null");
+        throw new UnsupportedOperationException("todo implement BaseXLocatableStore.list()");
+    }
+
+    @Override
+    public void query(String XQuery, OutputStream os) throws NotSupportedException, IOException
+    {
+        checkNotNull(XQuery, "XQuery cannot be null");
+        checkNotNull(os, "os cannot be null");
+        XQuery cmd = new XQuery(XQuery);
+        cmd.execute(m_ctx, os);
+    }
+
     ///
     /// Helpers
     ///

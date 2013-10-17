@@ -30,7 +30,7 @@ public abstract class LocatableStoreTestBase extends RMTestBase {
         
         subject = subject();
         ItemStructure otherDetails = list("EHRStatus details");
-        Archetyped arch = new Archetyped(new ArchetypeID("openehr-unittest-status.EHRSTATUS.v1"), "1.4");
+        Archetyped arch = new Archetyped(new ArchetypeID("unittest-EHR-EHRSTATUS.ehrstatus.v1"), "1.4");
         parent = new EHRStatus(makeUID(), "at0001", text("EHR Status"),
                 arch, null, null, null, subject, true, true, otherDetails);
         if (store.supportsTransactions()) {

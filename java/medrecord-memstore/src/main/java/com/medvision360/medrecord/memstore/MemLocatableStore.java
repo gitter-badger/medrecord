@@ -8,6 +8,8 @@
 package com.medvision360.medrecord.memstore;
 
 import com.google.common.collect.ImmutableSet;
+import com.medvision360.medrecord.spi.LocatableSelector;
+import com.medvision360.medrecord.spi.LocatableSelectorBuilder;
 import com.medvision360.medrecord.spi.base.AbstractLocatableStore;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
@@ -36,9 +38,14 @@ public class MemLocatableStore extends AbstractLocatableStore
     private Map<ObjectVersionID, Locatable> versions = new ConcurrentHashMap<>();
     private long v = 1; // VersionTreeID: version cannot start with 0
 
-    public MemLocatableStore(String name) {
-        super(name);
+    public MemLocatableStore(String name, LocatableSelector locatableSelector)
+    {
+        super(name, locatableSelector);
         this.systemId = new HierObjectID(name);
+    }
+
+    public MemLocatableStore(String name) {
+        this(name, LocatableSelectorBuilder.any());
     }
 
     public MemLocatableStore() {

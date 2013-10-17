@@ -18,7 +18,8 @@ import org.openehr.rm.common.archetyped.Locatable;
  * some other validators may check referential integrity constraints, and yet other validators may check validity 
  * against (an) archetype(s). 
  */
-public interface LocatableValidator extends LocatableService {
+public interface LocatableValidator extends LocatableSelector
+{
 
     /**
      * Determine whether the specified locatable is valid according to the rules implemented by this validator.

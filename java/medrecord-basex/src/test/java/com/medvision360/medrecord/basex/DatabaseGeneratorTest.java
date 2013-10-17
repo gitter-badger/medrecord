@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.medvision360.medrecord.spi.LocatableParser;
+import com.medvision360.medrecord.spi.LocatableSelectorBuilder;
 import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.spi.LocatableStore;
 import com.medvision360.medrecord.spi.tck.LocatableStoreTestBase;
@@ -31,7 +32,7 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
 
     LocatableParser parser = new MockLocatableParser();
     LocatableSerializer serializer = new MockLocatableSerializer();
-    String name = "BaseXLocatableStoreTest";
+    String name = "DatabaseGeneratorTest";
     String path = "unittest";
     int numLocatables = 2;
     
@@ -41,6 +42,7 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
                 ctx,
                 parser,
                 serializer,
+                LocatableSelectorBuilder.any(),
                 name,
                 path
         );

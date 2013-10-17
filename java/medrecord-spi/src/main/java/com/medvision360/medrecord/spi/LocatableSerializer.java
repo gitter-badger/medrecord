@@ -12,7 +12,8 @@ import org.openehr.rm.common.archetyped.Locatable;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public interface LocatableSerializer extends LocatableService { // todo javadoc / api spec / exceptions
+public interface LocatableSerializer extends LocatableSelector
+{ // todo javadoc / api spec / exceptions
     
     public void serialize(Locatable locatable, OutputStream os) throws IOException;
     

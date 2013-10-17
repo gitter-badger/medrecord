@@ -1,6 +1,7 @@
 package com.medvision360.medrecord.basex;
 
 import com.medvision360.medrecord.spi.LocatableParser;
+import com.medvision360.medrecord.spi.LocatableSelectorBuilder;
 import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.spi.LocatableStore;
 import com.medvision360.medrecord.spi.tck.LocatableStoreTCKTestBase;
@@ -36,6 +37,7 @@ public class BaseXLocatableStoreTest extends LocatableStoreTCKTestBase
                 ctx,
                 parser,
                 serializer,
+                LocatableSelectorBuilder.any(),
                 name,
                 path
         );

@@ -55,10 +55,10 @@ public class CompositeValidator implements LocatableValidator, CompositeService<
     }
 
     @Override
-    public boolean supports(Locatable locatable) {
-        checkNotNull(locatable, "locatable cannot be null");
+    public boolean supports(Locatable test) {
+        checkNotNull(test, "locatable cannot be null");
         for (LocatableValidator delegate : delegates) {
-            if (delegate.supports(locatable)) {
+            if (delegate.supports(test)) {
                 return true;
             }
         }
@@ -66,10 +66,10 @@ public class CompositeValidator implements LocatableValidator, CompositeService<
     }
 
     @Override
-    public boolean supports(Archetyped archetyped) {
-        checkNotNull(archetyped, "archetyped cannot be null");
+    public boolean supports(Archetyped test) {
+        checkNotNull(test, "archetyped cannot be null");
         for (LocatableValidator delegate : delegates) {
-            if (delegate.supports(archetyped)) {
+            if (delegate.supports(test)) {
                 return true;
             }
         }

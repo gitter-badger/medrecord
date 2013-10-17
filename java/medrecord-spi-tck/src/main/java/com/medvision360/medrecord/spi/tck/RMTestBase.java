@@ -47,7 +47,7 @@ public class RMTestBase extends CompositionTestBase
 
     protected Locatable makeLocatable(UIDBasedID uid, Pathable parent) throws Exception {
         Archetyped archetypeDetails = new Archetyped(
-                new ArchetypeID("openehr-unittest-ADMIN_ENTRY.date.v2"),
+                new ArchetypeID("unittest-EHR-ADMIN_ENTRY.date.v2"),
                 "1.4");        
         List<Element> items = new ArrayList<>();
         items.add(new Element(("at0001"), "header", new DvText("date")));

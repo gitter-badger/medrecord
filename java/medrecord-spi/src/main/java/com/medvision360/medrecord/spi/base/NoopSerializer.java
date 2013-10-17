@@ -35,12 +35,12 @@ public class NoopSerializer implements LocatableSerializer {
     }
 
     @Override
-    public boolean supports(Locatable locatable) {
+    public boolean supports(Locatable test) {
         throw new UnsupportedOperationException("todo implement NoopSerializer.supports()");
     }
 
     @Override
-    public boolean supports(Archetyped archetyped) {
+    public boolean supports(Archetyped test) {
         throw new UnsupportedOperationException("todo implement NoopSerializer.supports()");
     }
 }

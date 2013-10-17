@@ -47,7 +47,7 @@ import java.io.IOException;
  * constraints defined in archetypes rather than in the reference model itself are not expected to be implemented by 
  * stores.
  */
-public interface LocatableStore extends LocatableService, TransactionalService, StatusService {
+public interface LocatableStore extends LocatableSelector, TransactionalService, StatusService {
 
     /**
      * Retrieve the latest version of the specified locatable.

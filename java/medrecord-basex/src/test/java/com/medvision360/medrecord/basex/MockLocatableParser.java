@@ -65,13 +65,13 @@ class MockLocatableParser implements LocatableParser
     }
 
     @Override
-    public boolean supports(Locatable locatable)
+    public boolean supports(Locatable test)
     {
         return true;
     }
 
     @Override
-    public boolean supports(Archetyped archetyped)
+    public boolean supports(Archetyped test)
     {
         return true;
     }

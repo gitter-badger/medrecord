@@ -1,5 +1,7 @@
 package com.medvision360.medrecord.spi.base;
 
+import com.medvision360.medrecord.spi.LocatableSelector;
+import com.medvision360.medrecord.spi.LocatableSelectorBuilder;
 import com.medvision360.medrecord.spi.LocatableStore;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
@@ -13,21 +15,28 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractLocatableStore implements LocatableStore {
     protected String m_name;
+    protected LocatableSelector m_locatableSelector;
+
+    public AbstractLocatableStore(String name, LocatableSelector locatableSelector)
+    {
+        m_name = checkNotNull(name, "name cannot be null");
+        m_locatableSelector = checkNotNull(locatableSelector, "locatableSelector cannot be null");
+    }
 
     protected AbstractLocatableStore(String name) {
-        m_name = checkNotNull(name, "name cannot be null");
+        this(name, LocatableSelectorBuilder.any());
     }
 
     @Override
-    public boolean supports(Locatable locatable) {
-        checkNotNull(locatable, "locatable cannot be null");
-        return true;
+    public boolean supports(Locatable test) {
+        checkNotNull(test, "locatable cannot be null");
+        return m_locatableSelector.supports(test);
     }
 
     @Override
-    public boolean supports(Archetyped archetyped) {
-        checkNotNull(archetyped, "archetyped cannot be null");
-        return true;
+    public boolean supports(Archetyped test) {
+        checkNotNull(test, "archetyped cannot be null");
+        return m_locatableSelector.supports(test);
     }
 
     @Override

@@ -35,12 +35,12 @@ public class NoopParser implements LocatableParser {
     }
 
     @Override
-    public boolean supports(Locatable locatable) {
+    public boolean supports(Locatable test) {
         throw new UnsupportedOperationException("todo implement NoopParser.supports()");
     }
 
     @Override
-    public boolean supports(Archetyped archetyped) {
+    public boolean supports(Archetyped test) {
         throw new UnsupportedOperationException("todo implement NoopParser.supports()");
     }
 }

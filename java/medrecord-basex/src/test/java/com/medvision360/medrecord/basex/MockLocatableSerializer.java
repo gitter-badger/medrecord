@@ -22,8 +22,8 @@ class MockLocatableSerializer implements LocatableSerializer
     @Override
     public void serialize(Locatable locatable, OutputStream os, String encoding) throws IOException
     {
-        String rmName = locatable.getClass().getSimpleName().toUpperCase(); // note: not the proper rm_type_name
-        Element root = new Element(rmName);
+        String rmEntity = locatable.getArchetypeDetails().getArchetypeId().rmEntity();
+        Element root = new Element(rmEntity);
         root.setAttribute("archetype_node_id", locatable.getArchetypeNodeId());
         
         set(root, "/uid/value", locatable.getUid().getValue());
@@ -72,13 +72,13 @@ class MockLocatableSerializer implements LocatableSerializer
     }
 
     @Override
-    public boolean supports(Locatable locatable)
+    public boolean supports(Locatable test)
     {
         return true;
     }
 
     @Override
-    public boolean supports(Archetyped archetyped)
+    public boolean supports(Archetyped test)
     {
         return true;
     }

@@ -171,12 +171,12 @@ public class NoopStore implements VersioningStore, XQueryStore, AuditedService {
     }
 
     @Override
-    public boolean supports(Locatable locatable) {
+    public boolean supports(Locatable test) {
         return true;
     }
 
     @Override
-    public boolean supports(Archetyped archetyped) {
+    public boolean supports(Archetyped test) {
         return true;
     }
 

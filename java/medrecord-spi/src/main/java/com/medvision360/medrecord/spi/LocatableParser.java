@@ -12,7 +12,8 @@ import org.openehr.rm.common.archetyped.Locatable;
 import java.io.IOException;
 import java.io.InputStream;
 
-public interface LocatableParser extends LocatableService { // todo javadoc / api spec / exceptions
+public interface LocatableParser extends LocatableSelector
+{ // todo javadoc / api spec / exceptions
     
     public Locatable parse(InputStream is) throws IOException;
     
