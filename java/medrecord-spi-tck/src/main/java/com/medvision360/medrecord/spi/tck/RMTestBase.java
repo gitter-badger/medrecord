@@ -100,10 +100,10 @@ public class RMTestBase extends CompositionTestBase
                 new ArchetypeID("unittest-EHR-ADMIN_ENTRY.date.v2"),
                 "1.0.2");
         List<Element> items = new ArrayList<>();
-        items.add(new Element(("at0001"), "header", new DvText("date")));
-        items.add(new Element(("at0002"), "value", new DvDate("2008-05-17")));
-        ItemList itemList = new ItemList("at0003", "item list", items);
-        AdminEntry adminEntry = new AdminEntry(uid, "at0004", new DvText("admin entry"),
+        items.add(new Element(("at0003"), "header", new DvText("date")));
+        items.add(new Element(("at0004"), "value", new DvDate("2008-05-17")));
+        ItemList itemList = new ItemList("at0002", "item list", items);
+        AdminEntry adminEntry = new AdminEntry(uid, "at0001", new DvText("admin entry"),
                 archetypeDetails, null, null, parent, lang, encoding,
                 subject(), provider(), null, null, itemList, ts);
         return adminEntry;

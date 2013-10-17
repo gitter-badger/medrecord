@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -27,7 +29,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.spi.exceptions.SerializeException;
-import org.apache.commons.lang3.StringUtils;
 import org.openehr.rm.Attribute;
 import org.openehr.rm.FullConstructor;
 import org.openehr.rm.common.archetyped.Archetyped;
@@ -40,6 +41,7 @@ import org.openehr.rm.support.identification.ArchetypeID;
 public class PVSerializer implements LocatableSerializer
 {
     private static final String OPENEHR_RM_PACKAGE = "org.openehr.rm.";
+    private static final Pattern INDEX_PATH_PATTERN = Pattern.compile("^(.*?)\\[([0-9]+)\\]/$"); 
 
     @Override
     public void serialize(Locatable locatable, OutputStream os) throws IOException, SerializeException
@@ -84,7 +86,9 @@ public class PVSerializer implements LocatableSerializer
         String rmEntity = archetypeId.rmEntity();
         String uid = locatable.getUid().getValue();
 
-        String prefix = "[" + archetypeIdString + "]/";
+        // todo I feel like not putting the archetype in the path makes things a lot easier
+        //String prefix = "[" + archetypeIdString + "]/";
+        String prefix = "/";
 
         jg.writeStartObject();
             jg.writeStringField("uid", uid);
@@ -182,26 +186,12 @@ public class PVSerializer implements LocatableSerializer
     private void walk(Object obj, Visitor visitor, String path)
             throws InvocationTargetException, IllegalAccessException, IOException
     {
-        // todo this is missing at-codes
-        
         SortedMap<String, Attribute> attributes = attributeMap(obj.getClass());
         String name;
         String pathName;
         Object value;
-        Object archetypeNodeId = attributes.remove("archetypeNodeId");
-        if (!path.endsWith("]/") && archetypeNodeId != null)
-        {
-            Method getter = getter("archetypeNodeId", obj.getClass());
-            if (getter != null)
-            {
-                value = getter.invoke(obj, null);
-                if (value != null)
-                {
-                    path = path.substring(0, path.length()-1) + "[" + value.toString() + "]" + "/";
-                }
-            }
-            
-        }
+        path = handleArchetypeNodeId(obj, path, attributes);
+        
         Iterator<String> names = attributes.keySet().iterator();
         while (names.hasNext())
         {
@@ -209,63 +199,110 @@ public class PVSerializer implements LocatableSerializer
             pathName = toUnderscoreSeparated(name);
 
             Attribute attribute = attributes.get(name);
-            if (attribute.system())
+            if (attribute.system() || "archetypeNodeId".equals(attribute.name()))
             {
                 continue;
             }
 
-            Method getter = getter(name, obj.getClass());
-            if (getter == null)
-            {
-                continue;
-            }
-            
-            value = getter.invoke(obj, null);
+            value = get(obj, name);
             if (value == null)
             {
                 continue;
             }
-            
-            if ("parent".equals(attribute.name()))
-            {
-                if (value instanceof Locatable)
-                {
-                    Locatable parentLocatable = (Locatable) value;
-                    String parentUid = parentLocatable.getUid().getValue();
-                    visitor.pair(path + "parent/uid/value", parentUid);
-                    String parentArchetypeId = parentLocatable.getArchetypeDetails().getArchetypeId().getValue();
-                    visitor.pair(path + "parent/archetype_id/value", parentArchetypeId);
-                }
-            }
-            else if (isOpenEHRRMClass(value) && !(value instanceof ProportionKind))
-            {
-                if ("archetypeDetails".equals(name) && value instanceof Archetyped)
-                {
-                    Archetyped archetypeDetails = (Archetyped)value;
-                    visitor.pair(path+"archetype_id/value", archetypeDetails.getArchetypeId().getValue());
-                }
-                else
-                {
-                    walk(value, visitor, path + pathName + "/");
-                }
-            }
-            else if (value instanceof Collection)
-            {
-                Collection list = (Collection) value;
-                Iterator it = list.iterator();
-                for (int i = 1; it.hasNext(); i++)
-                {
-                    Object next = it.next();
-                    walk(next, visitor, path + pathName + "[" + i + "]/");
-                }
-            }
-            else
-            {
-                visitor.pair(path + pathName, value);
-            }
+
+            handleValue(visitor, path, name, pathName, value, attribute);
         }
     }
 
+    private void handleValue(Visitor visitor, String path, String name, String pathName, Object value,
+            Attribute attribute) throws IOException, InvocationTargetException, IllegalAccessException
+    {
+        if ("parent".equals(attribute.name()))
+        {
+            if (value instanceof Locatable)
+            {
+                Locatable parentLocatable = (Locatable) value;
+                String parentUid = parentLocatable.getUid().getValue();
+                visitor.pair(path + "parent/uid/value", parentUid);
+                String parentArchetypeId = parentLocatable.getArchetypeDetails().getArchetypeId().getValue();
+                visitor.pair(path + "parent/archetype_id/value", parentArchetypeId);
+            }
+        }
+        else if (isOpenEHRRMClass(value) && !(value instanceof ProportionKind))
+        {
+            if ("archetypeDetails".equals(name) && value instanceof Archetyped)
+            {
+                Archetyped archetypeDetails = (Archetyped)value;
+                visitor.pair(path+"archetype_id/value", archetypeDetails.getArchetypeId().getValue());
+            }
+            else
+            {
+                walk(value, visitor, path + pathName + "/"); // recurse!
+            }
+        }
+        else if (value instanceof Collection)
+        {
+            Collection list = (Collection) value;
+            Iterator it = list.iterator();
+            for (int i = 1; it.hasNext(); i++)
+            {
+                Object next = it.next();
+                walk(next, visitor, path + pathName + "[" + i + "]/"); // recurse!
+            }
+        }
+        else
+        {
+            visitor.pair(path + pathName, value);
+        }
+    }
+
+    private String handleArchetypeNodeId(Object obj, String path, SortedMap<String, Attribute> attributes)
+            throws InvocationTargetException, IllegalAccessException
+    {
+        Object archetypeNodeId = attributes.get("archetypeNodeId");
+        if (archetypeNodeId != null && pathShouldGetArchetypeNodeId(path))
+        {
+            Object value = get(obj, "archetypeNodeId");
+            
+            if (value != null)
+            {
+                Matcher matcher = INDEX_PATH_PATTERN.matcher(path);
+                if (matcher.matches())
+                {
+                    // change from /foo/bar/items[2]/ to /foo/bar/items[atXXXXX][2]/
+                    String prefix = matcher.group(1);
+                    String index = matcher.group(2);
+                    path = prefix + "[" + value.toString() + "][" + index + "]/"; 
+                }
+                else
+                {
+                    // change from /foo/bar/blah/ to /foo/bar/blah[atXXXXX]/
+                    path = path.substring(0, path.length()-1) + "[" + value.toString() + "]/";
+                }
+            }
+        }
+        return path;
+    }
+
+    private Object get(Object target, String name) throws InvocationTargetException, IllegalAccessException
+    {
+        Method getter = getter(name, target.getClass());
+        if (getter == null)
+        {
+            return null;
+        }
+
+        Object value = getter.invoke(target, null);
+        return value;
+    }
+
+    private boolean pathShouldGetArchetypeNodeId(String path)
+    {
+        // if we already have [archetype_id_here]/ or [archetype_node_id_here]/ then we don't want to add the 
+        // archetypeNodeId, but if we have foo[1]/ or foo[2]/ then we do want to add it in
+        return !"/".equals(path) && (!path.endsWith("]/") || INDEX_PATH_PATTERN.matcher(path).matches());
+    }
+    
     private Method getter(String attributeName, Class klass)
     {
         Method[] methods = klass.getMethods();
