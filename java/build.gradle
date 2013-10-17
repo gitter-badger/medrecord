@@ -62,7 +62,8 @@ subprojects {
                 'slf4j': '1.7.5',
                 'basex': '7.7.2',
                 'jdom': '2.0.2',
-                'jaxen': '1.1.4'
+                'jaxen': '1.1.4',
+                'jackson': '2.2.3'
         ]
     }
 

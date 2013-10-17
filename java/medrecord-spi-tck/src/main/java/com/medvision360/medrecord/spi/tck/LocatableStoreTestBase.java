@@ -8,18 +8,11 @@
 package com.medvision360.medrecord.spi.tck;
 
 import com.medvision360.medrecord.spi.LocatableStore;
-import org.openehr.rm.common.archetyped.Archetyped;
-import org.openehr.rm.common.generic.PartySelf;
-import org.openehr.rm.datastructure.itemstructure.ItemStructure;
-import org.openehr.rm.ehr.EHRStatus;
-import org.openehr.rm.support.identification.ArchetypeID;
 
 
 public abstract class LocatableStoreTestBase extends RMTestBase
 {
     protected LocatableStore store;
-    protected EHRStatus parent;
-    protected PartySelf subject;
 
     @Override
     public void setUp()
@@ -30,11 +23,6 @@ public abstract class LocatableStoreTestBase extends RMTestBase
         store.clear();
         store.initialize();
 
-        subject = subject();
-        ItemStructure otherDetails = list("EHRStatus details");
-        Archetyped arch = new Archetyped(new ArchetypeID("unittest-EHR-EHRSTATUS.ehrstatus.v1"), "1.4");
-        parent = new EHRStatus(makeUID(), "at0001", text("EHR Status"),
-                arch, null, null, null, subject, true, true, otherDetails);
         if (store.supportsTransactions())
         {
             store.begin();

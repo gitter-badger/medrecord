@@ -164,7 +164,7 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
         {
             i++;
             HierObjectID uid = new HierObjectID(makeUUID());
-            Locatable locatable = makeLocatable(uid, parent);
+            Locatable locatable = makeLocatable(uid, m_parent);
             data.add(locatable);
         }
 
