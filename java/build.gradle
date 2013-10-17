@@ -72,6 +72,6 @@ subprojects {
 
 // build vendor stuff
 task vendor(type:Exec) {
-    workingDir 'medrecord-vendor/ref_impl_java'
+    workingDir 'medrecord-vendor'
     commandLine 'mvn', 'install', '-Dmaven.test.skip=true'
 }

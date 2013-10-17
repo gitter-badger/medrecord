@@ -3,6 +3,7 @@ include(
         'medrecord-client-archetyped',
         'medrecord-jcg',
         'medrecord-memstore',
+        'medrecord-pv',
         'medrecord-spi',
         'medrecord-spi-tck'
 )
