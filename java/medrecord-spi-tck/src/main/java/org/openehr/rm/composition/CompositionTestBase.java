@@ -16,6 +16,8 @@ package org.openehr.rm.composition;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.measure.Measure;
+
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.common.generic.PartyIdentified;
@@ -39,6 +41,8 @@ import org.openehr.rm.datatypes.text.DvText;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.PartyRef;
+import org.openehr.rm.support.measurement.MeasurementService;
+import org.openehr.rm.support.measurement.TestMeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
 import org.openehr.rm.support.terminology.TestCodeSetAccess;
 import org.openehr.rm.support.terminology.TestTerminologyService;
@@ -172,9 +176,9 @@ public class CompositionTestBase extends DataStructureTestBase2
 
     /* field */
     protected static CodePhrase lang = TestCodeSetAccess.ENGLISH;
-    protected static CodePhrase encoding = TestCodeSetAccess.LATIN_1;
-    protected static TerminologyService ts = TestTerminologyService
-            .getInstance();
+    protected static CodePhrase encoding = TestCodeSetAccess.UTF_8;
+    protected static TerminologyService ts = TestTerminologyService.getInstance();
+    protected static MeasurementService ms = TestMeasurementService.getInstance();
     protected String path;
     protected Object value;
 }

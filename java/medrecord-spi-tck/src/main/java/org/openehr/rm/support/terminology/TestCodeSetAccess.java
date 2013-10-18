@@ -66,6 +66,8 @@ public class TestCodeSetAccess implements CodeSetAccess
     public static final CodePhrase ENGLISH = new CodePhrase("test", "en");
     public static final CodePhrase LATIN_1 = new CodePhrase("test",
             "iso-8859-1");
+    public static final CodePhrase UTF_8 = new CodePhrase("test",
+            "UTF-8");
     public static final CodePhrase NULL_FLAVOUR = new CodePhrase("test",
             "unanswered");
 
@@ -76,34 +78,35 @@ public class TestCodeSetAccess implements CodeSetAccess
         allCodes = new HashSet<CodePhrase>();
         allCodes.add(ENGLISH);
         allCodes.add(LATIN_1);
+        allCodes.add(UTF_8);
         allCodes.add(NULL_FLAVOUR);
     }
 
     // change type
     public static final DvCodedText AMENDMENT = new DvCodedText("creation",
-            ENGLISH, LATIN_1, new CodePhrase("test", "creation"),
+            ENGLISH, UTF_8, new CodePhrase("test", "creation"),
             TestTerminologyService.getInstance());
 
     public static final DvCodedText SETTING = new DvCodedText("setting",
-            ENGLISH, LATIN_1, new CodePhrase("test", "setting_code"),
+            ENGLISH, UTF_8, new CodePhrase("test", "setting_code"),
             TestTerminologyService.getInstance());
 
     public static final DvCodedText ISM_ACTIVE = new DvCodedText("ism states",
-            ENGLISH, LATIN_1, new CodePhrase("test", "active"),
+            ENGLISH, UTF_8, new CodePhrase("test", "active"),
             TestTerminologyService.getInstance());
 
     // composition category
     public static final DvCodedText EVENT = new DvCodedText("event",
-            ENGLISH, LATIN_1, new CodePhrase("test", "event"),
+            ENGLISH, UTF_8, new CodePhrase("test", "event"),
             TestTerminologyService.getInstance());
 
     public static final DvCodedText PERSISTENT = new DvCodedText("persistent",
-            ENGLISH, LATIN_1, new CodePhrase("test", "persistent"),
+            ENGLISH, UTF_8, new CodePhrase("test", "persistent"),
             TestTerminologyService.getInstance());
 
     // lifecycle state
     public static final DvState DRAFT = new DvState(new DvCodedText("draft",
-            new CodePhrase("test", "draft"), ENGLISH, LATIN_1,
+            new CodePhrase("test", "draft"), ENGLISH, UTF_8,
             TestTerminologyService.getInstance()), false);
 }
 

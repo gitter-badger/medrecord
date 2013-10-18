@@ -1,6 +1,7 @@
 package com.medvision360.medrecord.spi.tck;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,12 +16,15 @@ import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.common.archetyped.Pathable;
 import org.openehr.rm.common.generic.PartySelf;
+import org.openehr.rm.composition.Composition;
 import org.openehr.rm.composition.CompositionTestBase;
+import org.openehr.rm.composition.content.ContentItem;
 import org.openehr.rm.composition.content.entry.AdminEntry;
 import org.openehr.rm.datastructure.itemstructure.ItemList;
 import org.openehr.rm.datastructure.itemstructure.ItemStructure;
 import org.openehr.rm.datastructure.itemstructure.representation.Element;
 import org.openehr.rm.datatypes.quantity.datetime.DvDate;
+import org.openehr.rm.datatypes.text.DvCodedText;
 import org.openehr.rm.datatypes.text.DvText;
 import org.openehr.rm.ehr.EHRStatus;
 import org.openehr.rm.support.identification.ArchetypeID;
@@ -28,6 +32,7 @@ import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.ObjectVersionID;
 import org.openehr.rm.support.identification.UIDBasedID;
 import org.openehr.rm.support.identification.VersionTreeID;
+import org.openehr.rm.support.terminology.TestCodeSetAccess;
 import se.acode.openehr.parser.ADLParser;
 
 public class RMTestBase extends CompositionTestBase
@@ -100,20 +105,59 @@ public class RMTestBase extends CompositionTestBase
     }
     protected Locatable makeLocatable(UIDBasedID uid, Pathable parent) throws Exception
     {
-        Archetyped archetypeDetails = new Archetyped(
+        Archetyped archetypeDetails;
+        
+        archetypeDetails = new Archetyped(
+                new ArchetypeID("unittest-EHR-COMPOSITION.composition.v1"),
+                "1.0.2");
+        DvCodedText category = TestCodeSetAccess.EVENT;
+        /*
+            @FullConstructor
+            public Composition(@Attribute(name = "uid") UIDBasedID uid,
+                               @Attribute(name = "archetypeNodeId", required = true) String archetypeNodeId,
+                               @Attribute(name = "name", required = true) DvText name,
+                               @Attribute(name = "archetypeDetails", required = true) Archetyped archetypeDetails,
+                               @Attribute(name = "feederAudit") FeederAudit feederAudit,
+                               @Attribute(name = "links") Set<Link> links,
+                               @Attribute(name = "parent") Pathable parent,
+                               @Attribute(name = "content") List<ContentItem> content,
+                               @Attribute(name = "language", required = true) CodePhrase language,
+                               @Attribute(name = "context") EventContext context,
+                               @Attribute(name = "composer", required = true) PartyProxy composer,
+                               @Attribute(name = "category", required = true) DvCodedText category,
+                               @Attribute(name = "territory", required = true) CodePhrase territory,
+                               @Attribute(name = "terminologyService", system = true) TerminologyService terminologyService) {
+        
+         */
+        // todo composition cannot have a parent, but then how do we link EHR/EHR_STATUS? Hmm?
+        Composition composition = new Composition(uid, "at0001", new DvText("composition"),
+                archetypeDetails, null, null, null, null, lang, context(), provider(), category, 
+                territory(), ts);
+        
+        archetypeDetails = new Archetyped(
                 new ArchetypeID("unittest-EHR-ADMIN_ENTRY.date.v2"),
                 "1.0.2");
         List<Element> items = new ArrayList<>();
-        items.add(new Element(("at0003"), "header", new DvText("date")));
-        items.add(new Element(("at0004"), "value", new DvDate("2008-05-17")));
-        ItemList itemList = new ItemList("at0002", "item list", items);
-        AdminEntry adminEntry = new AdminEntry(uid, "at0001", new DvText("admin entry"),
-                archetypeDetails, null, null, parent, lang, encoding,
+        items.add(new Element(("at0004"), "header", new DvText("date")));
+        items.add(new Element(("at0005"), "value", new DvDate("2008-05-17")));
+        ItemList itemList = new ItemList("at0003", "item list", items);
+        AdminEntry adminEntry = new AdminEntry(makeUID(), "at0002", new DvText("admin entry"),
+                archetypeDetails, null, null, composition, lang, encoding,
                 subject(), provider(), null, null, itemList, ts);
         // adminEntry.set("/data[at0002]/items[at0004]/value", new DvDate("2009-06-18"));
         // set() does not support item indices
         //   adminEntry.set("/data[at0002]/items[2]/value", new DvDate("2009-07-19"));
-        return adminEntry;
+
+        // todo this is silly. There is no way to set parent after initialization, 
+        // and no way to create an empty composition to start with, resorting to reflection just to be able to create
+        // a valid composition at all seems quite silly!
+        List<ContentItem> contentItems = new ArrayList<>();
+        contentItems.add(adminEntry);
+        Method m = composition.getClass().getDeclaredMethod("setContent", List.class);
+        m.setAccessible(true);
+        m.invoke(composition, contentItems);
+        
+        return composition;
     }
     
     protected Archetype loadArchetype() throws Exception

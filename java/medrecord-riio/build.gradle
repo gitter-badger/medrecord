@@ -1,0 +1,24 @@
+// some standard settings for Java applications (language level etc)
+apply plugin: 'medvision-java'
+
+description = 'MEDvision360 MEDrecord reference implementation IO adapters'
+
+// do not update the license on code which we do not own
+import nl.javadude.gradle.plugins.license.License
+
+tasks.withType(License).each { licenseTask ->
+    licenseTask.exclude 'com/medvision360/medrecord/riio/**'
+}
+
+dependencies {
+    compile project(':medrecord-spi')
+//    compile "com.fasterxml.jackson.core:jackson-core:${ext.version.jackson}"
+//    compile "com.fasterxml.jackson.core:jackson-databind:${ext.version.jackson}"
+//    compile "org.apache.commons:commons-lang3:${ext.version.commonsLang3}"
+    compile "openehr:xml-binding:${ext.version.openEhr}"
+    compile "openehr:dadl-parser:${ext.version.openEhr}"
+    compile "jaxen:jaxen:${ext.version.jaxen}" // used by jdom
+
+    testCompile project(':medrecord-spi-tck')
+    testCompile project(':medrecord-memstore')
+}

@@ -6,7 +6,8 @@ include(
         'medrecord-pv',
         'medrecord-spi',
         'medrecord-spi-tck',
-        'medrecord-tools-dumpadl'
+        'medrecord-tools-dumpadl',
+        'medrecord-riio'
 )
 
 project(':medrecord-client-archetyped').projectDir = new File(rootDir, 'medrecord-client/medrecord-client-archetyped')
