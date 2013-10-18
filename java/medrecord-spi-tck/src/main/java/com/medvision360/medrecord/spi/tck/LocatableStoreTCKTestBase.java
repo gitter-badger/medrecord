@@ -36,8 +36,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
 
     public void testSupport() throws Exception
     {
-        HierObjectID uid = new HierObjectID(makeUUID());
-        Locatable locatable = makeLocatable(uid, m_parent);
+        Locatable locatable = makeLocatable();
         assertTrue(store.supports(locatable));
         assertTrue(store.supports(locatable.getArchetypeDetails()));
 

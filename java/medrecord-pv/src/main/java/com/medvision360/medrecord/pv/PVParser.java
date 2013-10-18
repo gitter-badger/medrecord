@@ -46,6 +46,24 @@ import org.openehr.rm.support.terminology.TerminologyService;
 public class PVParser implements LocatableParser
 {
     /*
+    
+    Problem:
+    com.medvision360.medrecord.spi.exceptions.ParseException: org.openehr.build.RMObjectBuildingException:
+            RM type unknown: "ObjectID"
+    	at com.medvision360.medrecord.pv.PVParser.parse(PVParser.java:376)
+    	at com.medvision360.medrecord.spi.tck.LocatableConverterTCKTestBase.testRoundTrip(
+    	        LocatableConverterTCKTestBase.java:66)
+    Caused by: org.openehr.build.RMObjectBuildingException: RM type unknown: "ObjectID"
+    	at org.openehr.build.RMObjectBuilder.retrieveRMType(RMObjectBuilder.java:485)
+    	at org.openehr.build.RMObjectBuilder.retrieveAttribute(RMObjectBuilder.java:500)
+    	at com.medvision360.medrecord.pv.PVParser.parse(PVParser.java:358)
+    	... 32 more
+    There are many arguments to @FullConstructor that specify abstract classes. In those cases, 
+    we do not have enough information in the JSON to be able to decide the concrete type to
+    instantiate.
+    
+    It may be possible to guess the right concrete type by looking at the archetype.
+    
     Accepts input such as
         {
           "uid" : "3c643208-ffcb-4b67-a154-a1fa778931e0",
@@ -170,6 +188,7 @@ public class PVParser implements LocatableParser
         root.setRmEntity(rmEntity);
         root.setArchetypeId(archetypeIdString);
         root.setArchetypeNodeId(archetypeNodeId);
+        root.setPath("");
         Iterator<Map.Entry<String,String>> it = pv.entrySet().iterator();
         
         OUTER:
@@ -180,6 +199,7 @@ public class PVParser implements LocatableParser
             String value = entry.getValue();
             
             String[] path = key.split("/");
+            String currentPath = "";
             
             Node current = root;
 
@@ -190,6 +210,8 @@ public class PVParser implements LocatableParser
                 {
                     continue;
                 }
+                
+                currentPath += "/" + pathPart;
                 
                 Matcher pathPartMatcher = PATH_PART_PATTERN.matcher(pathPart);
                 String attributeName = pathPart;
@@ -214,8 +236,8 @@ public class PVParser implements LocatableParser
                 {
                     continue OUTER;
                 }
-
-                Node newNode = makeNode(current, attributeName, archetypeNodeIdString, index);
+                
+                Node newNode = makeNode(current, currentPath, attributeName, archetypeNodeIdString, index, value);
                 
                 current = newNode;
             }
@@ -302,18 +324,41 @@ public class PVParser implements LocatableParser
         return intercept;
     }
 
-    private Node makeNode(Node current, String attributeName, String archetypeNodeIdString, int index)
+    private Node makeNode(Node current, String currentPath, String attributeName, String archetypeNodeIdString,
+            int index, String value) throws ParseException
     {
-        Node newNode = current.getChild(attributeName, archetypeNodeIdString, index);
+        Node newNode = current.getChild(attributeName, archetypeNodeIdString);
         if (newNode == null)
         {
             newNode = new Node();
+            newNode.setPath(currentPath);
             newNode.setAttributeName(attributeName);
             newNode.setArchetypeNodeId(archetypeNodeIdString);
-            newNode.setIndex(index);
             newNode.setParent(current);
             current.addChild(newNode);
         }
+        
+        if (index == -1)
+        {
+            newNode.setValue(value);
+        }
+        else
+        {
+            Node indexNode = newNode.getIndexNode(index);
+            if (indexNode == null)
+            {
+                indexNode = new Node();
+                indexNode.setPath(currentPath);
+                indexNode.setAttributeName(attributeName);
+                indexNode.setArchetypeNodeId(archetypeNodeIdString);
+                indexNode.setParent(newNode);
+                indexNode.setIndex(index);
+                indexNode.setValue(value);
+                newNode.addIndexNode(indexNode);
+            }
+            newNode = indexNode;
+        }
+        
         return newNode;
     }
 
@@ -331,6 +376,7 @@ public class PVParser implements LocatableParser
             Map<String, Class> attributes = builder.retrieveAttribute(node.getRmEntity());
 
             parseChildren(node, valueMap, attributes);
+            // todo parse Index children
             parseNodeFields(node, valueMap);
             
             int index = node.getIndex();
@@ -371,7 +417,8 @@ public class PVParser implements LocatableParser
             {
                 throw new ParseException("Child without attribute name");
             }
-            attributeName = toCamelCase(attributeName); 
+            attributeName = toCamelCase(attributeName);
+            attributeName = attributeName.substring(0, 1).toLowerCase() + attributeName.substring(1);
             
             if (attributes.containsKey(attributeName))
             {

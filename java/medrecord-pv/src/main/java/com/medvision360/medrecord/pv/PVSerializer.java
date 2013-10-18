@@ -234,10 +234,19 @@ public class PVSerializer implements LocatableSerializer
             {
                 Archetyped archetypeDetails = (Archetyped)value;
                 visitor.pair(path+"archetype_id/value", archetypeDetails.getArchetypeId().getValue());
+                // if (!"/".equals(path))
+                // {
+                //     visitor.pair(path+"rm_entity", archetypeDetails.getArchetypeId().rmEntity());
+                // }
             }
             else
             {
                 walk(value, visitor, path + pathName + "/"); // recurse!
+                // String rmEntity = value.getClass().getSimpleName();
+                // if (!"/".equals(path))
+                // {
+                //     visitor.pair(path + pathName + "/rm_entity", rmEntity);
+                // }
             }
         }
         else if (value instanceof Collection)

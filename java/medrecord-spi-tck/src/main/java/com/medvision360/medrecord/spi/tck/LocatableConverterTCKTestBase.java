@@ -38,8 +38,7 @@ public abstract class LocatableConverterTCKTestBase extends RMTestBase
 
     public void testSupport() throws Exception
     {
-        HierObjectID uid = new HierObjectID(makeUUID());
-        Locatable locatable = makeLocatable(uid, m_parent);
+        Locatable locatable = makeLocatable();
         assertTrue(m_parser.supports(locatable));
         assertTrue(m_parser.supports(locatable.getArchetypeDetails()));
         assertTrue(m_serializer.supports(locatable));
@@ -48,8 +47,7 @@ public abstract class LocatableConverterTCKTestBase extends RMTestBase
     
     public void testRoundTrip() throws Exception
     {
-        HierObjectID uid = new HierObjectID(makeUUID());
-        Locatable orig = makeLocatable(uid, m_parent);
+        Locatable orig = makeLocatable();
         Locatable result;
         ByteArrayOutputStream os;
         ByteArrayInputStream is;

@@ -16,6 +16,8 @@ import com.google.common.collect.Iterables;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
+import com.medvision360.medrecord.spi.exceptions.ParseException;
+import com.medvision360.medrecord.spi.exceptions.SerializeException;
 import com.medvision360.medrecord.spi.exceptions.StatusException;
 import com.medvision360.medrecord.spi.exceptions.TransactionException;
 import org.openehr.rm.common.archetyped.Archetyped;
@@ -43,7 +45,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
 
     @Override
     public Locatable get(HierObjectID id)
-            throws NotFoundException, IOException
+            throws NotFoundException, IOException, ParseException
     {
         checkNotNull(id, "id cannot be null");
         NotFoundException nfe = null;
@@ -82,7 +84,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
 
     @Override
     public Locatable get(ObjectVersionID id)
-            throws NotFoundException, IOException
+            throws NotFoundException, IOException, ParseException
     {
         checkNotNull(id, "id cannot be null");
         NotFoundException nfe = null;
@@ -160,7 +162,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
 
     @Override
     public Locatable insert(Locatable locatable)
-            throws DuplicateException, NotSupportedException, IOException
+            throws DuplicateException, NotSupportedException, IOException, SerializeException
     {
         checkNotNull(locatable, "locatable cannot be null");
         for (LocatableStore delegate : m_delegates)
@@ -175,7 +177,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
 
     @Override
     public Locatable update(Locatable locatable)
-            throws NotSupportedException, NotFoundException, IOException
+            throws NotSupportedException, NotFoundException, IOException, SerializeException
     {
         checkNotNull(locatable, "locatable cannot be null");
         UIDBasedID uidBasedID = locatable.getUid();

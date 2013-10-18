@@ -163,8 +163,7 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
         while (i < numLocatables)
         {
             i++;
-            HierObjectID uid = new HierObjectID(makeUUID());
-            Locatable locatable = makeLocatable(uid, m_parent);
+            Locatable locatable = makeLocatable();
             data.add(locatable);
         }
 
