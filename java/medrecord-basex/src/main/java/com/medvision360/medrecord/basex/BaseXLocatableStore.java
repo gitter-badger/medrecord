@@ -183,7 +183,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     }
 
     @Override
-    public Iterable<Locatable> getVersions(HierObjectID id) throws NotFoundException, IOException
+    public Iterable<Locatable> getVersions(HierObjectID id) throws NotFoundException, IOException, ParseException
     {
         checkNotNull(id, "id cannot be null");
 

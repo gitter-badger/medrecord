@@ -123,7 +123,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
 
     @Override
     public Iterable<Locatable> getVersions(HierObjectID id)
-            throws NotFoundException, IOException
+            throws NotFoundException, IOException, ParseException
     {
         checkNotNull(id, "id cannot be null");
         NotFoundException nfe = null;

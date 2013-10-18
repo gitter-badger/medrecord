@@ -82,7 +82,7 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
      * @throws IOException if another error occurs interacting with storage.
      * @see com.google.common.collect.Iterables for convenient utilities to work with Iterables.
      */
-    public Iterable<Locatable> getVersions(HierObjectID id) throws NotFoundException, IOException;
+    public Iterable<Locatable> getVersions(HierObjectID id) throws NotFoundException, IOException, ParseException;
 
     /**
      * Store a new locatable.
