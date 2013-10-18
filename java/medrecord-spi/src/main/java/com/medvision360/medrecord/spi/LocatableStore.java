@@ -12,6 +12,8 @@ import java.io.IOException;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
+import com.medvision360.medrecord.spi.exceptions.ParseException;
+import com.medvision360.medrecord.spi.exceptions.SerializeException;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.ObjectVersionID;
@@ -58,7 +60,7 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
      * @throws NotFoundException if the locatable cannot be found in storage.
      * @throws IOException if another error occurs interacting with storage.
      */
-    public Locatable get(HierObjectID id) throws NotFoundException, IOException;
+    public Locatable get(HierObjectID id) throws NotFoundException, IOException, ParseException;
 
     /**
      * Retrieve the specified version of the specified locatable.
@@ -69,7 +71,7 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
      * @throws NotFoundException if the locatable version cannot be found in storage.
      * @throws IOException if another error occurs interacting with storage.
      */
-    public Locatable get(ObjectVersionID id) throws NotFoundException, IOException;
+    public Locatable get(ObjectVersionID id) throws NotFoundException, IOException, ParseException;
 
     /**
      * Retrieve all versions of the specified locatable.
@@ -80,7 +82,7 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
      * @throws IOException if another error occurs interacting with storage.
      * @see com.google.common.collect.Iterables for convenient utilities to work with Iterables.
      */
-    public Iterable<Locatable> getVersions(HierObjectID id) throws NotFoundException, IOException;
+    public Iterable<Locatable> getVersions(HierObjectID id) throws NotFoundException, IOException, ParseException;
 
     /**
      * Store a new locatable.
@@ -95,7 +97,8 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
      * @throws DuplicateException if a locatable already exists with the same uid.
      * @throws IOException if another error occurs interacting with storage.
      */
-    public Locatable insert(Locatable locatable) throws DuplicateException, NotSupportedException, IOException;
+    public Locatable insert(Locatable locatable)
+            throws DuplicateException, NotSupportedException, IOException, SerializeException;
 
     /**
      * Store a new version of an existing locatable.
@@ -110,7 +113,8 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
      * @throws NotFoundException if the locatable cannot be found in storage.
      * @throws IOException if another error occurs interacting with storage.
      */
-    public Locatable update(Locatable locatable) throws NotSupportedException, NotFoundException, IOException;
+    public Locatable update(Locatable locatable)
+            throws NotSupportedException, NotFoundException, IOException, SerializeException;
 
     /**
      * Mark all versions of a {@link Locatable} as deleted.

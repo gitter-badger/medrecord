@@ -23,6 +23,8 @@ import com.medvision360.medrecord.spi.base.AbstractLocatableStore;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
+import com.medvision360.medrecord.spi.exceptions.ParseException;
+import com.medvision360.medrecord.spi.exceptions.SerializeException;
 import com.medvision360.medrecord.spi.exceptions.StatusException;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
@@ -163,7 +165,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     }
 
     @Override
-    public Locatable get(HierObjectID id) throws NotFoundException, IOException
+    public Locatable get(HierObjectID id) throws NotFoundException, IOException, ParseException
     {
         checkNotNull(id, "id cannot be null");
         String path = fullPath(id);
@@ -172,7 +174,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     }
 
     @Override
-    public Locatable get(ObjectVersionID id) throws NotFoundException, IOException
+    public Locatable get(ObjectVersionID id) throws NotFoundException, IOException, ParseException
     {
         checkNotNull(id, "id cannot be null");
         String path = fullPath(id);
@@ -181,7 +183,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     }
 
     @Override
-    public Iterable<Locatable> getVersions(HierObjectID id) throws NotFoundException, IOException
+    public Iterable<Locatable> getVersions(HierObjectID id) throws NotFoundException, IOException, ParseException
     {
         checkNotNull(id, "id cannot be null");
 
@@ -207,7 +209,8 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     }
 
     @Override
-    public Locatable insert(Locatable locatable) throws DuplicateException, NotSupportedException, IOException
+    public Locatable insert(Locatable locatable)
+            throws DuplicateException, NotSupportedException, IOException, SerializeException
     {
         checkNotNull(locatable, "locatable cannot be null");
         String path = fullPath(locatable);
@@ -220,7 +223,8 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
     }
 
     @Override
-    public Locatable update(Locatable locatable) throws NotSupportedException, NotFoundException, IOException
+    public Locatable update(Locatable locatable)
+            throws NotSupportedException, NotFoundException, IOException, SerializeException
     {
         checkNotNull(locatable, "locatable cannot be null");
         String path = fullPath(locatable);
@@ -576,7 +580,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
         return cmd.exists();
     }
 
-    private Locatable get(String path, Object argument) throws IOException, NotFoundException
+    private Locatable get(String path, Object argument) throws IOException, NotFoundException, ParseException
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         // if (path.startsWith("/"))
@@ -600,7 +604,7 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
         return m_parser.parse(is);
     }
 
-    private Locatable replace(Locatable locatable, String path) throws IOException
+    private Locatable replace(Locatable locatable, String path) throws IOException, SerializeException
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         m_serializer.serialize(locatable, os);

@@ -1,8 +1,11 @@
 package com.medvision360.medrecord.pv;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.medvision360.medrecord.spi.exceptions.ParseException;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
 
@@ -17,8 +20,10 @@ public class Node
     private String m_attributeName;
     private int m_index = -1;
     private Node m_parent;
-    private List<Node> children = new ArrayList<>();
+    private List<Node> m_children = new ArrayList<>();
+    private Map<Integer,Node> m_indexChildren = new HashMap<>();
     private String m_value;
+    private String m_path;
 
     public Node() {}
 
@@ -114,21 +119,20 @@ public class Node
 
     public void addChild(Node child)
     {
-        children.add(child);
+        m_children.add(child);
     }
 
     public List<Node> getChildren()
     {
-        return children;
+        return m_children;
     }
 
-    public Node getChild(String attributeName, String archetypeNodeIdString, int index)
+    public Node getChild(String attributeName, String archetypeNodeIdString)
     {
-        for (Node child : children)
+        for (Node child : m_children)
         {
             if (equals(attributeName, child.m_attributeName) &&
-                    equals(archetypeNodeIdString, child.m_archetypeNodeId) &&
-                    index == child.m_index)
+                    equals(archetypeNodeIdString, child.m_archetypeNodeId))
             {
                 return child;
             }
@@ -147,6 +151,33 @@ public class Node
         return m_value;
     }
 
+    public void setPath(String path)
+    {
+        m_path = path;
+    }
+
+    public String getPath()
+    {
+        return m_path;
+    }
+    
+    public Node getIndexNode(int index) throws ParseException
+    {
+        return m_indexChildren.get(index);
+    }
+
+    public void addIndexNode(Node node) throws ParseException
+    {
+        // since we are sorted alphabetically and not numerically this kind of check doesn't actually hold 
+        //      indexNode.getIndex() == indexMap.size()
+        // but conceptually it ought to be true eventually
+        if (m_indexChildren.containsKey(node.getIndex()))
+        {
+            throw new ParseException(String.format("Duplicate index in path %s", node.getPath()));
+        }
+        m_indexChildren.put(node.getIndex(), node);
+    }
+
     private boolean equals(String orig, String other)
     {
         if (orig == null)
@@ -159,10 +190,12 @@ public class Node
     public String toString()
     {
         String result = "" +
-                (m_archetypeId == null ? "" : m_archetypeId + " ") +
-                (m_attributeName == null ? "" : m_attributeName) +
+                (m_archetypeId == null ? "" : "[" + m_archetypeId + "]") +
+                (m_path == null ? "" : m_path) +
+                /*(m_attributeName == null ? "" : m_attributeName) +
                 (m_archetypeNodeId == null ? "" : "["+m_archetypeNodeId+"]") +
-                (m_index == -1 ? "" : "["+m_index+"]") +
+                (m_index == -1 ? "" : "["+m_index+"]")*/
+                (m_rmEntity == null ? "" : " "+m_rmEntity) +
                 (m_uid == null ? "" : " "+m_uid);
         return result;
     }

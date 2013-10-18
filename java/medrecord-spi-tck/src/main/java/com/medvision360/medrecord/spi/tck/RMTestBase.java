@@ -94,6 +94,10 @@ public class RMTestBase extends CompositionTestBase
         return new ObjectVersionID(hierObjectID.root(), new HierObjectID("medrecord.spi.tck"), new VersionTreeID("1"));
     }
 
+    protected Locatable makeLocatable() throws Exception
+    {
+        return makeLocatable(makeUID(), m_parent);
+    }
     protected Locatable makeLocatable(UIDBasedID uid, Pathable parent) throws Exception
     {
         Archetyped archetypeDetails = new Archetyped(
@@ -106,6 +110,9 @@ public class RMTestBase extends CompositionTestBase
         AdminEntry adminEntry = new AdminEntry(uid, "at0001", new DvText("admin entry"),
                 archetypeDetails, null, null, parent, lang, encoding,
                 subject(), provider(), null, null, itemList, ts);
+        // adminEntry.set("/data[at0002]/items[at0004]/value", new DvDate("2009-06-18"));
+        // set() does not support item indices
+        //   adminEntry.set("/data[at0002]/items[2]/value", new DvDate("2009-07-19"));
         return adminEntry;
     }
     
