@@ -1,0 +1,42 @@
+//
+// usage:
+//   gradle run -Pargs="-i <adlfile>"
+//
+
+// some standard settings for Java applications (language level etc)
+apply plugin: 'medvision-java'
+
+// add the 'run' task for running the artifact
+apply plugin: 'application'
+mainClassName = "com.medvision360.medrecord.tools.dumpadl.Dumper";
+
+description = 'MEDvision360 MEDrecord ADL dumper'
+
+// pass command line options to tool
+run {
+    if (project.hasProperty('args')) {
+        args project.args.split('\\s+')
+    }
+}
+
+dependencies {
+    //
+    // LOGGING
+    //
+    compile "org.slf4j:slf4j-api:${ext.version.slf4j}"
+    compile "ch.qos.logback:logback-classic:${ext.version.logback}"
+
+    // divert all logging to slf4j
+    compile "org.slf4j:jcl-over-slf4j:${ext.version.slf4j}"
+    compile "org.slf4j:log4j-over-slf4j:${ext.version.slf4j}"
+    compile "org.slf4j:jul-to-slf4j:${ext.version.slf4j}"
+
+
+    //
+    // OTHER DEPENDENCIES
+    //
+    compile "commons-cli:commons-cli:${ext.version.commonsCli}"
+    compile "commons-io:commons-io:${ext.version.commonsIo}"
+    compile "openehr:adl-parser:${ext.version.openEhr}"
+    compile "org.apache.commons:commons-lang3:${ext.version.commonsLang3}"
+}
