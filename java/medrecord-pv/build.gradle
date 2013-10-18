@@ -3,8 +3,20 @@ apply plugin: 'medvision-java'
 
 description = 'MEDvision360 MEDrecord Path/Value parsing and serializing'
 
+// do not update the license on code which we do not own
+import nl.javadude.gradle.plugins.license.License
+
+tasks.withType(License).each { licenseTask ->
+    licenseTask.exclude 'com/medvision360/medrecord/pv/PVSerializer.java'
+}
+
 dependencies {
     compile project(':medrecord-spi')
+    compile "com.fasterxml.jackson.core:jackson-core:${ext.version.jackson}"
+    compile "com.fasterxml.jackson.core:jackson-databind:${ext.version.jackson}"
+    compile "org.apache.commons:commons-lang3:${ext.version.commonsLang3}"
+    compile "openehr:rm-builder:${ext.version.openEhr}"
 
     testCompile project(':medrecord-spi-tck')
+    testCompile project(':medrecord-memstore')
 }

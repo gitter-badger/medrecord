@@ -12,7 +12,7 @@ import org.basex.core.Perm;
  */
 public class Exists extends Command
 {
-    private boolean result;
+    private boolean m_result;
 
     public Exists(String path)
     {
@@ -28,7 +28,7 @@ public class Exists extends Command
             path = path.substring(1);
         }
 
-        result = context.data().resources.doc(path) != -1;
+        m_result = context.data().resources.doc(path) != -1;
 
         return true;
     }
@@ -41,6 +41,6 @@ public class Exists extends Command
 
     public boolean exists()
     {
-        return result;
+        return m_result;
     }
 }

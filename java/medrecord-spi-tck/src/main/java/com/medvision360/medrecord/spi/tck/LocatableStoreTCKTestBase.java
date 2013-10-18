@@ -37,7 +37,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
     public void testSupport() throws Exception
     {
         HierObjectID uid = new HierObjectID(makeUUID());
-        Locatable locatable = makeLocatable(uid, parent);
+        Locatable locatable = makeLocatable(uid, m_parent);
         assertTrue(store.supports(locatable));
         assertTrue(store.supports(locatable.getArchetypeDetails()));
 
@@ -57,7 +57,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
     public void testBasicCRUD() throws Exception
     {
         HierObjectID uid = new HierObjectID(makeUUID());
-        Locatable orig = makeLocatable(uid, parent);
+        Locatable orig = makeLocatable(uid, m_parent);
 
         assertFalse(store.has(uid));
 
@@ -88,7 +88,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
         Locatable retrieved = store.get(uid);
         assertEqualish(orig, retrieved);
 
-        Locatable modify = makeLocatable(uid, parent);
+        Locatable modify = makeLocatable(uid, m_parent);
         modify.set("/name/value", "modified name");
         Locatable modified = store.update(modify);
         assertEqualish(modify, modified);
@@ -103,7 +103,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
         try
         {
             HierObjectID otherUid = new HierObjectID(makeUUID());
-            Locatable other = makeLocatable(otherUid, parent);
+            Locatable other = makeLocatable(otherUid, m_parent);
             store.update(other);
             fail("Should not allow updating non-existent locatable");
         }
@@ -123,10 +123,10 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
     public void testBasicVersioning() throws Exception
     {
         HierObjectID uid = new HierObjectID(makeUUID());
-        Locatable orig = makeLocatable(uid, parent);
+        Locatable orig = makeLocatable(uid, m_parent);
 
         HierObjectID otherUid = new HierObjectID(makeUUID());
-        Locatable other = makeLocatable(otherUid, parent);
+        Locatable other = makeLocatable(otherUid, m_parent);
 
         store.insert(orig);
         store.insert(other);

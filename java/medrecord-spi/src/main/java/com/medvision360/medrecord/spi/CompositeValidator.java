@@ -19,11 +19,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class CompositeValidator implements LocatableValidator, CompositeService<LocatableValidator>
 {
-    private List<LocatableValidator> delegates = new LinkedList<>();
+    private List<LocatableValidator> m_delegates = new LinkedList<>();
 
     public void addDelegate(LocatableValidator delegate)
     {
-        delegates.add(checkNotNull(delegate, "delegate cannot be null"));
+        m_delegates.add(checkNotNull(delegate, "delegate cannot be null"));
     }
 
     @Override
@@ -32,7 +32,7 @@ public class CompositeValidator implements LocatableValidator, CompositeService<
     {
         checkNotNull(locatable, "locatable cannot be null");
         ValidationReport result = null;
-        for (LocatableValidator delegate : delegates)
+        for (LocatableValidator delegate : m_delegates)
         {
             if (delegate.supports(locatable))
             {
@@ -67,7 +67,7 @@ public class CompositeValidator implements LocatableValidator, CompositeService<
     public boolean supports(Locatable test)
     {
         checkNotNull(test, "locatable cannot be null");
-        for (LocatableValidator delegate : delegates)
+        for (LocatableValidator delegate : m_delegates)
         {
             if (delegate.supports(test))
             {
@@ -81,7 +81,7 @@ public class CompositeValidator implements LocatableValidator, CompositeService<
     public boolean supports(Archetyped test)
     {
         checkNotNull(test, "archetyped cannot be null");
-        for (LocatableValidator delegate : delegates)
+        for (LocatableValidator delegate : m_delegates)
         {
             if (delegate.supports(test))
             {

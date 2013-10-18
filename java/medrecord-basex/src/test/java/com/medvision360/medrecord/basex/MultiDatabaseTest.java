@@ -51,14 +51,14 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
 
         LocatableSelector specialistECG = LocatableSelectorBuilder
                 .start()
-                .requireRMVersion("1.4")
+                .requireRMVersion("1.0.2")
                 .matchArchetypeId("^openEHR-EHR-OBSERVATION.ecg.v[12](?:draft)?$")
                 .build();
         store.addDelegate(getStore("MultiDatabaseTestECG", specialistECG));
 
         LocatableSelector basicEHR = LocatableSelectorBuilder
                 .start()
-                .requireRMVersion("1.4")
+                .requireRMVersion("1.0.2")
                 .requireRMName("EHR")
                 .matchRMEntity("^(?:COMPOSITION|EHRSTATUS|ACTION|ADMIN_ENTRY|EVALUATION|INSTRUCTION|OBSERVATION)$")
                 .build();
@@ -66,7 +66,7 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
 
         LocatableSelector basicDemographics = LocatableSelectorBuilder
                 .start()
-                .requireRMVersion("1.4")
+                .requireRMVersion("1.0.2")
                 .requireRMName("DEMOGRAPHIC")
                 .matchRMEntity("^(?:PARTY_IDENTITY|PARTY_RELATIONSHIP|PERSON|ORGANISATION|ROLE)$")
                 .build();
@@ -74,7 +74,7 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
 
         LocatableSelector standardsOnly = LocatableSelectorBuilder
                 .start()
-                .matchRMVersion("^1\\.[45]$")
+                .matchRMVersion("^1\\.0\\.[012]$")
                 .matchRMOriginator("openEHR")
                 .build();
         store.addDelegate(getStore("MultiDatabaseTestOPENEHR", standardsOnly));
@@ -102,13 +102,13 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
 
     public void testUsingCompositeStoreWithMultipleBaseXDatabaseBackends() throws Exception
     {
-        Archetyped personType = new Archetyped(new ArchetypeID("unittest-DEMOGRAPHIC-PERSON.person.v1"), "1.4");
-        Archetyped ehrStatusType = new Archetyped(new ArchetypeID("unittest-EHR-EHRSTATUS.ehrstatus.v1"), "1.4");
-        Archetyped ecgType = new Archetyped(new ArchetypeID("openEHR-EHR-OBSERVATION.ecg.v1"), "1.4");
+        Archetyped personType = new Archetyped(new ArchetypeID("unittest-DEMOGRAPHIC-PERSON.person.v1"), "1.0.2");
+        Archetyped ehrStatusType = new Archetyped(new ArchetypeID("unittest-EHR-EHRSTATUS.ehrstatus.v1"), "1.0.2");
+        Archetyped ecgType = new Archetyped(new ArchetypeID("openEHR-EHR-OBSERVATION.ecg.v1"), "1.0.2");
         Archetyped medicationListType = new Archetyped(new ArchetypeID("unittest-EHR-COMPOSITION.medication_list.v1"),
-                "1.4");
+                "1.0.2");
         Archetyped adminEntryType = new Archetyped(new ArchetypeID("unittest-EHR-ADMIN_ENTRY.status.v1"),
-                "1.4");
+                "1.0.2");
 
         assertTrue(store.supports(personType));
         assertTrue(store.supports(ehrStatusType));
@@ -161,7 +161,7 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
         HierObjectID uid = makeUID();
         DvText dvName = new DvText(name);
 
-        Locatable locatable = new MockLocatable(uid, "at0001", dvName, archetypeDetails, null, null, parent);
+        Locatable locatable = new MockLocatable(uid, "at0001", dvName, archetypeDetails, null, null, m_parent);
         return locatable;
     }
 }

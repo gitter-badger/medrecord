@@ -15,7 +15,7 @@ import static org.basex.core.Text.NAME_INVALID_X;
  */
 public class ExistsDB extends Command
 {
-    private boolean result;
+    private boolean m_result;
 
     public ExistsDB(String name)
     {
@@ -31,7 +31,7 @@ public class ExistsDB extends Command
             return error(NAME_INVALID_X, name);
         }
 
-        result = context.mprop.dbexists(name);
+        m_result = context.mprop.dbexists(name);
 
         return true;
     }
@@ -44,6 +44,6 @@ public class ExistsDB extends Command
 
     public boolean exists()
     {
-        return result;
+        return m_result;
     }
 }

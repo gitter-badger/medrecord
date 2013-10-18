@@ -28,17 +28,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class CompositeStore implements XQueryStore, CompositeService<LocatableStore>
 {
-    private List<LocatableStore> delegates = new LinkedList<>();
-    private String name;
+    private List<LocatableStore> m_delegates = new LinkedList<>();
+    private String m_name;
 
     public CompositeStore(String name)
     {
-        this.name = checkNotNull(name, "name cannot be null");
+        m_name = checkNotNull(name, "name cannot be null");
     }
 
     public void addDelegate(LocatableStore delegate)
     {
-        delegates.add(checkNotNull(delegate, "delegate cannot be null"));
+        m_delegates.add(checkNotNull(delegate, "delegate cannot be null"));
     }
 
     @Override
@@ -48,7 +48,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
         checkNotNull(id, "id cannot be null");
         NotFoundException nfe = null;
         IOException ioe = null;
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             try
             {
@@ -87,7 +87,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
         checkNotNull(id, "id cannot be null");
         NotFoundException nfe = null;
         IOException ioe = null;
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             try
             {
@@ -126,7 +126,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
         checkNotNull(id, "id cannot be null");
         NotFoundException nfe = null;
         IOException ioe = null;
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             try
             {
@@ -163,7 +163,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
             throws DuplicateException, NotSupportedException, IOException
     {
         checkNotNull(locatable, "locatable cannot be null");
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             if (delegate.supports(locatable))
             {
@@ -189,7 +189,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
         }
         boolean haveHierObjectID = hierObjectID != null;
 
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             boolean found = haveHierObjectID ? delegate.has(hierObjectID) : delegate.hasAny(objectVersionID);
             if (found)
@@ -205,7 +205,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
             throws IOException
     {
         checkNotNull(id, "id cannot be null");
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             if (delegate.has(id))
             {
@@ -220,7 +220,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
             throws IOException
     {
         checkNotNull(id, "id cannot be null");
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             if (delegate.has(id))
             {
@@ -235,7 +235,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
             throws IOException
     {
         checkNotNull(id, "id cannot be null");
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             if (delegate.hasAny(id))
             {
@@ -250,7 +250,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
             throws NotFoundException, IOException
     {
         checkNotNull(id, "id cannot be null");
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             if (delegate.has(id))
             {
@@ -266,7 +266,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
             throws NotFoundException, IOException
     {
         checkNotNull(id, "id cannot be null");
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             if (delegate.has(id))
             {
@@ -282,7 +282,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
             throws IOException
     {
         List<Iterable<HierObjectID>> all = new LinkedList<>();
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             all.add(delegate.list());
         }
@@ -295,7 +295,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
             throws IOException
     {
         List<Iterable<ObjectVersionID>> all = new LinkedList<>();
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             all.add(delegate.listVersions());
         }
@@ -309,7 +309,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
     {
         checkNotNull(XQuery, "XQuery cannot be null");
         List<Iterable<Locatable>> all = new LinkedList<>();
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             if (delegate instanceof XQueryStore)
             {
@@ -326,7 +326,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
     {
         checkNotNull(XQuery, "XQuery cannot be null");
         checkNotNull(os, "os cannot be null");
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             if (delegate instanceof XQueryStore)
             {
@@ -339,7 +339,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
     public void initialize()
             throws IOException
     {
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             delegate.initialize();
         }
@@ -349,7 +349,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
     public void clear()
             throws IOException
     {
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             delegate.clear();
         }
@@ -359,7 +359,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
     public boolean supports(Locatable test)
     {
         checkNotNull(test, "locatable cannot be null");
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             if (delegate.supports(test))
             {
@@ -373,7 +373,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
     public boolean supports(Archetyped test)
     {
         checkNotNull(test, "archetyped cannot be null");
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             if (delegate.supports(test))
             {
@@ -387,7 +387,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
     public void verifyStatus()
             throws StatusException
     {
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             delegate.verifyStatus();
         }
@@ -398,7 +398,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
             throws StatusException
     {
         StringBuilder b = new StringBuilder();
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             b.append(delegate.getName());
             b.append(": ");
@@ -411,13 +411,13 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
     @Override
     public String getName()
     {
-        return this.name;
+        return this.m_name;
     }
 
     @Override
     public boolean supportsTransactions()
     {
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             if (!delegate.supportsTransactions())
             {
@@ -431,7 +431,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
     public void begin()
             throws TransactionException
     {
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             delegate.begin();
         }
@@ -442,7 +442,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
             throws TransactionException
     {
         // todo we _should_ have two-phase commit for this, but, well, we don't
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             delegate.commit();
         }
@@ -452,7 +452,7 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
     public void rollback()
             throws TransactionException
     {
-        for (LocatableStore delegate : delegates)
+        for (LocatableStore delegate : m_delegates)
         {
             delegate.rollback();
         }

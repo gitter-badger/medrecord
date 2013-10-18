@@ -10,14 +10,15 @@ package com.medvision360.medrecord.spi;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.medvision360.medrecord.spi.exceptions.SerializeException;
 import org.openehr.rm.common.archetyped.Locatable;
 
 public interface LocatableSerializer extends LocatableSelector
 { // todo javadoc / api spec / exceptions
 
-    public void serialize(Locatable locatable, OutputStream os) throws IOException;
+    public void serialize(Locatable locatable, OutputStream os) throws IOException, SerializeException;
 
-    public void serialize(Locatable locatable, OutputStream os, String encoding) throws IOException;
+    public void serialize(Locatable locatable, OutputStream os, String encoding) throws IOException, SerializeException;
 
     public String getMimeType();
 

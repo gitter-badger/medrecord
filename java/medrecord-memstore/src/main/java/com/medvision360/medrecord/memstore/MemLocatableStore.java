@@ -33,15 +33,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MemLocatableStore extends AbstractLocatableStore
 {
-    private HierObjectID systemId;
-    private Map<HierObjectID, Locatable> storage = new ConcurrentHashMap<>();
-    private Map<ObjectVersionID, Locatable> versions = new ConcurrentHashMap<>();
+    private HierObjectID m_systemId;
+    private Map<HierObjectID, Locatable> m_storage = new ConcurrentHashMap<>();
+    private Map<ObjectVersionID, Locatable> m_versions = new ConcurrentHashMap<>();
     private long v = 1; // VersionTreeID: version cannot start with 0
 
     public MemLocatableStore(String name, LocatableSelector locatableSelector)
     {
         super(name, locatableSelector);
-        this.systemId = new HierObjectID(name);
+        m_systemId = new HierObjectID(name);
     }
 
     public MemLocatableStore(String name)
@@ -60,7 +60,7 @@ public class MemLocatableStore extends AbstractLocatableStore
     {
         checkNotNull(id, "id cannot be null");
 
-        Locatable result = storage.get(id);
+        Locatable result = m_storage.get(id);
         if (result == null)
         {
             throw notFound(id);
@@ -74,7 +74,7 @@ public class MemLocatableStore extends AbstractLocatableStore
     {
         checkNotNull(id, "id cannot be null");
 
-        Locatable result = versions.get(id);
+        Locatable result = m_versions.get(id);
         if (result == null)
         {
             throw notFound(id);
@@ -89,7 +89,7 @@ public class MemLocatableStore extends AbstractLocatableStore
         checkNotNull(id, "id cannot be null");
 
         List<Locatable> result = new ArrayList<>();
-        Collection<Locatable> all = versions.values();
+        Collection<Locatable> all = m_versions.values();
         for (Locatable locatable : all)
         {
             if (locatable.getUid().equals(id))
@@ -112,7 +112,7 @@ public class MemLocatableStore extends AbstractLocatableStore
         HierObjectID hierObjectID = getHierObjectID(locatable);
         ensureNotFound(hierObjectID);
 
-        storage.put(hierObjectID, locatable);
+        m_storage.put(hierObjectID, locatable);
         storeVersion(locatable);
 
         return locatable;
@@ -126,7 +126,7 @@ public class MemLocatableStore extends AbstractLocatableStore
         HierObjectID hierObjectID = getHierObjectID(locatable);
         ensureFound(hierObjectID);
 
-        storage.put(hierObjectID, locatable);
+        m_storage.put(hierObjectID, locatable);
         storeVersion(locatable);
 
         return locatable;
@@ -139,10 +139,10 @@ public class MemLocatableStore extends AbstractLocatableStore
         checkNotNull(id, "id cannot be null");
         ensureFound(id);
 
-        storage.remove(id);
+        m_storage.remove(id);
 
         List<ObjectVersionID> toDelete = new ArrayList<>();
-        Set<Map.Entry<ObjectVersionID, Locatable>> entrySet = versions.entrySet();
+        Set<Map.Entry<ObjectVersionID, Locatable>> entrySet = m_versions.entrySet();
         for (Map.Entry<ObjectVersionID, Locatable> entry : entrySet)
         {
             Locatable locatable = entry.getValue();
@@ -155,7 +155,7 @@ public class MemLocatableStore extends AbstractLocatableStore
         }
         for (ObjectVersionID objectVersionID : toDelete)
         {
-            versions.remove(objectVersionID);
+            m_versions.remove(objectVersionID);
         }
     }
 
@@ -164,7 +164,7 @@ public class MemLocatableStore extends AbstractLocatableStore
             throws IOException
     {
         checkNotNull(id, "id cannot be null");
-        return storage.containsKey(id);
+        return m_storage.containsKey(id);
     }
 
     @Override
@@ -172,7 +172,7 @@ public class MemLocatableStore extends AbstractLocatableStore
             throws IOException
     {
         checkNotNull(id, "id cannot be null");
-        return versions.containsKey(id);
+        return m_versions.containsKey(id);
     }
 
     @Override
@@ -192,21 +192,21 @@ public class MemLocatableStore extends AbstractLocatableStore
         checkNotNull(id, "id cannot be null");
         ensureFound(id);
 
-        versions.remove(id);
+        m_versions.remove(id);
     }
 
     @Override
     public Iterable<HierObjectID> list()
             throws IOException
     {
-        return ImmutableSet.copyOf(storage.keySet());
+        return ImmutableSet.copyOf(m_storage.keySet());
     }
 
     @Override
     public Iterable<ObjectVersionID> listVersions()
             throws IOException
     {
-        return ImmutableSet.copyOf(versions.keySet());
+        return ImmutableSet.copyOf(m_versions.keySet());
     }
 
     @Override
@@ -219,8 +219,8 @@ public class MemLocatableStore extends AbstractLocatableStore
     public void clear()
             throws IOException
     {
-        storage.clear();
-        versions.clear();
+        m_storage.clear();
+        m_versions.clear();
     }
 
     @Override
@@ -233,7 +233,7 @@ public class MemLocatableStore extends AbstractLocatableStore
     public String reportStatus()
             throws StatusException
     {
-        return String.format(String.format("%s locatables stored", storage.size()));
+        return String.format(String.format("%s locatables stored", m_storage.size()));
     }
 
     ///
@@ -243,7 +243,7 @@ public class MemLocatableStore extends AbstractLocatableStore
     protected void ensureNotFound(HierObjectID hierObjectID)
             throws DuplicateException
     {
-        if (storage.containsKey(hierObjectID))
+        if (m_storage.containsKey(hierObjectID))
         {
             throw duplicate(hierObjectID);
         }
@@ -252,7 +252,7 @@ public class MemLocatableStore extends AbstractLocatableStore
     protected void ensureFound(HierObjectID hierObjectID)
             throws NotFoundException
     {
-        if (!storage.containsKey(hierObjectID))
+        if (!m_storage.containsKey(hierObjectID))
         {
             throw notFound(hierObjectID);
         }
@@ -261,7 +261,7 @@ public class MemLocatableStore extends AbstractLocatableStore
     protected void ensureFound(ObjectVersionID id)
             throws NotFoundException
     {
-        if (!versions.containsKey(id))
+        if (!m_versions.containsKey(id))
         {
             throw notFound(id);
         }
@@ -274,7 +274,7 @@ public class MemLocatableStore extends AbstractLocatableStore
 
     protected ObjectVersionID newObjectVersionID(UID uid)
     {
-        return new ObjectVersionID(uid, systemId, nextVersion());
+        return new ObjectVersionID(uid, m_systemId, nextVersion());
     }
 
     private void storeVersion(Locatable locatable)
@@ -282,7 +282,7 @@ public class MemLocatableStore extends AbstractLocatableStore
         HierObjectID hierObjectID = getHierObjectID(locatable);
         UID uid = hierObjectID.root();
         ObjectVersionID objectVersionID = newObjectVersionID(uid);
-        versions.put(objectVersionID, locatable);
+        m_versions.put(objectVersionID, locatable);
     }
 
 }

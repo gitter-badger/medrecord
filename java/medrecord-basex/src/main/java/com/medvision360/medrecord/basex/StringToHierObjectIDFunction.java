@@ -5,11 +5,11 @@ import org.openehr.rm.support.identification.HierObjectID;
 
 class StringToHierObjectIDFunction implements Function<String, HierObjectID>
 {
-    private static final StringToHierObjectIDFunction instance = new StringToHierObjectIDFunction();
+    private static final StringToHierObjectIDFunction INSTANCE = new StringToHierObjectIDFunction();
 
     public static StringToHierObjectIDFunction getInstance()
     {
-        return instance;
+        return INSTANCE;
     }
 
     @Override
