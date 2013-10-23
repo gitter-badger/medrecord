@@ -17,6 +17,7 @@ dependencies {
 //    compile "org.apache.commons:commons-lang3:${ext.version.commonsLang3}"
     compile "openehr:xml-binding:${ext.version.openEhr}"
     compile "openehr:dadl-parser:${ext.version.openEhr}"
+    compile "openehr:dadl-binding:${ext.version.openEhr}"
     compile "jaxen:jaxen:${ext.version.jaxen}" // used by jdom
 
     testCompile project(':medrecord-spi-tck')
