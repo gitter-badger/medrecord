@@ -26,7 +26,7 @@ public class PVConverterTest extends LocatableConverterTCKTestBase
     @Override
     protected LocatableParser getParser() throws Exception
     {
-        return new PVParser(new TestTerminologyService(), new TestMeasurementService());
+        return new PVParser(new TestTerminologyService(), new TestMeasurementService(), encoding, lang);
     }
 
     @Override

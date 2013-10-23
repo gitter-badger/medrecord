@@ -1,40 +1,23 @@
 package com.medvision360.medrecord.pv;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import com.medvision360.medrecord.spi.exceptions.ParseException;
-import org.openehr.rm.support.identification.ArchetypeID;
-import org.openehr.rm.support.identification.HierObjectID;
 
 public class Node
 {
-    private HierObjectID m_uid;
     private String m_rmEntity;
-    private ArchetypeID m_archetypeId;
+    private String m_collectionType;
     private String m_archetypeNodeId;
-    private HierObjectID m_parentUid;
-    private ArchetypeID m_parentArchetypeId;
     private String m_attributeName;
     private int m_index = -1;
     private Node m_parent;
     private List<Node> m_children = new ArrayList<>();
-    private Map<Integer,Node> m_indexChildren = new HashMap<>();
     private String m_value;
     private String m_path;
+    private String m_level = "root";
 
-    public Node() {}
-
-    public void setUid(String uidString)
+    public Node()
     {
-        m_uid = new HierObjectID(uidString);
-    }
-
-    public HierObjectID getUid()
-    {
-        return m_uid;
     }
 
     public void setRmEntity(String rmEntity)
@@ -47,14 +30,14 @@ public class Node
         return m_rmEntity;
     }
 
-    public void setArchetypeId(String archetypeIdString)
+    public String getCollectionType()
     {
-        m_archetypeId = new ArchetypeID(archetypeIdString);
+        return m_collectionType;
     }
 
-    public ArchetypeID getArchetypeId()
+    public void setCollectionType(String collectionType)
     {
-        return m_archetypeId;
+        m_collectionType = collectionType;
     }
 
     public void setArchetypeNodeId(String archetypeNodeId)
@@ -65,26 +48,6 @@ public class Node
     public String getArchetypeNodeId()
     {
         return m_archetypeNodeId;
-    }
-
-    public void setParentUid(String uidString)
-    {
-        m_parentUid = new HierObjectID(uidString);
-    }
-
-    public HierObjectID getParentUid()
-    {
-        return m_parentUid;
-    }
-
-    public void setParentArchetypeId(String archetypeIdString)
-    {
-        m_parentArchetypeId = new ArchetypeID(archetypeIdString);
-    }
-
-    public ArchetypeID getParentArchetypeId()
-    {
-        return m_parentArchetypeId;
     }
 
     public void setAttributeName(String attributeName)
@@ -127,17 +90,42 @@ public class Node
         return m_children;
     }
 
-    public Node getChild(String attributeName, String archetypeNodeIdString)
+    public Node getAttributeNode(String attributeName)
     {
         for (Node child : m_children)
         {
-            if (equals(attributeName, child.m_attributeName) &&
-                    equals(archetypeNodeIdString, child.m_archetypeNodeId))
+            if (attributeName == null || attributeName.equals(child.m_attributeName))
             {
                 return child;
             }
         }
-        
+
+        return null;
+    }
+
+    public Node getIndexNode(int index)
+    {
+        for (Node child : m_children)
+        {
+            if (index == -1 || index == child.m_index)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
+    public Node getArchetypeNodeIdNode(String archetypeNodeId)
+    {
+        for (Node child : m_children)
+        {
+            if (archetypeNodeId == null || archetypeNodeId.equals(child.m_archetypeNodeId))
+            {
+                return child;
+            }
+        }
+
         return null;
     }
 
@@ -156,47 +144,99 @@ public class Node
         m_path = path;
     }
 
-    public String getPath()
+    public String getLevel()
     {
-        return m_path;
-    }
-    
-    public Node getIndexNode(int index) throws ParseException
-    {
-        return m_indexChildren.get(index);
+        return m_level;
     }
 
-    public void addIndexNode(Node node) throws ParseException
+    public void setLevel(String level)
     {
-        // since we are sorted alphabetically and not numerically this kind of check doesn't actually hold 
-        //      indexNode.getIndex() == indexMap.size()
-        // but conceptually it ought to be true eventually
-        if (m_indexChildren.containsKey(node.getIndex()))
-        {
-            throw new ParseException(String.format("Duplicate index in path %s", node.getPath()));
-        }
-        m_indexChildren.put(node.getIndex(), node);
+        m_level = level;
     }
 
-    private boolean equals(String orig, String other)
+    public boolean isLeaf()
     {
-        if (orig == null)
-        {
-            return other == null;
-        }
-        return orig.equals(other);
+        return getChildren().size() == 0;
     }
-    
+
+    public boolean isCollection()
+    {
+        return getCollectionType() != null;
+    }
+
+    public String findValue()
+    {
+        if (m_value != null)
+        {
+            return m_value;
+        }
+        Node child = firstChild();
+        if (child != null)
+        {
+            return child.findValue();
+        }
+        return null;
+    }
+
+    public Node findAttributeNode(String attributeName)
+    {
+        Node node = this;
+
+        if ("attribute".equals(node.getLevel()))
+        {
+            node = firstChild();
+        }
+        if ("index".equals(node.getLevel()))
+        {
+            node = firstChild();
+        }
+
+        // node.level == archetypeNodeId || node.level == root
+
+        Node result = node.getAttributeNode(attributeName);
+
+        // result.level == attribute
+
+        return result;
+    }
+
+    public String findArchetypeNodeId()
+    {
+        Node node = this;
+
+        if ("attribute".equals(node.getLevel()))
+        {
+            node = firstChild();
+        }
+        if ("index".equals(node.getLevel()))
+        {
+            node = firstChild();
+        }
+
+        return node.getArchetypeNodeId();
+    }
+
+    public Node firstChild()
+    {
+        if (m_children.size() != 0)
+        {
+            Node child = m_children.get(0);
+            return child;
+        }
+        return null;
+    }
+
     public String toString()
     {
         String result = "" +
-                (m_archetypeId == null ? "" : "[" + m_archetypeId + "]") +
-                (m_path == null ? "" : m_path) +
-                /*(m_attributeName == null ? "" : m_attributeName) +
-                (m_archetypeNodeId == null ? "" : "["+m_archetypeNodeId+"]") +
-                (m_index == -1 ? "" : "["+m_index+"]")*/
-                (m_rmEntity == null ? "" : " "+m_rmEntity) +
-                (m_uid == null ? "" : " "+m_uid);
+                (m_level == null ? "" : "{" + m_level + "} ") +
+                (m_attributeName == null ? "" : m_attributeName) +
+                (m_archetypeNodeId == null ? "" : "[" + m_archetypeNodeId + "]") +
+                (m_index == -1 ? "" : "[" + m_index + "]") +
+                (m_rmEntity == null ? "" : " (" + m_rmEntity.toUpperCase() + ")") +
+                (m_collectionType == null ? "" : " <" + m_collectionType.toUpperCase() + ">") +
+                (m_value == null ? "" : " = " + m_value) +
+                (m_path == null ? "" : "\n                                                                 " + m_path);
         return result;
     }
 }
