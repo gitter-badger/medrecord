@@ -14,8 +14,11 @@ package com.medvision360.medrecord.pv;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -28,7 +31,17 @@ import org.openehr.build.SystemValue;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.common.archetyped.Pathable;
+import org.openehr.rm.common.generic.PartyIdentified;
+import org.openehr.rm.common.generic.PartySelf;
+import org.openehr.rm.datatypes.quantity.datetime.DvDate;
+import org.openehr.rm.datatypes.quantity.datetime.DvDateTime;
+import org.openehr.rm.datatypes.quantity.datetime.DvDateTimeParser;
+import org.openehr.rm.datatypes.quantity.datetime.DvDuration;
+import org.openehr.rm.datatypes.quantity.datetime.DvTime;
 import org.openehr.rm.datatypes.text.CodePhrase;
+import org.openehr.rm.datatypes.text.DvCodedText;
+import org.openehr.rm.datatypes.text.DvText;
+import org.openehr.rm.datatypes.uri.DvURI;
 import org.openehr.rm.support.measurement.MeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
 
@@ -144,19 +157,41 @@ public class PVParser extends AbstractPVParser
     */
 
     private RMObjectBuilder m_builder;
+    private CodePhrase m_language;
+    private CodePhrase m_territory;
+    private CodePhrase m_encoding;
+    private DvCodedText m_categoryEvent;
 
     public PVParser(TerminologyService terminologyService, MeasurementService measurementService,
-            CodePhrase charset, CodePhrase language)
+            CodePhrase encoding, CodePhrase language, CodePhrase territory)
     {
-        super(charset.getCodeString());
+        super(encoding.getCodeString());
 
         Map<SystemValue, Object> systemValues = new HashMap<>();
         systemValues.put(SystemValue.TERMINOLOGY_SERVICE, terminologyService);
         systemValues.put(SystemValue.MEASUREMENT_SERVICE, measurementService);
-        systemValues.put(SystemValue.CHARSET, charset);
-        systemValues.put(SystemValue.ENCODING, charset);
+        systemValues.put(SystemValue.CHARSET, encoding);
+        systemValues.put(SystemValue.ENCODING, encoding);
+        m_encoding = encoding;
         systemValues.put(SystemValue.LANGUAGE, language);
-
+        m_language = language;
+        systemValues.put(SystemValue.TERRITORY, territory);
+        m_territory = territory;
+        
+        Iterator<CodePhrase> it = terminologyService
+                .terminology(TerminologyService.OPENEHR)
+                .codesForGroupName("composition category", m_language.getCodeString())
+                .iterator();
+        while (it.hasNext())
+        {
+            CodePhrase code = it.next();
+            if (code.getCodeString().equalsIgnoreCase("event"))
+            {
+                m_categoryEvent = new DvCodedText("event", code);
+                break;
+            }
+        }
+        
         m_builder = RMObjectBuilder.getInstance(systemValues);
     }
 
@@ -245,7 +280,27 @@ public class PVParser extends AbstractPVParser
             parseNodeFields(node, valueMap);
             parseChildren(node, valueMap);
 
-            Object result = m_builder.construct(rmEntity, valueMap);
+            Object result = null;
+            try
+            {
+                result = m_builder.construct(rmEntity, valueMap);
+            }
+            catch (RMObjectBuildingException e)
+            {
+                if (e.getMessage() != null && e.getMessage().contains("type unknown"))
+                {
+                    String guess = guessRmEntity(rmEntity, node);
+                    if (guess == null)
+                    {
+                        throw e;
+                    }
+                    result = m_builder.construct(guess, valueMap);
+                }
+                else
+                {
+                    throw e;
+                }
+            }
 
             for (Object child : valueMap.values())
             {
@@ -254,17 +309,9 @@ public class PVParser extends AbstractPVParser
 
             return result;
         }
-        catch (RMObjectBuildingException e)
+        catch (RMObjectBuildingException|InvocationTargetException|IllegalAccessException e)
         {
-            throw new ParseException(e);
-        }
-        catch (InvocationTargetException e)
-        {
-            throw new ParseException(e);
-        }
-        catch (IllegalAccessException e)
-        {
-            throw new ParseException(e);
+            throw new ParseException(String.format("Problem while parsing %s: %s", node, e.getMessage()), e);
         }
     }
 
@@ -293,7 +340,27 @@ public class PVParser extends AbstractPVParser
         // node.level == root|archetypeNodeId
         //   node.children.level == attribute
         String rmEntity = node.getRmEntity();
-        Map<String, Class> attributes = m_builder.retrieveAttribute(rmEntity);
+        Map<String, Class> attributes = null;
+        try
+        {
+            attributes = m_builder.retrieveAttribute(rmEntity);
+        }
+        catch (RMObjectBuildingException e)
+        {
+            if (e.getMessage() != null && e.getMessage().contains("RM type unknown"))
+            {
+                String guess = guessRmEntity(rmEntity, node);
+                if (guess == null)
+                {
+                    throw e;
+                }
+                attributes = m_builder.retrieveAttribute(guess);
+            }
+            else
+            {
+                throw e;
+            }
+        }
         List<Node> children = node.getChildren();
         for (Node child : children)
         {
@@ -319,7 +386,244 @@ public class PVParser extends AbstractPVParser
             Object value = parse(child); // recurse!
             valueMap.put(attributeName, value);
         }
+        guessDefaults(rmEntity, valueMap, attributes);
     }
+
+    private String guessRmEntity(String rmEntity, Node node)
+    {
+        if ("PartyProxy".equals(rmEntity))
+        {
+            String path = node.getPath();
+            if(path.startsWith("/subject"))
+            {
+                return "PartySelf";
+            }
+            return "PartyIdentified";
+        }
+        
+        if ("ObjectID".equals(rmEntity) || "UIDBasedID".equals(rmEntity))
+        {
+            return "HierObjectID";
+        }
+        
+        if ("ItemStructure".equals(rmEntity))
+        {
+            return "ItemList";
+        }
+        
+        if ("DataValue".equals(rmEntity))
+        {
+            String value = node.findValue();
+            if (value == null)
+            {
+                Node child = node.findAttributeNode("value");
+                if (child != null)
+                {
+                    value = child.findValue();
+                }
+            }
+            
+            if (value == null)
+            {
+                return null;
+            }
+            
+            if (value.matches("^-?[0-9]+(?:\\.[0-9]+)?(?:E[0-9]+)$"))
+            {
+                if (node.findAttributeNode("units") != null)
+                {
+                    return "DvQuantity";
+                }
+                else if (node.findAttributeNode("numerator") != null)
+                {
+                    return "DvProportion";
+                }
+                else if (node.findAttributeNode("magnitude") != null)
+                {
+                    return "DvCount";
+                }
+                else if (node.findAttributeNode("symbol") != null)
+                {
+                    return "DvOrdinal";
+                }
+            }
+
+            try
+            {
+                DvDuration.parseValue(value);
+                return "DvDuration";
+            } catch(IllegalArgumentException e) {}
+            
+            try
+            {
+                DvDateTimeParser.parseDateTime(value);
+                return "DvDateTime";
+            } catch(IllegalArgumentException e) {}
+            
+            try
+            {
+                DvDateTimeParser.parseDate(value);
+                return "DvDate";
+            } catch(IllegalArgumentException e) {}
+            
+            try
+            {
+                DvDateTimeParser.parseTime(value);
+                return "DvTime";
+            } catch(IllegalArgumentException e) {}
+            
+            if (node.findAttributeNode("id") != null
+                    && node.findAttributeNode("issuer") != null)
+            {
+                return "DvIdentifier";
+            }
+            
+            if (node.getAttributeNode("value") != null
+                    && node.getAttributeNode("value").getAttributeNode("value") != null
+                    && node.getAttributeNode("value").getAttributeNode("defining_code") != null)
+            {
+                // state is a DvValue hat takes anoter DvCodedText in the constructor
+                return "DvState";
+            }
+            
+            if (node.getAttributeNode("formalism") != null)
+            {
+                return "DvEncapsulated";
+            }
+            
+            if (node.getAttributeNode("mediaType") != null)
+            {
+                return "DvMultimedia";
+            }
+            
+            if (node.getAttributeNode("definingCode") != null)
+            {
+                return "DvCodedText";
+            }
+
+            if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value))
+            {
+                return "DvBoolean";
+            }
+
+            if (value.contains("://"))
+            {
+                try {
+                    URI uri = new URI(value);
+                    if ("ehr".equals(uri.getScheme()))
+                    {
+                        return "DvEHRURI";
+                    }
+                    return "DvURI";
+                }
+                catch (URISyntaxException e) {}
+            }
+
+            return "DvText";
+        }
+        
+        if ("DvEncapsulated".equals(rmEntity))
+        {
+            if (node.getAttributeNode("formalism") != null)
+            {
+                return "DvEncapsulated";
+            }
+            if (node.getAttributeNode("mediaType") != null)
+            {
+                return "DvMultimedia";
+            }
+            return null;
+        }
+        
+        return null;
+    }
+    
+    private void guessDefaults(String rmEntity, Map<String, Object> valueMap, Map<String, Class> attributes)
+    {
+        // todo I don't know why a lot of these don't simply count as SystemValue in the RM....
+        
+        if (attributes.containsKey("name") && !valueMap.containsKey("name"))
+        {
+            Class klass = attributes.get("name");
+            String className = klass.getSimpleName();
+            if ("String".equals(className))
+            {
+                valueMap.put("name", "UNNAMED");
+            }
+            else if ("DvText".equals(className))
+            {
+                valueMap.put("name", new DvText("UNNAMED"));
+            }
+        }
+
+        if (attributes.containsKey("language") && !valueMap.containsKey("language"))
+        {
+            Class klass = attributes.get("language");
+            String className = klass.getSimpleName();
+            if ("CodePhrase".equals(className))
+            {
+                valueMap.put("language", m_language);
+            }
+        }
+
+        if (attributes.containsKey("territory") && !valueMap.containsKey("territory"))
+        {
+            Class klass = attributes.get("territory");
+            String className = klass.getSimpleName();
+            if ("CodePhrase".equals(className))
+            {
+                valueMap.put("territory", m_territory);
+            }
+        }
+
+        if (attributes.containsKey("encoding") && !valueMap.containsKey("encoding"))
+        {
+            Class klass = attributes.get("encoding");
+            String className = klass.getSimpleName();
+            if ("CodePhrase".equals(className))
+            {
+                valueMap.put("encoding", m_encoding);
+            }
+        }
+
+        if ("ARCHETYPED".equalsIgnoreCase(rmEntity))
+        {
+            if (attributes.containsKey("rmVersion") && !valueMap.containsKey("rmVersion"))
+            {
+                valueMap.put("rmVersion", "1.0.2");
+            }
+        }
+
+        if ("COMPOSITION".equalsIgnoreCase(rmEntity))
+        {
+            if (m_categoryEvent != null && !valueMap.containsKey("category"))
+            {
+                valueMap.put("category", m_categoryEvent);
+            }
+            
+            if (!valueMap.containsKey("composer"))
+            {
+                PartyIdentified composer = new PartyIdentified(null, "UNKNOWN", null);
+                valueMap.put("composer", composer);
+            }
+        }
+
+        if ("OBSERVATION".equalsIgnoreCase(rmEntity) ||
+                "EVALUATION".equalsIgnoreCase(rmEntity) ||
+                "INSTRUCTION".equalsIgnoreCase(rmEntity) ||
+                "ACTION".equalsIgnoreCase(rmEntity) ||
+                "ADMINENTRY".equalsIgnoreCase(rmEntity) ||
+                "CAREENTRY".equalsIgnoreCase(rmEntity))
+        {
+            if (!valueMap.containsKey("subject"))
+            {
+                PartySelf self = new PartySelf();
+                valueMap.put("subject", self);
+            }
+        }
+    }
+
+    
 
 
     private void setParent(Object child, Object parent)

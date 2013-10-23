@@ -144,6 +144,11 @@ public class Node
         m_path = path;
     }
 
+    public String getPath()
+    {
+        return m_path;
+    }
+
     public String getLevel()
     {
         return m_level;
