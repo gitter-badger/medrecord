@@ -1,0 +1,30 @@
+// some standard settings for Java applications (language level etc)
+apply plugin: 'medvision-java'
+
+description = 'MEDvision360 MEDrecord Integration Tests'
+
+dependencies {
+    compile project(':medrecord-spi')
+    compile project(':medrecord-basex')
+    compile project(':medrecord-memstore')
+    compile project(':medrecord-pv')
+    compile project(':medrecord-riio')
+    compile project(':medrecord-memstore')
+    compile project(':medrecord-engine')
+
+    compile project(':medrecord-spi-tck')
+    
+    compile "openehr:openehr-aom:${ext.version.openEhr}"
+    compile "openehr:openehr-rm-core:${ext.version.openEhr}"
+    compile "openehr:openehr-rm-domain:${ext.version.openEhr}"
+    compile "openehr:adl-parser:${ext.version.openEhr}"
+    compile "openehr:adl-serializer:${ext.version.openEhr}"
+    compile "openehr:rm-skeleton:${ext.version.openEhr}"
+
+    compile "junit:junit:${ext.version.junit}"
+
+    compile "com.medvision360.archetypes:openehr-archetypes:${ext.version.archetypes}"
+    compile "com.medvision360.archetypes:openehr-archetypes-chiron:${ext.version.archetypes}"
+    compile "com.medvision360.archetypes:openehr-archetypes-medfit:${ext.version.archetypes}"
+    compile "com.medvision360.archetypes:openehr-archetypes-mobiguide:${ext.version.archetypes}"
+}

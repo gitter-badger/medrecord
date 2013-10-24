@@ -58,6 +58,7 @@ public class PVConverterTest extends LocatableConverterTCKTestBase
         };
 
         String json = toJSON(sample);
+        System.out.println(json);
         ByteArrayInputStream is = new ByteArrayInputStream(json.getBytes("UTF-8"));
         Locatable locatable = m_parser.parse(is);
         

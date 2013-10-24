@@ -63,7 +63,9 @@ subprojects {
                 'basex': '7.7.2',
                 'jdom': '2.0.2',
                 'jaxen': '1.1.4',
-                'jackson': '2.2.3'
+                'jackson': '2.2.3',
+                'archetypes': '2.0.0',
+                'spring': '3.2.4.RELEASE'
         ]
     }
 

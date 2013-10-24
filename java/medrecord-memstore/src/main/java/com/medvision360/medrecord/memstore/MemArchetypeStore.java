@@ -1,6 +1,8 @@
 package com.medvision360.medrecord.memstore;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -77,6 +79,12 @@ public class MemArchetypeStore implements ArchetypeStore
         {
             m_locks.put(archetypeID, true);
         }
+    }
+
+    @Override
+    public Iterable<ArchetypeID> list() throws IOException
+    {
+        return new HashSet<>(m_store.keySet());
     }
 
     @Override

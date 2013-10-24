@@ -24,6 +24,8 @@ public interface ArchetypeStore // todo javadoc / api spec / exceptions
     public void delete(ArchetypeID archetypeID) throws InUseException, IOException, NotFoundException;
     
     public void lock(ArchetypeID archetypeID) throws NotFoundException, IOException;
+    
+    public Iterable<ArchetypeID> list() throws IOException;
 
     public void initialize() throws IOException;
 

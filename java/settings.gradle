@@ -1,13 +1,15 @@
 include(
         'medrecord-basex',
         'medrecord-client-archetyped',
+        'medrecord-engine',
+        'medrecord-itest',
         'medrecord-jcg',
         'medrecord-memstore',
         'medrecord-pv',
+        'medrecord-riio',
         'medrecord-spi',
         'medrecord-spi-tck',
-        'medrecord-tools-dumpadl',
-        'medrecord-riio'
+        'medrecord-tools-dumpadl'
 )
 
 project(':medrecord-client-archetyped').projectDir = new File(rootDir, 'medrecord-client/medrecord-client-archetyped')
