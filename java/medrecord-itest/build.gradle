@@ -13,13 +13,6 @@ dependencies {
     compile project(':medrecord-engine')
 
     compile project(':medrecord-spi-tck')
-    
-    compile "openehr:openehr-aom:${ext.version.openEhr}"
-    compile "openehr:openehr-rm-core:${ext.version.openEhr}"
-    compile "openehr:openehr-rm-domain:${ext.version.openEhr}"
-    compile "openehr:adl-parser:${ext.version.openEhr}"
-    compile "openehr:adl-serializer:${ext.version.openEhr}"
-    compile "openehr:rm-skeleton:${ext.version.openEhr}"
 
     compile "junit:junit:${ext.version.junit}"
 

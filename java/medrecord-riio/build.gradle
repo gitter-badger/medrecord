@@ -15,9 +15,6 @@ dependencies {
 //    compile "com.fasterxml.jackson.core:jackson-core:${ext.version.jackson}"
 //    compile "com.fasterxml.jackson.core:jackson-databind:${ext.version.jackson}"
 //    compile "org.apache.commons:commons-lang3:${ext.version.commonsLang3}"
-    compile "openehr:xml-binding:${ext.version.openEhr}"
-    compile "openehr:dadl-parser:${ext.version.openEhr}"
-    compile "openehr:dadl-binding:${ext.version.openEhr}"
     compile "jaxen:jaxen:${ext.version.jaxen}" // used by jdom
 
     testCompile project(':medrecord-spi-tck')

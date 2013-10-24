@@ -18,7 +18,6 @@ dependencies {
     compile "com.fasterxml.jackson.core:jackson-core:${ext.version.jackson}"
     compile "com.fasterxml.jackson.core:jackson-databind:${ext.version.jackson}"
     compile "org.apache.commons:commons-lang3:${ext.version.commonsLang3}"
-    compile "openehr:rm-builder:${ext.version.openEhr}"
 
     testCompile project(':medrecord-spi-tck')
     testCompile project(':medrecord-memstore')

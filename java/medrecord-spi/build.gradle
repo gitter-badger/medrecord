@@ -9,11 +9,64 @@ tasks.withType(License).each { licenseTask ->
     licenseTask.exclude 'com/medvision360/medrecord/spi/AuditInfo.java'
 }
 
+import org.gradle.plugins.ide.idea.model.*
+apply plugin: 'idea'
+
+idea.module.iml {
+    whenMerged { module ->
+        
+        // add module dependencies for vendor libraries
+        def toModuleDependencies = [
+                'adl-parser',
+                'adl-serializer',
+                //'archetype-validator',
+                'dadl-binding',
+                'dadl-parser',
+                'measure-serv',
+                'mini-termserv',
+                //'oet-parser',
+                'openehr-aom',
+                //'openehr-ap',
+                'openehr-rm-core',
+                'openehr-rm-domain',
+                'rm-builder',
+                'rm-skeleton',
+                'xml-binding',
+                'xml-serializer'
+        ]
+        
+        toModuleDependencies.each { dependencyName ->
+            module.dependencies += new ModuleDependency(dependencyName, 'COMPILE')
+        }
+
+        // split dependencies into module dependencies and jar dependencies
+        def moduleDependencies = []
+        module.dependencies.each { dependency ->
+            if (dependency.class.simpleName == 'ModuleDependency') {
+                if (dependency.scope.equalsIgnoreCase("COMPILE")) {
+                    moduleDependencies += dependency
+                }
+            }
+        }
+
+        module.dependencies.removeAll(moduleDependencies)
+        def jarDependencies = new LinkedHashSet(module.dependencies)
+
+        module.dependencies.clear()
+        module.dependencies.addAll(moduleDependencies)
+        module.dependencies.addAll(jarDependencies)
+    }
+}
+
+
 description = 'MEDvision360 MEDrecord Service Provider Interface'
 
 dependencies {
     compile "com.google.guava:guava:${ext.version.guava}"
+    compile "openehr:openehr-aom:${ext.version.openEhr}"
     compile "openehr:openehr-rm-core:${ext.version.openEhr}"
     compile "openehr:openehr-rm-domain:${ext.version.openEhr}"
-    compile "openehr:openehr-aom:${ext.version.openEhr}"
+    compile "openehr:adl-parser:${ext.version.openEhr}"
+    compile "openehr:adl-serializer:${ext.version.openEhr}"
+    compile "openehr:rm-skeleton:${ext.version.openEhr}"
 }

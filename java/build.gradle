@@ -23,6 +23,27 @@ allprojects {
     // Gradle can generate IDEA project files.
     // Run 'gradle idea' and open the project file in IDEA.
     apply plugin: 'idea'
+
+    idea.module.iml {
+        whenMerged { module ->
+            // split dependencies into module dependencies and jar dependencies
+            def moduleDependencies = []
+            module.dependencies.each { dependency ->
+                if (dependency.class.simpleName == 'ModuleDependency') {
+                    if (dependency.scope.equalsIgnoreCase("COMPILE")) {
+                        moduleDependencies += dependency
+                    }
+                }
+            }
+    
+            module.dependencies.removeAll(moduleDependencies)
+            def jarDependencies = new LinkedHashSet(module.dependencies)
+    
+            module.dependencies.clear()
+            module.dependencies.addAll(moduleDependencies)
+            module.dependencies.addAll(jarDependencies)
+        }
+    }
 }
 
 subprojects {

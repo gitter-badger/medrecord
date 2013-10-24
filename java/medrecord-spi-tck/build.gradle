@@ -14,5 +14,4 @@ dependencies {
     compile project(':medrecord-spi')
     compile "junit:junit:${ext.version.junit}"
     compile "commons-io:commons-io:${ext.version.commonsIo}"
-    compile "openehr:adl-parser:${ext.version.openEhr}"
 }
