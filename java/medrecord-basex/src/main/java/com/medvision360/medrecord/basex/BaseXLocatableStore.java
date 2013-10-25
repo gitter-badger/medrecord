@@ -36,6 +36,7 @@ import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.Replace;
 import org.basex.core.cmd.XQuery;
+import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.ObjectVersionID;
@@ -162,6 +163,18 @@ public class BaseXLocatableStore extends AbstractLocatableStore implements XQuer
         {
             m_path = "/";
         }
+    }
+
+    @Override
+    public boolean supports(Locatable test)
+    {
+        return super.supports(test) && m_parser.supports(test) && m_serializer.supports(test);
+    }
+
+    @Override
+    public boolean supports(Archetyped test)
+    {
+        return super.supports(test) && m_parser.supports(test) && m_serializer.supports(test);
     }
 
     @Override

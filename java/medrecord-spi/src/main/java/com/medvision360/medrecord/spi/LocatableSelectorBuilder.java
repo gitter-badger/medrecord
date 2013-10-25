@@ -168,18 +168,28 @@ public class LocatableSelectorBuilder
         @Override
         public boolean match(Locatable test)
         {
-            return getTest(test).equals(m_expected);
+            Object toTest = getTest(test);
+            if (toTest == null)
+            {
+                return test == null;
+            }
+            return toTest.equals(m_expected);
         }
 
         @Override
         public boolean match(Archetyped test)
         {
-            return getTest(test).equals(m_expected);
+            Object toTest = getTest(test);
+            if (toTest == null)
+            {
+                return test == null;
+            }
+            return toTest.equals(m_expected);
         }
 
         protected Object getTest(Locatable test)
         {
-            return getTest(test.getArchetypeDetails());
+            return getTest(test == null ? null : test.getArchetypeDetails());
         }
 
         protected abstract Object getTest(Archetyped test);
@@ -208,7 +218,7 @@ public class LocatableSelectorBuilder
 
         protected String getTest(Locatable test)
         {
-            return getTest(test.getArchetypeDetails());
+            return getTest(test == null ? null : test.getArchetypeDetails());
         }
 
         protected abstract String getTest(Archetyped test);
@@ -262,7 +272,7 @@ public class LocatableSelectorBuilder
         @Override
         protected String getTest(Archetyped test)
         {
-            return test.getRmVersion();
+            return test == null ? null : test.getRmVersion();
         }
     }
 
@@ -276,7 +286,7 @@ public class LocatableSelectorBuilder
         @Override
         protected Object getTest(Archetyped test)
         {
-            return test.getRmVersion();
+            return test == null ? null : test.getRmVersion();
         }
     }
 
@@ -328,7 +338,9 @@ public class LocatableSelectorBuilder
         @Override
         protected String getTest(Archetyped test)
         {
-            return test.getArchetypeId().getValue();
+            return test == null ? null :
+                    test.getArchetypeId() == null ? null :
+                            test.getArchetypeId().getValue();
         }
     }
 
@@ -342,7 +354,9 @@ public class LocatableSelectorBuilder
         @Override
         protected Object getTest(Archetyped test)
         {
-            return test.getArchetypeId().getValue();
+            return test == null ? null :
+                    test.getArchetypeId() == null ? null :
+                            test.getArchetypeId().getValue();
         }
     }
 
@@ -394,7 +408,9 @@ public class LocatableSelectorBuilder
         @Override
         protected String getTest(Archetyped test)
         {
-            return test.getArchetypeId().rmOriginator();
+            return test == null ? null :
+                test.getArchetypeId() == null ? null :
+                        test.getArchetypeId().rmOriginator();
         }
     }
 
@@ -408,7 +424,9 @@ public class LocatableSelectorBuilder
         @Override
         protected Object getTest(Archetyped test)
         {
-            return test.getArchetypeId().rmOriginator();
+            return test == null ? null :
+                test.getArchetypeId() == null ? null :
+                        test.getArchetypeId().rmOriginator();
         }
     }
 
@@ -460,7 +478,9 @@ public class LocatableSelectorBuilder
         @Override
         protected String getTest(Archetyped test)
         {
-            return test.getArchetypeId().rmName();
+            return test == null ? null :
+                test.getArchetypeId() == null ? null :
+                        test.getArchetypeId().rmName();
         }
     }
 
@@ -474,7 +494,9 @@ public class LocatableSelectorBuilder
         @Override
         protected Object getTest(Archetyped test)
         {
-            return test.getArchetypeId().rmName();
+            return test == null ? null :
+                test.getArchetypeId() == null ? null :
+                        test.getArchetypeId().rmName();
         }
     }
 
@@ -526,7 +548,9 @@ public class LocatableSelectorBuilder
         @Override
         protected String getTest(Archetyped test)
         {
-            return test.getArchetypeId().rmEntity();
+            return test == null ? null :
+                test.getArchetypeId() == null ? null :
+                        test.getArchetypeId().rmEntity();
         }
     }
 
@@ -540,7 +564,9 @@ public class LocatableSelectorBuilder
         @Override
         protected Object getTest(Archetyped test)
         {
-            return test.getArchetypeId().rmEntity();
+            return test == null ? null :
+                test.getArchetypeId() == null ? null :
+                        test.getArchetypeId().rmEntity();
         }
     }
 }

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.openehr.am.archetype.constraintmodel.CObject</OriginalElement>
+  <nodes>
+    <node x="250.0" y="581.0">org.openehr.am.archetype.constraintmodel.ArchetypeInternalRef</node>
+    <node x="0.0" y="196.0">org.openehr.am.openehrprofile.datatypes.quantity.CDvQuantity</node>
+    <node x="348.0" y="393.0">org.openehr.am.archetype.constraintmodel.CDefinedObject</node>
+    <node x="261.0" y="321.0">org.openehr.am.archetype.constraintmodel.CObject</node>
+    <node x="0.0" y="449.0">org.openehr.am.archetype.constraintmodel.ArchetypeSlot</node>
+    <node x="89.0" y="128.0">org.openehr.am.openehrprofile.datatypes.text.CCodePhrase</node>
+    <node x="522.0" y="369.0">org.openehr.am.archetype.constraintmodel.CPrimitiveObject</node>
+    <node x="322.0" y="60.0">org.openehr.am.archetype.constraintmodel.ArchetypeConstraint</node>
+    <node x="162.0" y="448.0">org.openehr.am.archetype.constraintmodel.CReferenceObject</node>
+    <node x="420.0" y="510.0">org.openehr.am.archetype.constraintmodel.CComplexObject</node>
+    <node x="146.0" y="242.0">org.openehr.am.archetype.constraintmodel.CDomainType</node>
+    <node x="455.0" y="181.0">org.openehr.am.archetype.constraintmodel.CAttribute</node>
+    <node x="421.0" y="270.0">org.openehr.am.archetype.constraintmodel.CMultipleAttribute</node>
+    <node x="89.0" y="570.0">org.openehr.am.archetype.constraintmodel.ConstraintRef</node>
+    <node x="103.0" y="355.0">org.openehr.am.openehrprofile.datatypes.quantity.CDvOrdinal</node>
+    <node x="8.0" y="284.0">org.openehr.am.openehrprofile.datatypes.basic.CDvState</node>
+    <node x="589.0" y="133.0">org.openehr.am.archetype.constraintmodel.CSingleAttribute</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.openehr.am.archetype.constraintmodel.CDomainType" target="org.openehr.am.archetype.constraintmodel.CObject">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.openehrprofile.datatypes.text.CCodePhrase" target="org.openehr.am.archetype.constraintmodel.CDomainType">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.archetype.constraintmodel.CDefinedObject" target="org.openehr.am.archetype.constraintmodel.CObject">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.archetype.constraintmodel.ConstraintRef" target="org.openehr.am.archetype.constraintmodel.CReferenceObject">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.archetype.constraintmodel.CSingleAttribute" target="org.openehr.am.archetype.constraintmodel.CAttribute">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.archetype.constraintmodel.ArchetypeInternalRef" target="org.openehr.am.archetype.constraintmodel.CReferenceObject">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.archetype.constraintmodel.CComplexObject" target="org.openehr.am.archetype.constraintmodel.CDefinedObject">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.archetype.constraintmodel.ArchetypeSlot" target="org.openehr.am.archetype.constraintmodel.CReferenceObject">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.openehrprofile.datatypes.basic.CDvState" target="org.openehr.am.archetype.constraintmodel.CDomainType">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.archetype.constraintmodel.CReferenceObject" target="org.openehr.am.archetype.constraintmodel.CObject">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.openehrprofile.datatypes.quantity.CDvOrdinal" target="org.openehr.am.archetype.constraintmodel.CDomainType">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.openehrprofile.datatypes.quantity.CDvQuantity" target="org.openehr.am.archetype.constraintmodel.CDomainType">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.archetype.constraintmodel.CMultipleAttribute" target="org.openehr.am.archetype.constraintmodel.CAttribute">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.archetype.constraintmodel.CObject" target="org.openehr.am.archetype.constraintmodel.ArchetypeConstraint">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.archetype.constraintmodel.CPrimitiveObject" target="org.openehr.am.archetype.constraintmodel.CDefinedObject">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="org.openehr.am.archetype.constraintmodel.CAttribute" target="org.openehr.am.archetype.constraintmodel.ArchetypeConstraint">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="350.0" y="294.0" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

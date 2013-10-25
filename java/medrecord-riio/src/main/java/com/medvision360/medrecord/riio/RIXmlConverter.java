@@ -404,12 +404,30 @@ public class RIXmlConverter implements LocatableParser, LocatableSerializer
     @Override
     public boolean supports(Locatable test)
     {
+        if (test == null)
+        {
+            return false;
+        }
         return supports(test.getArchetypeDetails());
     }
 
     @Override
     public boolean supports(Archetyped test)
     {
-        return m_rmEntityToXmlFactorySerializerMap.containsKey(test.getArchetypeId().rmEntity().toLowerCase());
+        if (test == null)
+        {
+            return false;
+        }
+        ArchetypeID archetypeID = test.getArchetypeId();
+        if (archetypeID == null)
+        {
+            return false;
+        }
+        String rmEntity = archetypeID.rmEntity();
+        if (rmEntity == null)
+        {
+            return false;
+        }
+        return m_rmEntityToXmlFactorySerializerMap.containsKey(rmEntity.toLowerCase());
     }
 }

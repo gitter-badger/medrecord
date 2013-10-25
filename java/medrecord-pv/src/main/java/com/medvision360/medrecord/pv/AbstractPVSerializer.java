@@ -73,6 +73,10 @@ public abstract class AbstractPVSerializer implements LocatableSerializer
     protected void walk(Object obj, SerializeVisitor visitor, String path)
             throws InvocationTargetException, IllegalAccessException, IOException, SerializeException
     {
+        if (obj == null)
+        {
+            return;
+        }
         SortedMap<String, Attribute> attributes = attributeMap(obj.getClass());
         String name;
         String pathName;

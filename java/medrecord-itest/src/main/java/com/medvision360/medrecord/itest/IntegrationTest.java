@@ -1,27 +1,49 @@
 package com.medvision360.medrecord.itest;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.medvision360.medrecord.basex.BaseXLocatableStore;
 import com.medvision360.medrecord.engine.ArchetypeLoader;
+import com.medvision360.medrecord.engine.UIDGenerator;
 import com.medvision360.medrecord.memstore.MemArchetypeStore;
+import com.medvision360.medrecord.memstore.MemLocatableStore;
+import com.medvision360.medrecord.pv.PVSerializer;
 import com.medvision360.medrecord.riio.RIXmlConverter;
 import com.medvision360.medrecord.spi.ArchetypeStore;
 import com.medvision360.medrecord.spi.CompositeStore;
+import com.medvision360.medrecord.spi.CompositeTransformer;
 import com.medvision360.medrecord.spi.LocatableSelector;
 import com.medvision360.medrecord.spi.LocatableSelectorBuilder;
 import com.medvision360.medrecord.spi.LocatableStore;
+import com.medvision360.medrecord.spi.LocatableTransformer;
+import com.medvision360.medrecord.spi.exceptions.NotFoundException;
+import com.medvision360.medrecord.spi.exceptions.ParseException;
+import com.medvision360.medrecord.spi.exceptions.SerializeException;
 import com.medvision360.medrecord.spi.tck.RMTestBase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.basex.core.Context;
 import org.openehr.am.archetype.Archetype;
+import org.openehr.build.RMObjectBuilder;
+import org.openehr.build.SystemValue;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.support.identification.ArchetypeID;
-import org.openehr.rm.util.SkeletonGenerator;
+import org.openehr.rm.support.identification.HierObjectID;
+import org.openehr.rm.support.measurement.MeasurementService;
+import org.openehr.rm.support.measurement.SimpleMeasurementService;
+import org.openehr.rm.support.terminology.TerminologyService;
+import org.openehr.terminology.SimpleTerminologyService;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
@@ -29,6 +51,9 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 public class IntegrationTest extends RMTestBase
 {
     private final static Log log = LogFactory.getLog(IntegrationTest.class);
+    
+    private TerminologyService m_terminologyService;
+    private MeasurementService m_measurementService;
 
     private ArchetypeStore m_archetypeStore;
     private ResourcePatternResolver m_resolver;
@@ -37,20 +62,30 @@ public class IntegrationTest extends RMTestBase
     private boolean m_adlEmptyPurposeCompatible;
     private ArchetypeLoader m_archetypeLoader;
     
-    //private GenerationStrategy m_generationStrategy;
-    private SkeletonGenerator m_skeletonGenerator;
+    private RMObjectBuilder m_rmObjectBuilder;
+    
+    private LocatableGenerator m_locatableGenerator;
     
     RIXmlConverter m_xmlConverter;
+    
+    PVSerializer m_pvSerializer;
+    
+    LocatableTransformer m_locatableTransformer;
 
     List<Context> m_baseXContexts;
     String m_locatableStoreName = "IntegrationTest";
     String m_locatableStorePath = "itest";
     LocatableStore m_locatableStore;
+    LocatableStore m_fallbackStore;
     
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
+        
+        m_terminologyService = SimpleTerminologyService.getInstance();
+        m_measurementService = SimpleMeasurementService.getInstance();
+        
         m_archetypeStore = new MemArchetypeStore();
 
         m_resolver = new PathMatchingResourcePatternResolver();
@@ -60,12 +95,25 @@ public class IntegrationTest extends RMTestBase
         m_archetypeLoader = new ArchetypeLoader(m_archetypeStore, m_resolver, m_archetypeLoaderBasePath,
                 m_adlMissingLanguageCompatible, m_adlEmptyPurposeCompatible);
 
-        // todo experiment with strategies m_generationStrategy = GenerationStrategy.MAXIMUM;
-        m_skeletonGenerator = SkeletonGenerator.getInstance(); // todo make configurable
+        Map<SystemValue, Object> systemValues = new HashMap<>();
+        systemValues.put(SystemValue.TERMINOLOGY_SERVICE, m_terminologyService);
+        systemValues.put(SystemValue.MEASUREMENT_SERVICE, m_measurementService);
+        systemValues.put(SystemValue.LANGUAGE, Terminology.L_en);
+        systemValues.put(SystemValue.CHARSET, Terminology.CHARSET_UTF8);
+        systemValues.put(SystemValue.TERRITORY, Terminology.C_NL);
+        systemValues.put(SystemValue.ENCODING, Terminology.CHARSET_UTF8);
+        m_rmObjectBuilder = new RMObjectBuilder(systemValues);
+
+        m_locatableGenerator = new LocatableGenerator(m_archetypeStore, m_terminologyService, m_measurementService, 
+                m_rmObjectBuilder);
         
-        m_xmlConverter = new RIXmlConverter(ts, ms, encoding, lang);
+        m_xmlConverter = new RIXmlConverter(m_terminologyService, m_measurementService,
+                Terminology.CHARSET_UTF8, Terminology.L_en);
         
-        m_baseXContexts = new ArrayList<>();
+        m_pvSerializer = new PVSerializer();
+        
+        m_locatableTransformer = getLocatableTransformer();
+        
         m_locatableStore = getLocatableStore();
     }
     
@@ -81,11 +129,12 @@ public class IntegrationTest extends RMTestBase
     
     protected LocatableStore getLocatableStore() throws Exception
     {
+        m_baseXContexts = new ArrayList<>();
         CompositeStore store = new CompositeStore(m_locatableStoreName);
 
         LocatableSelector basicEHR = LocatableSelectorBuilder
                 .start()
-                .requireRMVersion("1.0.2")
+                //.requireRMVersion("1.0.2")
                 .requireRMName("EHR")
                 .matchRMEntity("^(?:COMPOSITION|EHRSTATUS|ACTION|ADMIN_ENTRY|EVALUATION|INSTRUCTION|OBSERVATION)$")
                 .build();
@@ -93,15 +142,20 @@ public class IntegrationTest extends RMTestBase
 
         LocatableSelector basicDemographics = LocatableSelectorBuilder
                 .start()
-                .requireRMVersion("1.0.2")
+                //.requireRMVersion("1.0.2")
                 .requireRMName("DEMOGRAPHIC")
-                .matchRMEntity("^(?:PARTY_IDENTITY|PARTY_RELATIONSHIP|PERSON|ORGANISATION|ROLE)$")
+                .matchRMEntity("^(?:PARTY_IDENTITY|PARTY_RELATIONSHIP|PERSON|ORGANISATION|ROLE|ADDRESS|CAPABILITY)$")
                 .build();
         store.addDelegate(getStore("IntegrationTestDEMOGRAPHIC", basicDemographics));
 
-        LocatableSelector fallback = LocatableSelectorBuilder.any();
-        store.addDelegate(getStore("IntegrationTestFALLBACK", fallback));
+        LocatableSelector xmlFallback = LocatableSelectorBuilder.any();
+        store.addDelegate(getStore("IntegrationTestFALLBACK", xmlFallback));
         
+        m_fallbackStore = new MemLocatableStore("IntegrationTestMEMORY");
+        
+        store.addDelegate(m_fallbackStore);
+        
+        store.clear();
         store.initialize();
 
         return store;
@@ -122,6 +176,13 @@ public class IntegrationTest extends RMTestBase
         );
     }
     
+    protected LocatableTransformer getLocatableTransformer()
+    {
+        CompositeTransformer transformer = new CompositeTransformer();
+        transformer.addDelegate(new UIDGenerator());
+        return transformer;
+    }
+    
     public void testEverything() throws Exception
     {
         m_archetypeLoader.loadAll("openehr");
@@ -130,11 +191,20 @@ public class IntegrationTest extends RMTestBase
         m_archetypeLoader.loadAll("mobiguide");
         
         Iterable<ArchetypeID> allArchetypeIDs = m_archetypeStore.list();
-        int generated = 0;
-        int inserted = 0;
-        for (ArchetypeID archetypeID : allArchetypeIDs)
+        TreeSet<String> sortedIDs = new TreeSet<>();
+        Iterables.addAll(sortedIDs, Iterables.transform(allArchetypeIDs, new Function<ArchetypeID, String>()
         {
-            String archetypeName = archetypeID.getValue();
+            public String apply(ArchetypeID input)
+            {
+                return input.getValue();
+            }
+        }));
+        int generated = 0;
+        int failed = 0;
+        int inserted = 0;
+        for (String archetypeName : sortedIDs)
+        {
+            ArchetypeID archetypeID = new ArchetypeID(archetypeName);
             Archetype archetype = m_archetypeStore.get(archetypeID);
             if (!supported(archetypeID))
             {
@@ -143,139 +213,101 @@ public class IntegrationTest extends RMTestBase
                 continue;
             }
             
-            
+            // generate
             log.debug(String.format("Generating instance of %s", archetypeName));
-            Object instance;
+            Locatable instance;
             try
             {
-                instance = m_skeletonGenerator.create(archetype);
+                instance = m_locatableGenerator.generate(archetype);
                 generated++;
             }
             catch (Exception e)
             {
-                log.error(String.format("FAILED generating instance of %s: %s", archetypeName, e.getMessage()));
-                throw e;
+                log.error(String.format("FAILED generating instance of %s: %s", archetypeName, e.getMessage()), e);
+                failed++;
+                continue;
             }
             String className = instance.getClass().getSimpleName();
             log.debug(String.format("Got %s for archetype %s", className, archetypeName));
             
-            
-            if (instance instanceof Locatable)
+            // transform
+            log.debug(String.format("Transforming instance of %s", archetypeName));
+            m_locatableTransformer.transform(instance);
+        
+            // insert
+            m_locatableStore.insert(instance);
+            log.debug(String.format("Inserted a %s", archetypeName));
+            inserted++;
+        }
+        
+        int storedInMemory = Iterables.size(m_fallbackStore.list());
+
+        failed += serializeAll();
+        
+        log.info(String.format("Created %s instances using skeleton generation (skipped %s, failed %s)",
+                generated, Iterables.size(allArchetypeIDs)-generated, failed));
+        log.info(String.format("Inserted %s locatables (%s in xml databases)",
+                inserted, inserted - storedInMemory));
+        
+        assertEquals("No failures", 0, failed);
+    }
+
+    private int serializeAll() throws IOException
+    {
+        int all = 0;
+        int retrieved = 0;
+        int failed = 0;
+        int serialized = 0;
+        
+        Iterable<HierObjectID> allIDs = m_locatableStore.list();
+        File base = new File("build" + File.separatorChar + "ser");
+        if (!base.exists())
+        {
+            base.mkdirs();
+        }
+        for(HierObjectID hierObjectID : allIDs)
+        {
+            all++;
+            String id = null;
+            try
             {
-                Locatable locatable = (Locatable)instance;
-                m_locatableStore.insert(locatable);
-                log.debug(String.format("Inserted a %s", archetypeName));
-                inserted++;
+                id = hierObjectID.root().getValue();
+                Locatable locatable = m_locatableStore.get(hierObjectID);
+                retrieved++;
+                File target = new File(base, id + ".json");
+                FileOutputStream fis = new FileOutputStream(target);
+                BufferedOutputStream bos = new BufferedOutputStream(fis);
+                m_pvSerializer.serialize(locatable, bos);
+                serialized++;
+            }
+            catch (NotFoundException|IOException|ParseException|SerializeException e)
+            {
+                failed++;
+                log.error(String.format("Difficulty serializing %s: %s", id, e.getMessage(), e));
             }
         }
-        log.info(String.format("Created %s instances using skeleton generation (skipped %s)",
-                generated, Iterables.size(allArchetypeIDs)-generated));
-        log.info(String.format("Inserted %s locatables (skipped %s non-locatables)",
-                inserted, generated - inserted));
+        log.info(String.format("Serialized %s instances (total %s, retrieved %s, failed %s)",
+                serialized, all, retrieved, failed));
+        return failed;
     }
-    
-    private String[] skipConcepts = new String[] {
-            // Failed to construct: ITEM_TREE, value for attribute 'items' has wrong type,
-            // expected "interface java.util.List", but got
-            // "class org.openehr.rm.datastructure.itemstructure.representation.Element"
-            // "class org.openehr.rm.datastructure.itemstructure.representation.Cluster
-            "address",
-            "person_identifier",
-            "person_details",
-            //"person",
 
-            "mobiguide_vmr_clinical_statement_encounter_event",
-            "mobiguide_vmr_clinical_statement_appointment_request",
-            "mobiguide_vmr_clinical_statement_substance_administration_order",
-            "mobiguide_vmr_clinical_statement_undelivered_substance_administration",
-            "mobiguide_vmr_clinical_statement_substance_administration_event",
-            "mobiguide_vmr_clinical_statement_scheduled_appointment",
-            "mobiguide_vmr_clinical_statement_denied_adverse_event",
-            "mobiguide_vmr_clinical_statement_missed_appointment",
-            "mobiguide_vmr_clinical_statement_substance_dispensation_event",
-            "mobiguide_vmr_clinical_statement_observation_order",
-            "mobiguide_vmr_clinical_statement_problem",
-            "mobiguide_vmr_clinical_statement_substance_administration_proposal",
-            "mobiguide_vmr_clinical_statement_appointement_proposal",
-            "mobiguide_vmr_clinical_statement_goal",
-            
-            // failed to create new instance of  HISTORY with valueMap: 
-            "mobiguide_vmr_clinical_statement_denied_problem",
-            "mobiguide_vmr_clinical_statement_goal_proposal",
-            "mobiguide_vmr_clinical_statement_observation_proposal",
-            "mobiguide_vmr_clinical_statement_procedure_event",
-            "mobiguide_vmr_clinical_statement_unconducted_observation",
-            "mobiguide_vmr_clinical_statement_adverse_event",
-            "sweating",
-            "implantable_devices",
-            "CHF_aetiology",
-            "hourly_energy_expenditure",
-            "NYHA_classification",
-            "indirect_oximetry",
-            "daily_activity",
-            "daily_weight_change",
-            "monitoring_body_mass_index",
-            "monitoring_temperature",
-            "monitoring_heartrate",
-            "waist_to_hip_ratio",
-            "left_ventricle",
-            "environmental_variables",
-            
-            // missing value for required attribute "id" of type class org.openehr.rm.support.identification.ObjectID
-            // while constructing class org.openehr.rm.support.identification.PartyRef with valueMap:
-            // {template_id=null}
-            "medvision_ehrstatus",
-            
-            // missing value for required attribute "uid" of type class
-            // org.openehr.rm.support.identification.UIDBasedID while constructing class
-            // org.openehr.rm.demographic.Person with valueMap
-            "mobiguide_vmr_person_evaluated_person",
-            "fifo_user",
-            "healthcare_provider_organisation",
-            "healthcare_consumer",
-
-            // missing value for required attribute "value" of type class java.lang.String while constructing class
-            // org.openehr.rm.datatypes.basic.DvBoolean with valueMap: {template_id=null}
-            "individual_credentials",
-            
-            // missing value for required attribute "description" of type class
-            // org.openehr.rm.datastructure.itemstructure.ItemStructure while constructing class
-            // org.openehr.rm.composition.content.entry.Activity with valueMap
-            "imaging",
-            
-            // missing value for required attribute "addresses" of type interface java.util.List while constructing
-            // class org.openehr.rm.demographic.Contact with valueMap
-            "person",
-            "individual_provider",
-            "organisation",
-            
-            // missing value for required attribute "value" of type class java.lang.String while constructing class
-            // org.openehr.rm.datatypes.basic.DvBoolean with valueMap:
-            "person_name",
-            "medvision_person",
-            "chiron_person",
-            
-            // term of given code: at0000, language: en not found..
-            "fifo_progress",
-            "physical_activity_progress",
-            
-            // no child object..
-            "fifo_activity",
-            "medvision_party_relationship_person_person",
-            "physical_activity",
-            "chiron_party_relationship_person_person",
-            
-            // unknown original language openEHR::en
-            "monitoring_blood_pressure"
+    private String[] skipArchetypes = new String[] {
+            // No archetypes found to match the slot at ..., but a value is required
+            "openEHR-DEMOGRAPHIC-ORGANISATION.organisation.v1",
+            "openEHR-DEMOGRAPHIC-PERSON.person-patient.v1",
+            "openEHR-DEMOGRAPHIC-PERSON.person.v1",
+            "openEHR-DEMOGRAPHIC-ROLE.healthcare_consumer.v1",
+            "openEHR-DEMOGRAPHIC-ROLE.healthcare_provider_organisation.v1",
+            "openEHR-DEMOGRAPHIC-ROLE.individual_provider.v1",
     };
     {
-        Arrays.sort(skipConcepts);
+        Arrays.sort(skipArchetypes);
     }
 
     private boolean supported(ArchetypeID archetypeID)
     {
-        String conceptName = archetypeID.conceptName();
-        if (Arrays.binarySearch(skipConcepts, conceptName) < 0)
+        String archetypeName = archetypeID.getValue();
+        if (Arrays.binarySearch(skipArchetypes, archetypeName) < 0)
         {
             return true;
         }
