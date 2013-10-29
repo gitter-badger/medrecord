@@ -386,6 +386,14 @@ public class RMAdapter
                 case "DV_EHR_URI":
                     addValue(valueMap, "ehr://generated/" + m_valueGenerator.generateName("uri"));
                     break;
+
+                case "DV_PARSABLE":
+                    addValue(valueMap, m_valueGenerator.generateString(null));
+                    if (!valueMap.containsKey("formalism"))
+                    {
+                        valueMap.put("formalism", m_valueGenerator.generateString(null));
+                    }
+                    break;
             }
         }
 
