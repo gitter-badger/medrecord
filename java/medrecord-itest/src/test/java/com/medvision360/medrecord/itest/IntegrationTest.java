@@ -62,6 +62,11 @@ public class IntegrationTest extends RMTestBase
     private boolean m_adlEmptyPurposeCompatible;
     private ArchetypeLoader m_archetypeLoader;
 
+    private StringGenerator m_stringGenerator;
+    private RandomSupport m_randomSupport;
+    private AssertionSupport m_assertionSupport;
+    private ValueGenerator m_valueGenerator;
+    private RMAdapter m_rmAdapter;
     private RMObjectBuilder m_rmObjectBuilder;
 
     private LocatableGenerator m_locatableGenerator;
@@ -95,6 +100,13 @@ public class IntegrationTest extends RMTestBase
         m_archetypeLoader = new ArchetypeLoader(m_archetypeStore, m_resolver, m_archetypeLoaderBasePath,
                 m_adlMissingLanguageCompatible, m_adlEmptyPurposeCompatible);
 
+        m_randomSupport = new RandomSupport();
+        m_assertionSupport = new AssertionSupport();
+        m_stringGenerator = new StringGenerator();
+        m_valueGenerator = new ValueGenerator(m_randomSupport, m_stringGenerator, m_terminologyService,
+                m_measurementService);
+        m_rmAdapter = new RMAdapter(m_valueGenerator);
+
         Map<SystemValue, Object> systemValues = new HashMap<>();
         systemValues.put(SystemValue.TERMINOLOGY_SERVICE, m_terminologyService);
         systemValues.put(SystemValue.MEASUREMENT_SERVICE, m_measurementService);
@@ -104,8 +116,8 @@ public class IntegrationTest extends RMTestBase
         systemValues.put(SystemValue.ENCODING, Terminology.CHARSET_UTF8);
         m_rmObjectBuilder = new RMObjectBuilder(systemValues);
 
-        m_locatableGenerator = new LocatableGenerator(m_archetypeStore, m_terminologyService, m_measurementService,
-                m_rmObjectBuilder);
+        m_locatableGenerator = new LocatableGenerator(m_archetypeStore, m_randomSupport, m_assertionSupport,
+                m_valueGenerator, m_rmAdapter, m_rmObjectBuilder);
 
         m_xmlConverter = new RIXmlConverter(m_terminologyService, m_measurementService,
                 Terminology.CHARSET_UTF8, Terminology.L_en);
