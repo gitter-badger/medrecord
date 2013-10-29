@@ -5,6 +5,8 @@ import com.medvision360.medrecord.spi.exceptions.RecordException;
 @SuppressWarnings("UnusedDeclaration")
 public class GenerateException extends RecordException
 {
+    private static final long serialVersionUID = 0x130L;
+    
     public GenerateException()
     {
     }

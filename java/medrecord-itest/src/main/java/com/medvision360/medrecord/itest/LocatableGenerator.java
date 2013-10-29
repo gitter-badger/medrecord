@@ -61,7 +61,7 @@ import org.openehr.rm.support.identification.UIDBasedID;
 /**
  * Programmatic generator of {@link Locatable} instances that match an {@link Archetype}.
  */
-@SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "unchecked", "rawtypes"})
 public class LocatableGenerator
 {
     private final static Log log = LogFactory.getLog(LocatableGenerator.class);

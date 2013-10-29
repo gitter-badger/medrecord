@@ -26,6 +26,7 @@ import org.openehr.rm.support.identification.ObjectVersionID;
  * little points of friction between the archetype structures and/or serialized forms and the actual RM object model as
  * expressed in java, and this adapter helps smooth over those.
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class RMAdapter
 {
     private final static Log log = LogFactory.getLog(RMAdapter.class);
