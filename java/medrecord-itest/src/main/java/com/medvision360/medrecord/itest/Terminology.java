@@ -164,9 +164,9 @@ public class Terminology
     public static CodePhrase[] STATUSES;
 
     public final static TerminologyID ISO_3166_1 = new TerminologyID("ISO_3166-1");
-    public final static CodePhrase C_GB = new CodePhrase(ISO_3166_1, "C_GB");
-    public final static CodePhrase C_US = new CodePhrase(ISO_3166_1, "C_US");
-    public final static CodePhrase C_NL = new CodePhrase(ISO_3166_1, "C_NL");
+    public final static CodePhrase C_GB = new CodePhrase(ISO_3166_1, "GB");
+    public final static CodePhrase C_US = new CodePhrase(ISO_3166_1, "US");
+    public final static CodePhrase C_NL = new CodePhrase(ISO_3166_1, "NL");
     public static CodePhrase[] COUNTRIES;
 
     public final static TerminologyID IANA_character_sets = new TerminologyID("IANA_character-sets");

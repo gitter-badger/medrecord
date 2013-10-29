@@ -242,7 +242,8 @@ public class LocatableGenerator
     protected Object generateMultiple(Archetype archetype, CAttribute attribute, Map<String, Object> map)
             throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
     {
-        log.debug(String.format("generateMultiple %s %s", name(attribute), attribute.path()));
+        String attributeName = name(attribute);
+        log.debug(String.format("generateMultiple %s %s", attributeName, attribute.path()));
         List<CObject> children = attribute.getChildren();
         Collection<Object> container = generateContainer(attribute);
         for (CObject child : children)
@@ -269,6 +270,18 @@ public class LocatableGenerator
                 Object childValue = generateObject(archetype, child, child.isRequired(), map);
                 log.debug(String.format("Generated child %s, %s: %s", child.path(),
                         attribute.getRmAttributeName(), childValue));
+                if (childValue == null)
+                {
+                    if (!child.isRequired())
+                    {
+                        log.debug(String.format("Skip child %s, generated a null child", attribute.path()));
+                        continue;
+                    }
+                    else
+                    {
+                        throw new GenerateException(String.format("Generated a null child for %s", attribute.path()));
+                    }
+                }
                 container.add(childValue);
             }
         }
@@ -465,6 +478,11 @@ public class LocatableGenerator
             throws IOException, GenerateException, NotFoundException, RMObjectBuildingException
     {
         String rmType = object.getRmTypeName();
+        Object result = generateCustomComplexObject(rmType);
+        if (result != null)
+        {
+            return result;
+        }
         String objectPath = object.path();
         String className = m_rmAdapter.findConcreteClassName(rmType);
         Map<String, Object> map = new HashMap<>();
@@ -479,15 +497,71 @@ public class LocatableGenerator
         {
             if (!required)
             {
-                log.warn(String.format(
-                        "Skipping complex object at %s since it is optional and construction failed: %s",
-                        object.path(), e.getMessage()), e);
+                boolean empty = false;
+                String message = e.getMessage();
+                if (message != null && message.contains("empty items"))
+                {
+                    empty = true;
+                }
+                else
+                {
+                    Throwable cause = e.getCause();
+                    while (cause != null)
+                    {
+                        message = cause.getMessage();
+                        if (message != null && message.contains("empty items"))
+                        {
+                            empty = true;
+                        }
+                        cause = cause.getCause();
+                    }
+                }
+                if (empty)
+                {
+                    log.warn(String.format(
+                            "Skipping complex object at %s since it is optional and construction failed: %s",
+                            object.path(), e.getMessage()));
+                }
+                else
+                {
+                    log.warn(String.format(
+                            "Skipping complex object at %s since it is optional and construction failed: %s",
+                            object.path(), e.getMessage()), e);
+
+                }
+
                 return null;
             }
             else
             {
                 throw e;
             }
+        }
+    }
+
+    public Object generateCustomComplexObject(String rmType)
+    {
+        rmType = m_rmAdapter.toUnderscoreSeparated(rmType);
+
+        switch (rmType)
+        {
+            case "OBJECT_ID":
+                return m_valueGenerator.generateUID();
+            case "UID_BASED_ID":
+                return m_valueGenerator.generateUID();
+            case "ARCHETYPE_ID":
+                try
+                {
+                    Iterable<ArchetypeID> archetypeIDS = m_archetypeStore.list();
+                    ArchetypeID archetypeID = m_randomSupport.pick(archetypeIDS);
+                    return archetypeID;
+                }
+                catch (IOException e)
+                {
+                    return new ArchetypeID("openEHR-EHR-INSTRUCTION.generated_instruction.v1test");
+                }
+            default:
+                return null;
         }
     }
 

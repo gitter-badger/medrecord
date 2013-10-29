@@ -1,9 +1,13 @@
 package com.medvision360.medrecord.itest;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openehr.am.archetype.constraintmodel.primitive.CBoolean;
 import org.openehr.am.archetype.constraintmodel.primitive.CDate;
 import org.openehr.am.archetype.constraintmodel.primitive.CDateTime;
@@ -22,7 +26,12 @@ import org.openehr.am.openehrprofile.datatypes.quantity.Ordinal;
 import org.openehr.am.openehrprofile.datatypes.text.CCodePhrase;
 import org.openehr.rm.common.generic.PartyProxy;
 import org.openehr.rm.common.generic.PartySelf;
+import org.openehr.rm.composition.content.entry.ISMTransition;
+import org.openehr.rm.datastructure.history.Event;
+import org.openehr.rm.datastructure.history.History;
+import org.openehr.rm.datastructure.history.PointEvent;
 import org.openehr.rm.datastructure.itemstructure.ItemList;
+import org.openehr.rm.datastructure.itemstructure.representation.Element;
 import org.openehr.rm.datatypes.basic.DvState;
 import org.openehr.rm.datatypes.quantity.DvOrdinal;
 import org.openehr.rm.datatypes.quantity.DvQuantity;
@@ -33,6 +42,7 @@ import org.openehr.rm.datatypes.quantity.datetime.DvTime;
 import org.openehr.rm.datatypes.text.CodePhrase;
 import org.openehr.rm.datatypes.text.DvCodedText;
 import org.openehr.rm.datatypes.text.DvText;
+import org.openehr.rm.demographic.PartyIdentity;
 import org.openehr.rm.support.basic.Interval;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.ObjectVersionID;
@@ -48,6 +58,8 @@ import org.openehr.rm.support.terminology.TerminologyService;
  */
 public class ValueGenerator
 {
+    private final static Log log = LogFactory.getLog(ValueGenerator.class);
+
     private Random m_random = new Random();
     private RandomSupport m_randomSupport;
     private StringGenerator m_stringGenerator;
@@ -211,7 +223,15 @@ public class ValueGenerator
             units = item.getUnits();
 
             magnitudeValue = doubleFromInterval(magnitude);
+            if (magnitudeValue < 0)
+            {
+                magnitudeValue = 1.0;
+            }
             precisionValue = integerFromInterval(precision);
+            if (precisionValue < 1)
+            {
+                precisionValue = 1;
+            }
         }
         else
         {
@@ -540,12 +560,32 @@ public class ValueGenerator
 
     public int integerFromInterval(Interval<Integer> interval)
     {
+        if (interval == null)
+        {
+            return m_random.nextInt();
+        }
+
         int lower = interval.getLower() == null ? 0 :
                 Math.max(interval.getLower(), 0);
         int upper = interval.getUpper() == null ? Integer.MAX_VALUE :
                 Math.max(interval.getUpper(), lower);
 
+        if (upper == 0)
+        {
+            return 0;
+        }
+
+        boolean flip = false;
+        if (upper < 0)
+        {
+            flip = true;
+            upper = -upper;
+        }
         int value = m_random.nextInt(upper);
+        if (flip)
+        {
+            value = -value;
+        }
         if (value < lower)
         {
             value = lower;
@@ -555,6 +595,11 @@ public class ValueGenerator
 
     public double doubleFromInterval(Interval<Double> interval)
     {
+        if (interval == null)
+        {
+            return m_random.nextDouble();
+        }
+
         double lower = interval.getLower() == null ? 0 :
                 Math.max(interval.getLower(), 0);
         double upper = interval.getUpper() == null ? Double.MAX_VALUE :
@@ -622,6 +667,112 @@ public class ValueGenerator
     {
         ItemList description = new ItemList(generateNodeId(), generateName("item-list"), null);
         return description;
+    }
+
+    public Element generateObservationEventElement()
+    {
+        String nodeId = generateNodeId();
+        DvText name = generateName("element");
+        DvText value = new DvText(generateString());
+        Element element = new Element(nodeId, name, value);
+        return element;
+    }
+
+    public ItemList generateObservationEventData()
+    {
+        String nodeId = generateNodeId();
+        DvText name = generateName("item-list");
+
+        List<Element> items = new ArrayList<>();
+        int listSize = m_randomSupport.listSize(4);
+        for (int i = 0; i < listSize; i++)
+        {
+            items.add(generateObservationEventElement());
+        }
+
+        ItemList data = new ItemList(nodeId, name, items);
+        return data;
+    }
+
+    public PointEvent<ItemList> generateEvent()
+    {
+        String nodeId = generateNodeId();
+        DvText name = generateName("event");
+        DvDateTime origin = generateDateTime(null);
+        ItemList data = generateObservationEventData();
+        PointEvent<ItemList> event = new PointEvent<>(nodeId, name, origin, data);
+        return event;
+    }
+
+    public History<ItemList> generateObservationData()
+    {
+        String nodeId = generateNodeId();
+        DvText name = generateName("history");
+        DvDateTime origin = generateDateTime(null);
+        List<Event<ItemList>> events = new ArrayList<>();
+
+        int listSize = m_randomSupport.listSize(4);
+        for (int i = 0; i < listSize; i++)
+        {
+            events.add(generateEvent());
+        }
+
+        //noinspection Convert2Diamond
+        History<ItemList> history = new History<ItemList>(nodeId, name, origin, events);
+        return history;
+    }
+
+    public ISMTransition generateIsmTransition()
+    {
+        DvCodedText state = codeToText(chooseInstructionState());
+        DvCodedText transition = null;
+        if (m_randomSupport.should(0.3))
+        {
+            transition = codeToText(chooseInstructionTransition());
+        }
+        DvCodedText step = null; // apparently should be defined in archetype somehow, but if we are here, 
+        // it is clear that it wasn't
+        ISMTransition ismTransition = new ISMTransition(state, transition, step, m_terminologyService);
+        return ismTransition;
+    }
+
+    public Element generateIdentityElement()
+    {
+        String nodeId = generateNodeId();
+        DvText name = generateName("identity-element");
+        DvText value = new DvText(generateString());
+        Element element = new Element(nodeId, name, value);
+        return element;
+    }
+
+    public PartyIdentity generateIdentity()
+    {
+        log.debug("generateIdentity");
+        DvText purpose = new DvText("legal identity");
+        /*
+        ItemList(String archetypeNodeId, DvText name, List<Element> items)
+         */
+        List<Element> items = new ArrayList<>();
+        int listSize = m_randomSupport.listSize(4);
+        for (int i = 0; i < listSize; i++)
+        {
+            items.add(generateIdentityElement());
+        }
+        ItemList details = new ItemList(generateNodeId(), generateName("item-list"), items);
+        PartyIdentity identity = new PartyIdentity(null, generateNodeId(), purpose, null, null, null, null, details);
+        return identity;
+    }
+
+    public Set<PartyIdentity> generateIdentities()
+    {
+        log.debug("generateIdentities");
+        Set<PartyIdentity> identities = new HashSet<>();
+        int listSize = m_randomSupport.listSize(2);
+        for (int i = 0; i < listSize; i++)
+        {
+            identities.add(generateIdentity());
+        }
+        return identities;
     }
 
     public CodePhrase chooseCategory()

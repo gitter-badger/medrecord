@@ -1,19 +1,25 @@
 package com.medvision360.medrecord.itest;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.measure.unit.Unit;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openehr.am.archetype.constraintmodel.CComplexObject;
 import org.openehr.rm.datatypes.encapsulated.DvParsable;
+import org.openehr.rm.datatypes.quantity.DvQuantity;
 import org.openehr.rm.datatypes.quantity.ProportionKind;
 import org.openehr.rm.datatypes.text.CodePhrase;
 import org.openehr.rm.datatypes.text.DvText;
 import org.openehr.rm.datatypes.uri.DvURI;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.LocatableRef;
+import org.openehr.rm.support.identification.ObjectVersionID;
 
 /**
  * Utilities for adapting from openehr-aom expectations/rules to opener-rm expectations/rules. There are a variety of
@@ -22,6 +28,8 @@ import org.openehr.rm.support.identification.LocatableRef;
  */
 public class RMAdapter
 {
+    private final static Log log = LogFactory.getLog(RMAdapter.class);
+
     private ValueGenerator m_valueGenerator;
 
     public RMAdapter(ValueGenerator valueGenerator)
@@ -65,9 +73,8 @@ public class RMAdapter
                 return "POINT_EVENT";
             case "ITEM_STRUCTURE":
                 return "ITEM_LIST";
-            case "OBJECT_ID":
-            case "UID_BASED_ID":
-                return "HIER_OBJECT_ID";
+            case "INTERVAL_EVENT":
+                return "POINT_EVENT";
             default:
                 return rmType;
         }
@@ -96,15 +103,6 @@ public class RMAdapter
                 switch (attributeName)
                 {
                     case "rows":
-                        return true;
-                }
-                break;
-            case "EVENT":
-            case "INTERVAL_EVENT":
-            case "POINT_EVENT":
-                switch (attributeName)
-                {
-                    case "state":
                         return true;
                 }
                 break;
@@ -148,7 +146,6 @@ public class RMAdapter
                 switch (attributeName)
                 {
                     case "items":
-                    case "attestations":
                         return true;
                 }
                 break;
@@ -203,10 +200,17 @@ public class RMAdapter
             case "ACTIVITY":
             case "ADMIN_ENTRY":
             case "EVALUATION":
-            case "INSTRUCTION":
             case "OBSERVATION":
                 switch (attributeName)
                 {
+                    case "otherParticipations":
+                        return true;
+                }
+                break;
+            case "INSTRUCTION":
+                switch (attributeName)
+                {
+                    case "activities":
                     case "otherParticipations":
                         return true;
                 }
@@ -237,6 +241,95 @@ public class RMAdapter
                 break;
         }
         return false;
+    }
+
+    protected void forceList(Map<String, Object> valueMap, String rmTypeName)
+    {
+        switch (rmTypeName)
+        {
+            // structure
+            case "ITEM_LIST":
+            case "ITEM_TREE":
+            case "CLUSTER":
+                setToList(valueMap, "items");
+                break;
+            case "ITEM_TABLE":
+                setToList(valueMap, "rows");
+                break;
+            case "HISTORY":
+                setToList(valueMap, "events");
+                break;
+
+            // directory
+            case "FOLDER":
+                setToList(valueMap, "folders");
+                setToList(valueMap, "items");
+                break;
+
+            // change control
+            case "CONTRIBUTION":
+                listToSet(valueMap, "versions");
+                break;
+            case "ORIGINAL_VERSION":
+                listToSet(valueMap, "otherInputVersionUids");
+                setToList(valueMap, "attestations");
+                break;
+
+            // generic
+            case "ATTESTATION":
+                setToList(valueMap, "items");
+                break;
+            case "PARTY_IDENTIFIED":
+            case "PARTY_RELATED":
+                setToList(valueMap, "identifiers");
+                break;
+            case "REVISION_HISTORY":
+                setToList(valueMap, "items");
+                break;
+            case "REVISION_HISTORY_ITEM":
+                setToList(valueMap, "audits");
+                break;
+
+            // todo resource package uses Map...
+
+            // composition
+            case "COMPOSITION":
+                setToList(valueMap, "content");
+                break;
+            case "EVENT_CONTEXT":
+                setToList(valueMap, "participations");
+                break;
+            case "SECTION":
+                setToList(valueMap, "items");
+                break;
+            case "ACTION":
+            case "ACTIVITY":
+            case "ADMIN_ENTRY":
+            case "EVALUATION":
+            case "OBSERVATION":
+                setToList(valueMap, "otherParticipations");
+                break;
+            case "INSTRUCTION":
+                setToList(valueMap, "activities");
+                setToList(valueMap, "otherParticipations");
+                break;
+
+            // demographic
+            case "AGENT":
+            case "GROUP":
+            case "ORGANISATION":
+            case "PERSON":
+            case "ROLE":
+                listToSet(valueMap, "identities");
+                listToSet(valueMap, "contacts");
+                listToSet(valueMap, "relationships");
+                listToSet(valueMap, "reverseRelationships");
+                listToSet(valueMap, "roles");
+                break;
+            case "CONTACT":
+                setToList(valueMap, "addresses");
+                break;
+        }
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -295,7 +388,20 @@ public class RMAdapter
 
         switch (rmTypeName)
         {
-            // domain types                    
+            // domain types
+            case "CODE_PHRASE":
+            case "DV_CODE_PHRASE":
+                CodePhrase other = m_valueGenerator.generateCodePhrase(null);
+                if (!valueMap.containsKey("terminologyId"))
+                {
+                    valueMap.put("terminologyId", other.getTerminologyId());
+                }
+                if (!valueMap.containsKey("codeString"))
+                {
+                    valueMap.put("codeString", other.getCodeString());
+                }
+                break;
+
             case "DV_CODED_TEXT":
                 CodePhrase code;
                 if (valueMap.containsKey("defining_code"))
@@ -332,12 +438,9 @@ public class RMAdapter
                 }
                 if (!valueMap.containsKey("precision"))
                 {
-                    valueMap.put("precision", String.valueOf(m_valueGenerator.generateInteger(null)));
+                    valueMap.put("precision", 1);
                 }
-                if (!valueMap.containsKey("type"))
-                {
-                    valueMap.put("type", ProportionKind.RATIO);
-                }
+                valueMap.put("type", ProportionKind.RATIO);
                 break;
 
             case "DV_INTERVAL":
@@ -353,14 +456,40 @@ public class RMAdapter
                     if (upper instanceof Comparable && lower instanceof Comparable)
                     {
                         //noinspection unchecked
-                        Comparable upperQ = (Comparable) upper;
+                        Comparable upperC = (Comparable) upper;
                         //noinspection unchecked
-                        Comparable lowerQ = (Comparable) lower;
-                        //noinspection unchecked
-                        if (upperQ.compareTo(lowerQ) < 0)
+                        Comparable lowerC = (Comparable) lower;
+                        try
                         {
-                            valueMap.put("upper", lower);
-                            valueMap.put("lower", upper);
+                            //noinspection unchecked
+                            if (upperC.compareTo(lowerC) < 0)
+                            {
+                                valueMap.put("upper", lower);
+                                valueMap.put("lower", upper);
+                            }
+                        }
+                        catch (IllegalArgumentException e)
+                        {
+                            // this is here to try and track down an obscure bug where sometimes we seem to be 
+                            // generating bad/weird/unsupported units
+                            String upperUnit = null;
+                            String lowerUnit = null;
+
+                            if (upper instanceof DvQuantity)
+                            {
+                                DvQuantity upperQ = (DvQuantity) upperC;
+                                upperUnit = upperQ.getUnits();
+                            }
+                            if (lower instanceof DvQuantity)
+                            {
+                                DvQuantity lowerQ = (DvQuantity) lowerC;
+                                lowerUnit = lowerQ.getUnits();
+                            }
+
+                            log.error(String.format(
+                                    "IllegalArgumentException: %s (upperUnit=%s, lowerUnit=%s)", e.getMessage(),
+                                    upperUnit, lowerUnit), e);
+                            throw e;
                         }
                     }
                     if (upper instanceof Double && lower instanceof Double)
@@ -382,6 +511,28 @@ public class RMAdapter
                             valueMap.put("upper", lower);
                             valueMap.put("lower", upper);
                         }
+                    }
+                }
+                break;
+            case "DV_QUANTITY":
+                if (!valueMap.containsKey("magnitude"))
+                {
+                    valueMap.put("magnitude", 1.0);
+                }
+                if (!valueMap.containsKey("units"))
+                {
+                    valueMap.put("units", "m");
+                }
+                else
+                {
+                    String value = String.valueOf(valueMap.get("units"));
+                    try
+                    {
+                        Unit.valueOf(value);
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                        valueMap.put("units", "m");
                     }
                 }
                 break;
@@ -422,6 +573,15 @@ public class RMAdapter
                 if (!valueMap.containsKey("id"))
                 {
                     valueMap.put("id", m_valueGenerator.generateOVID());
+                }
+                else
+                {
+                    Object value = valueMap.get("id");
+                    if (!(value instanceof ObjectVersionID))
+                    {
+                        // todo not sure why this can happen
+                        valueMap.put("id", m_valueGenerator.generateOVID());
+                    }
                 }
                 if (!valueMap.containsKey("namespace"))
                 {
@@ -472,6 +632,10 @@ public class RMAdapter
                 if (!valueMap.containsKey("time"))
                 {
                     valueMap.put("time", m_valueGenerator.generateDateTime(null));
+                }
+                if (!valueMap.containsKey("ismTransition"))
+                {
+                    valueMap.put("ismTransition", m_valueGenerator.generateIsmTransition());
                 }
                 break;
             case "ACTIVITY":
@@ -531,9 +695,9 @@ public class RMAdapter
                 {
                     valueMap.put("subject", m_valueGenerator.generateSubject());
                 }
-                if (!valueMap.containsKey("description") || valueMap.get("description") == null)
+                if (!valueMap.containsKey("data") || valueMap.get("data") == null)
                 {
-                    valueMap.put("description", m_valueGenerator.generateDescription());
+                    valueMap.put("data", m_valueGenerator.generateObservationData());
                 }
                 break;
             case "INSTRUCTION_DETAILS":
@@ -550,6 +714,29 @@ public class RMAdapter
                 }
                 break;
 
+            // ehr
+            case "EHR_STATUS":
+                if (!valueMap.containsKey("uid"))
+                {
+                    // todo weirdly, UID is required for PARTY_RELATIONSHIP
+                    valueMap.put("uid", m_valueGenerator.generateUID());
+                }
+                if (!valueMap.containsKey("subject"))
+                {
+                    valueMap.put("subject", m_valueGenerator.generateSubject());
+                }
+                if (!valueMap.containsKey("isModifiable"))
+                {
+                    // todo weirdly, UID is required for PARTY_RELATIONSHIP
+                    valueMap.put("isModifiable", Boolean.parseBoolean(m_valueGenerator.generateBoolean(null)));
+                }
+                if (!valueMap.containsKey("isQueryable"))
+                {
+                    // todo weirdly, UID is required for PARTY_RELATIONSHIP
+                    valueMap.put("isQueryable", Boolean.parseBoolean(m_valueGenerator.generateBoolean(null)));
+                }
+                break;
+
             // demographic
             case "PARTICIPATION":
                 if (!valueMap.containsKey("performer"))
@@ -561,19 +748,25 @@ public class RMAdapter
                 valueMap.put("mode", m_valueGenerator.codeToText(m_valueGenerator.chooseParticipationMode()));
                 //if (!map.containsKey("function"))
                 valueMap.put("function", m_valueGenerator.codeToText(m_valueGenerator.chooseParticipationFunction()));
+                break;
+            case "PARTY_RELATIONSHIP":
+                if (!valueMap.containsKey("uid"))
+                {
+                    // todo weirdly, UID is required for PARTY_RELATIONSHIP
+                    valueMap.put("uid", m_valueGenerator.generateUID());
+                }
+                break;
+            case "PERSON":
+                if (!valueMap.containsKey("uid"))
+                {
+                    // todo weirdly, UID is required for PERSON
+                    valueMap.put("uid", m_valueGenerator.generateUID());
+                }
+                // todo generating a set of valid identities seems to be difficult, not sure why
+                valueMap.put("identities", m_valueGenerator.generateIdentities());
+                break;
 
             // structure
-            case "ITEM_LIST":
-                if (valueMap.containsKey("items"))
-                {
-                    Object items = valueMap.get("items");
-                    if (items instanceof Set)
-                    {
-                        Set itemSet = (Set) items;
-                        List<Object> itemList = new ArrayList<>();
-                        itemList.addAll(itemSet);
-                    }
-                }
             case "HISTORY":
                 if (!valueMap.containsKey("origin"))
                 {
@@ -585,9 +778,25 @@ public class RMAdapter
             case "EVENT":
             case "POINT_EVENT":
             case "INTERVAL_EVENT":
+                if (!valueMap.containsKey("name"))
+                {
+                    valueMap.put("name", m_valueGenerator.generateName("event"));
+                }
+                if (!valueMap.containsKey("data"))
+                {
+                    valueMap.put("data", m_valueGenerator.generateObservationEventData());
+                }
                 if (!valueMap.containsKey("time"))
                 {
                     valueMap.put("time", m_valueGenerator.generateDateTime(null));
+                }
+                if (!valueMap.containsKey("width"))
+                {
+                    valueMap.put("width", m_valueGenerator.generateDuration(null));
+                }
+                if (!valueMap.containsKey("mathFunction"))
+                {
+                    valueMap.put("mathFunction", m_valueGenerator.codeToText(m_valueGenerator.chooseMathFunction()));
                 }
                 break;
             case "DV_MULTIMEDIA":
@@ -609,6 +818,8 @@ public class RMAdapter
                 }
 
         }
+
+        forceList(valueMap, rmTypeName);
 
         if (!valueMap.containsKey("encoding"))
         {
@@ -652,4 +863,35 @@ public class RMAdapter
     {
         return map.containsKey("name");
     }
+
+    protected void setToList(Map<String, Object> valueMap, String key)
+    {
+        if (valueMap.containsKey(key))
+        {
+            Object items = valueMap.get(key);
+            if (items instanceof Set)
+            {
+                Set set = (Set) items;
+                List<Object> list = new ArrayList<>();
+                list.addAll(set);
+                valueMap.put(key, list);
+            }
+        }
+    }
+
+    protected void listToSet(Map<String, Object> valueMap, String key)
+    {
+        if (valueMap.containsKey(key))
+        {
+            Object items = valueMap.get(key);
+            if (items instanceof List)
+            {
+                List list = (List) items;
+                Set<Object> set = new HashSet<>();
+                set.addAll(list);
+                valueMap.put(key, set);
+            }
+        }
+    }
+
 }
