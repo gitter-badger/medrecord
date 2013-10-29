@@ -63,7 +63,8 @@ public class RMTestBase extends CompositionTestBase
         assertEquals(orig.getUid(), other.getUid());
         assertEquals(orig.getArchetypeNodeId(), other.getArchetypeNodeId());
         assertEquals(orig.getName(), other.getName());
-        assertEquals(orig.getArchetypeDetails(), other.getArchetypeDetails());
+        assertEquals(orig.getArchetypeDetails().getArchetypeId().getValue(),
+                other.getArchetypeDetails().getArchetypeId().getValue());
     }
     
     protected void assertEqualish(Archetype orig, Archetype other)
