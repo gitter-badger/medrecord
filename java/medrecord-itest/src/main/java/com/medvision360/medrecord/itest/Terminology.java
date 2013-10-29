@@ -17,7 +17,7 @@ public class Terminology
     public final static CodePhrase CATEGORY_persistent = new CodePhrase(OPENEHR, "431");
     public final static CodePhrase CATEGORY_event = new CodePhrase(OPENEHR, "433");
     public static CodePhrase[] CATEGORIES;
-    
+
     public final static CodePhrase ATTEST_signed = new CodePhrase(OPENEHR, "240");
     public final static CodePhrase ATTEST_witnessed = new CodePhrase(OPENEHR, "648");
     public static CodePhrase[] ATTEST;
@@ -30,7 +30,7 @@ public class Terminology
     public final static CodePhrase AUDIT_attestation = new CodePhrase(OPENEHR, "666");
     public final static CodePhrase AUDIT_unknown = new CodePhrase(OPENEHR, "253");
     public static CodePhrase[] AUDIT;
-    
+
     public final static CodePhrase MULTIMEDIA_html = new CodePhrase(OPENEHR, "417");
     public final static CodePhrase MULTIMEDIA_plain = new CodePhrase(OPENEHR, "418");
     public final static CodePhrase MULTIMEDIA_rtf = new CodePhrase(OPENEHR, "419");
@@ -49,28 +49,28 @@ public class Terminology
     public final static CodePhrase PROPERTY_Temperature = new CodePhrase(OPENEHR, "127");
     public final static CodePhrase PROPERTY_Volume = new CodePhrase(OPENEHR, "129");
     public static CodePhrase[] PROPERTY;
-    
+
     public final static CodePhrase VERSION_LIFECYCLE_complete = new CodePhrase(OPENEHR, "532");
     public final static CodePhrase VERSION_LIFECYCLE_incomplete = new CodePhrase(OPENEHR, "553");
     public final static CodePhrase VERSION_LIFECYCLE_deleted = new CodePhrase(OPENEHR, "523");
     public static CodePhrase[] VERSION_LIFECYCLE;
-    
+
     public final static CodePhrase PARTICIPATION_FUNCTION_unknown = new CodePhrase(OPENEHR, "253");
     public static CodePhrase[] PARTICIPATION_FUNCTION;
-    
+
     public final static CodePhrase NULL_FLAVOUR_no_information = new CodePhrase(OPENEHR, "271");
     public final static CodePhrase NULL_FLAVOUR_unknown = new CodePhrase(OPENEHR, "253");
     public final static CodePhrase NULL_FLAVOUR_masked = new CodePhrase(OPENEHR, "272");
     public final static CodePhrase NULL_FLAVOUR_not_applicable = new CodePhrase(OPENEHR, "273");
     public static CodePhrase[] NULL_FLAVOUR;
-    
+
     public final static CodePhrase PARTICIPATION_MODE_not_specified = new CodePhrase(OPENEHR, "193");
     public final static CodePhrase PARTICIPATION_MODE_face_to_face_communication = new CodePhrase(OPENEHR, "216");
     public final static CodePhrase PARTICIPATION_MODE_telephone = new CodePhrase(OPENEHR, "204");
     public final static CodePhrase PARTICIPATION_MODE_interactive_written_note = new CodePhrase(OPENEHR, "215");
     public final static CodePhrase PARTICIPATION_MODE_email = new CodePhrase(OPENEHR, "207");
     public static CodePhrase[] PARTICIPATION_MODE;
-    
+
     public final static CodePhrase INSTRUCTION_STATE_initial = new CodePhrase(OPENEHR, "524");
     public final static CodePhrase INSTRUCTION_STATE_planned = new CodePhrase(OPENEHR, "526");
     public final static CodePhrase INSTRUCTION_STATE_postponed = new CodePhrase(OPENEHR, "527");
@@ -82,7 +82,7 @@ public class Terminology
     public final static CodePhrase INSTRUCTION_STATE_completed = new CodePhrase(OPENEHR, "532");
     public final static CodePhrase INSTRUCTION_STATE_expired = new CodePhrase(OPENEHR, "533");
     public static CodePhrase[] INSTRUCTION_STATE;
-    
+
     public final static CodePhrase INSTRUCTION_TRANSITION_initiate = new CodePhrase(OPENEHR, "535");
     public final static CodePhrase INSTRUCTION_TRANSITION_plan_step = new CodePhrase(OPENEHR, "536");
     public final static CodePhrase INSTRUCTION_TRANSITION_postpone = new CodePhrase(OPENEHR, "537");
@@ -103,7 +103,7 @@ public class Terminology
     public final static CodePhrase INSTRUCTION_TRANSITION_notify_completed = new CodePhrase(OPENEHR, "551");
     public final static CodePhrase INSTRUCTION_TRANSITION_notify_cancelled = new CodePhrase(OPENEHR, "552");
     public static CodePhrase[] INSTRUCTION_TRANSITION;
-    
+
     public final static CodePhrase SUBJECT_RELATIONSHIP_self = new CodePhrase(OPENEHR, "0");
     public final static CodePhrase SUBJECT_RELATIONSHIP_mother = new CodePhrase(OPENEHR, "10");
     public final static CodePhrase SUBJECT_RELATIONSHIP_father = new CodePhrase(OPENEHR, "9");
@@ -113,12 +113,12 @@ public class Terminology
     public final static CodePhrase SUBJECT_RELATIONSHIP_parent = new CodePhrase(OPENEHR, "254");
     public final static CodePhrase SUBJECT_RELATIONSHIP_partner_spouse = new CodePhrase(OPENEHR, "22");
     public static CodePhrase[] SUBJECT_RELATIONSHIP;
-    
+
     public final static CodePhrase TERM_MAPPING_PURPOSE_public_health = new CodePhrase(OPENEHR, "669");
     public final static CodePhrase TERM_MAPPING_PURPOSE_reimbursement = new CodePhrase(OPENEHR, "670");
     public final static CodePhrase TERM_MAPPING_PURPOSE_research_study = new CodePhrase(OPENEHR, "671");
     public static CodePhrase[] TERM_MAPPING_PURPOSE;
-    
+
     public final static CodePhrase MATH_FUNCTION_minimum = new CodePhrase(OPENEHR, "145");
     public final static CodePhrase MATH_FUNCTION_maximum = new CodePhrase(OPENEHR, "144");
     public final static CodePhrase MATH_FUNCTION_mode = new CodePhrase(OPENEHR, "267");
@@ -131,21 +131,21 @@ public class Terminology
     public final static CodePhrase MATH_FUNCTION_increase = new CodePhrase(OPENEHR, "522");
     public final static CodePhrase MATH_FUNCTION_actual = new CodePhrase(OPENEHR, "640");
     public static CodePhrase[] MATH_FUNCTION;
-    
+
     public final static CodePhrase SETTING_home = new CodePhrase(OPENEHR, "225");
     public final static CodePhrase SETTING_emergency_care = new CodePhrase(OPENEHR, "227");
-    public final static CodePhrase SETTING_primary_medical  = new CodePhrase(OPENEHR, "228");
-    public final static CodePhrase SETTING_primary_nursing  = new CodePhrase(OPENEHR, "229");
-    public final static CodePhrase SETTING_primary_allied  = new CodePhrase(OPENEHR, "230");
-    public final static CodePhrase SETTING_secondary_medical  = new CodePhrase(OPENEHR, "232");
-    public final static CodePhrase SETTING_secondary_nursing  = new CodePhrase(OPENEHR, "233");
-    public final static CodePhrase SETTING_secondary_allied  = new CodePhrase(OPENEHR, "234");
-    public final static CodePhrase SETTING_complementary  = new CodePhrase(OPENEHR, "235");
+    public final static CodePhrase SETTING_primary_medical = new CodePhrase(OPENEHR, "228");
+    public final static CodePhrase SETTING_primary_nursing = new CodePhrase(OPENEHR, "229");
+    public final static CodePhrase SETTING_primary_allied = new CodePhrase(OPENEHR, "230");
+    public final static CodePhrase SETTING_secondary_medical = new CodePhrase(OPENEHR, "232");
+    public final static CodePhrase SETTING_secondary_nursing = new CodePhrase(OPENEHR, "233");
+    public final static CodePhrase SETTING_secondary_allied = new CodePhrase(OPENEHR, "234");
+    public final static CodePhrase SETTING_complementary = new CodePhrase(OPENEHR, "235");
     public final static CodePhrase SETTING_dental_care = new CodePhrase(OPENEHR, "236");
     public final static CodePhrase SETTING_nursing_home_care = new CodePhrase(OPENEHR, "237");
     public final static CodePhrase SETTING_other_care = new CodePhrase(OPENEHR, "238");
     public static CodePhrase[] SETTING;
-    
+
     public final static TerminologyID COMPRESSION = new TerminologyID("openehr_compression_algorithms");
     public final static CodePhrase COMPRESSION_gzip = new CodePhrase(COMPRESSION, "gzip");
     public final static CodePhrase COMPRESSION_deflate = new CodePhrase(COMPRESSION, "deflate");
@@ -156,13 +156,13 @@ public class Terminology
     public final static CodePhrase CHECKSUM_sha1 = new CodePhrase(CHECKSUM, "SHA-1");
     public final static CodePhrase CHECKSUM_sha256 = new CodePhrase(CHECKSUM, "SHA-256");
     public static CodePhrase[] CHECKSUMS;
-    
+
     public final static TerminologyID STATUS = new TerminologyID("openehr_normal_statuses");
     public final static CodePhrase STATUS_H = new CodePhrase(STATUS, "H");
     public final static CodePhrase STATUS_N = new CodePhrase(STATUS, "N");
     public final static CodePhrase STATUS_L = new CodePhrase(STATUS, "L");
     public static CodePhrase[] STATUSES;
-    
+
     public final static TerminologyID ISO_3166_1 = new TerminologyID("ISO_3166-1");
     public final static CodePhrase C_GB = new CodePhrase(ISO_3166_1, "C_GB");
     public final static CodePhrase C_US = new CodePhrase(ISO_3166_1, "C_US");
@@ -186,7 +186,7 @@ public class Terminology
     public final static TerminologyID ISO_639_1 = new TerminologyID("ISO_639-1");
     public final static CodePhrase L_en = new CodePhrase(ISO_639_1, "en");
     public static CodePhrase[] LANGUAGES;
-    
+
     public void fillArrays()
     {
         try
@@ -208,16 +208,17 @@ public class Terminology
                 {
                     String prefixName =
                             arrayName.equals("CATEGORIES") ? "CATEGORY" :
-                            arrayName.equals("COMPRESSIONS") ? "COMPRESSION" :
-                            arrayName.equals("CHECKSUMS") ? "CHECKSUM" :
-                            arrayName.equals("STATUSES") ? "STATUS" :
-                            arrayName.equals("COUNTRIES") ? "C" :
-                            arrayName.equals("LANGUAGES") ? "L" :
-                            arrayName.equals("CHARSETS") ? "CHARSET" :
-                            arrayName.equals("MEDIA_TYPES") ? "MEDIA_TYPE" :
-                            arrayName;
+                                    arrayName.equals("COMPRESSIONS") ? "COMPRESSION" :
+                                            arrayName.equals("CHECKSUMS") ? "CHECKSUM" :
+                                                    arrayName.equals("STATUSES") ? "STATUS" :
+                                                            arrayName.equals("COUNTRIES") ? "C" :
+                                                                    arrayName.equals("LANGUAGES") ? "L" :
+                                                                            arrayName.equals("CHARSETS") ? "CHARSET" :
+                                                                                    arrayName.equals("MEDIA_TYPES") ?
+                                                                                            "MEDIA_TYPE" :
+                                                                                            arrayName;
                     prefixName += "_";
-                    
+
                     List<CodePhrase> values = new ArrayList<>();
                     for (String fieldName : fieldNames)
                     {
@@ -244,7 +245,7 @@ public class Terminology
                             }
                         }
                     }
-                    
+
                     CodePhrase[] valuesArray = values.toArray(new CodePhrase[values.size()]);
                     field.set(null, valuesArray);
                 }
@@ -256,11 +257,13 @@ public class Terminology
         }
     }
 
-    Terminology() {}
+    Terminology()
+    {
+    }
 
     static
     {
         new Terminology().fillArrays();
     }
-    
+
 }

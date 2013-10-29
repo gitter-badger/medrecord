@@ -2,6 +2,7 @@ package com.medvision360.medrecord.itest;
 
 import com.medvision360.medrecord.spi.exceptions.RecordException;
 
+@SuppressWarnings("UnusedDeclaration")
 public class GenerateException extends RecordException
 {
     public GenerateException()

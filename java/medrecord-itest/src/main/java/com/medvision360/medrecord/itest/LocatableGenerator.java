@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.medvision360.medrecord.spi.ArchetypeStore;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
@@ -81,10 +80,8 @@ import org.openehr.rm.support.basic.Interval;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.LocatableRef;
-import org.openehr.rm.support.identification.ObjectID;
 import org.openehr.rm.support.identification.ObjectVersionID;
 import org.openehr.rm.support.identification.TerminologyID;
-import org.openehr.rm.support.identification.UID;
 import org.openehr.rm.support.identification.UIDBasedID;
 import org.openehr.rm.support.identification.UUID;
 import org.openehr.rm.support.identification.VersionTreeID;
@@ -93,7 +90,8 @@ import org.openehr.rm.support.terminology.TerminologyAccess;
 import org.openehr.rm.support.terminology.TerminologyService;
 
 @SuppressWarnings("UnusedDeclaration")
-public class LocatableGenerator extends Terminology {
+public class LocatableGenerator extends Terminology
+{
     //
     // Set up
     //
@@ -129,21 +127,21 @@ public class LocatableGenerator extends Terminology {
     //
     // API
     //
-    
+
     public Locatable generate(String archetypeName)
             throws NotFoundException, IOException, RMObjectBuildingException, GenerateException
     {
         ArchetypeID archetypeID = new ArchetypeID(archetypeName);
         return generate(archetypeID);
     }
-    
+
     public Locatable generate(ArchetypeID archetypeID)
             throws NotFoundException, IOException, RMObjectBuildingException, GenerateException
     {
         Archetype archetype = m_archetypeStore.get(archetypeID);
         return generate(archetype);
     }
-    
+
     public Locatable generate(Archetype archetype)
             throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
     {
@@ -159,7 +157,7 @@ public class LocatableGenerator extends Terminology {
     //
     // Object walking and structure generation
     //
-    
+
     private Object generateObject(Archetype archetype)
             throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
     {
@@ -167,7 +165,7 @@ public class LocatableGenerator extends Terminology {
         String archetypeName = archetypeID.getValue();
         String className = findClassName(archetypeID);
         log.debug(String.format("Attempting to construct a %s to match %s", className, archetypeName));
-        
+
         Map<String, Object> map = new HashMap<>();
         Archetyped archetypeDetails = new Archetyped(archetypeID, null, m_rmVersion);
         // uid added during transformation
@@ -175,7 +173,7 @@ public class LocatableGenerator extends Terminology {
         map.put("archetypeDetails", archetypeDetails);
         map.put("archetypeNodeId", archetypeName);
         map.put("links", makeLinks());
-        
+
         CComplexObject definition = archetype.getDefinition();
         generateMap(archetype, map, definition);
 
@@ -196,9 +194,9 @@ public class LocatableGenerator extends Terminology {
         {
             map.put("archetypeNodeId", newNodeId());
         }
-        nodeId = String.valueOf(map.get("archetypeNodeId"));
+        //nodeId = String.valueOf(map.get("archetypeNodeId"));
         //log.debug(String.format("generating map for node %s", nodeId));
-        
+
         List<CAttribute> attributes = definition.getAttributes();
         if (attributes != null)
         {
@@ -206,7 +204,7 @@ public class LocatableGenerator extends Terminology {
             {
                 String attributePath = attribute.path();
                 String attributeName = attribute.getRmAttributeName();
-                
+
                 if (!attribute.isAllowed())
                 {
                     log.debug(String.format("Skip attribute %s, not allowed", attributePath));
@@ -224,7 +222,7 @@ public class LocatableGenerator extends Terminology {
                 }
                 boolean forceMultiple = forceMultiple(rmTypeName, attributeName);
                 Object value = generateAttribute(archetype, attribute, map, forceMultiple);
-                log.debug(String.format("Generated attribute %s, %s: %s", attribute.path(), 
+                log.debug(String.format("Generated attribute %s, %s: %s", attribute.path(),
                         attribute.getRmAttributeName(), value));
                 if (value != null)
                 {
@@ -232,7 +230,7 @@ public class LocatableGenerator extends Terminology {
                 }
             }
         }
-        
+
         tweakMap(archetype, map, definition);
     }
 
@@ -275,20 +273,7 @@ public class LocatableGenerator extends Terminology {
     {
         log.debug(String.format("generateMultiple %s %s", name(attribute), attribute.path()));
         List<CObject> children = attribute.getChildren();
-        Collection<Object> container;
-        boolean isUnique = false;
-        if (attribute instanceof CMultipleAttribute)
-        {
-            isUnique = ((CMultipleAttribute)attribute).getCardinality().isUnique();
-        }
-        if(isUnique)
-        {
-            container = new TreeSet<>(); // also sorted
-        }
-        else
-        {
-            container = new ArrayList<>();
-        }
+        Collection<Object> container = generateContainer(attribute);
         for (CObject child : children)
         {
             if (!child.isAllowed())
@@ -307,7 +292,7 @@ public class LocatableGenerator extends Terminology {
             int upper = occurrences.getUpper() == null ? lower + listSize(2) :
                     Math.max(occurrences.getUpper(), lower);
 
-            int size = chooseOccurrences(isUnique, lower, upper);
+            int size = chooseOccurrences(container instanceof Set, lower, upper);
             for (int i = 0; i < size; i++)
             {
                 Object childValue = generateObject(archetype, child, child.isRequired(), map);
@@ -315,6 +300,25 @@ public class LocatableGenerator extends Terminology {
                         attribute.getRmAttributeName(), childValue));
                 container.add(childValue);
             }
+        }
+        return container;
+    }
+
+    private Collection<Object> generateContainer(CAttribute attribute)
+    {
+        Collection<Object> container;
+        boolean isUnique = false;
+        if (attribute instanceof CMultipleAttribute)
+        {
+            isUnique = ((CMultipleAttribute) attribute).getCardinality().isUnique();
+        }
+        if (isUnique)
+        {
+            container = new TreeSet<>(); // also sorted
+        }
+        else
+        {
+            container = new ArrayList<>();
         }
         return container;
     }
@@ -366,12 +370,12 @@ public class LocatableGenerator extends Terminology {
         }
         else if (object instanceof CPrimitiveObject)
         {
-            Object value = generatePrimitive(archetype, (CPrimitiveObject)object);
+            Object value = generatePrimitive(archetype, (CPrimitiveObject) object);
             return value;
         }
         else
         {
-            throw new GenerateException(String.format("Unrecognized constraint type %s (%s) at %s", 
+            throw new GenerateException(String.format("Unrecognized constraint type %s (%s) at %s",
                     object.getClass().getSimpleName(), objectName, objectPath));
         }
     }
@@ -387,7 +391,8 @@ public class LocatableGenerator extends Terminology {
             if (required)
             {
                 throw new GenerateException(String.format("Cannot resolve archetype reference %s", path));
-            } else
+            }
+            else
             {
                 log.warn(String.format(
                         "Skipping archetype ref %s since it is optional and we cannot resolve",
@@ -429,7 +434,7 @@ public class LocatableGenerator extends Terminology {
                         }
                         if (term.endsWith("]") || term.endsWith(">"))
                         {
-                            term = term.substring(0, term.length()-1);
+                            term = term.substring(0, term.length() - 1);
                         }
                         CodePhrase phrase;
                         try
@@ -437,7 +442,8 @@ public class LocatableGenerator extends Terminology {
                             phrase = (CodePhrase) CodePhrase.parseValue(term);
                             log.debug(String.format("Mapped ref %s to %s", reference, phrase));
                             return phrase;
-                        } catch(IllegalArgumentException|ClassCastException e)
+                        }
+                        catch (IllegalArgumentException | ClassCastException e)
                         {
                             log.warn(String.format("Could not parse term binding %s, skipping it", term));
                             continue;
@@ -456,7 +462,7 @@ public class LocatableGenerator extends Terminology {
         Archetype slotArchetype = chooseArchetype(slot);
         if (slotArchetype != null)
         {
-            log.debug(String.format("Satisfy slot %s with archetype %s", slot.path(), 
+            log.debug(String.format("Satisfy slot %s with archetype %s", slot.path(),
                     slotArchetype.getArchetypeId().getValue()));
             Object value = generateObject(archetype);
             return value;
@@ -480,14 +486,14 @@ public class LocatableGenerator extends Terminology {
         String objectPath = object.path();
         String className = findClassName(rmType);
         Map<String, Object> map = new HashMap<>();
-        log.debug(String.format("Generate complex object entity %s at %s with class %s", 
+        log.debug(String.format("Generate complex object entity %s at %s with class %s",
                 rmType, objectPath, className));
         try
         {
             generateMap(archetype, map, object);
             return m_rmObjectBuilder.construct(className, map);
         }
-        catch (IOException|GenerateException|NotFoundException|RMObjectBuildingException e)
+        catch (IOException | GenerateException | NotFoundException | RMObjectBuildingException e)
         {
             if (!required)
             {
@@ -507,7 +513,7 @@ public class LocatableGenerator extends Terminology {
     {
         if (domainType instanceof CCodePhrase)
         {
-            return generateCodePhrase(archetype, (CCodePhrase)domainType);
+            return generateCodePhrase(archetype, (CCodePhrase) domainType);
         }
         else if (domainType instanceof CDvQuantity)
         {
@@ -531,41 +537,41 @@ public class LocatableGenerator extends Terminology {
     private Object generatePrimitive(Archetype archetype, CPrimitiveObject primitiveObject) throws GenerateException
     {
         CPrimitive primitive = primitiveObject.getItem();
-        
+
         if (primitive instanceof CDate)
         {
-            return generateDate(archetype, (CDate)primitive).toString();
+            return generateDate(archetype, (CDate) primitive).toString();
         }
         else if (primitive instanceof CDateTime)
         {
-            return generateDateTime(archetype, (CDateTime)primitive).toString();
-            
+            return generateDateTime(archetype, (CDateTime) primitive).toString();
+
         }
         else if (primitive instanceof CTime)
         {
-            return generateTime(archetype, (CTime)primitive).toString();
+            return generateTime(archetype, (CTime) primitive).toString();
         }
         else if (primitive instanceof CDuration)
         {
-            return generateDuration(archetype, (CDuration)primitive).toString();
+            return generateDuration(archetype, (CDuration) primitive).toString();
         }
         else if (primitive instanceof CBoolean)
         {
-            return generateBoolean(archetype, (CBoolean)primitive);
+            return generateBoolean(archetype, (CBoolean) primitive);
         }
         else if (primitive instanceof CInteger)
         {
-            return generateInteger(archetype, (CInteger)primitive);
+            return generateInteger(archetype, (CInteger) primitive);
         }
         else if (primitive instanceof CReal)
         {
-            return generateReal(archetype, (CReal)primitive);
+            return generateReal(archetype, (CReal) primitive);
         }
         else if (primitive instanceof CString)
         {
-            return generateString(archetype, (CString)primitive);
+            return generateString(archetype, (CString) primitive);
         }
-        else if(primitive.hasAssumedValue())
+        else if (primitive.hasAssumedValue())
         {
             return primitive.assumedValue();
         }
@@ -573,7 +579,7 @@ public class LocatableGenerator extends Terminology {
         {
             throw new GenerateException(String.format("Unrecognized primitive type %s at %s",
                     primitive.getClass().getSimpleName(), primitiveObject.path()));
-            
+
         }
     }
 
@@ -585,10 +591,10 @@ public class LocatableGenerator extends Terminology {
     {
         String rmType = slot.getRmTypeName();
         String nodeId = slot.getNodeId();
-        
+
         Set<Assertion> includes = slot.getIncludes();
         Set<Assertion> excludes = slot.getIncludes();
-        
+
         Iterable<ArchetypeID> archetypes = m_archetypeStore.list();
         Set<ArchetypeID> possibilities = new HashSet<>();
         OUTER:
@@ -599,30 +605,32 @@ public class LocatableGenerator extends Terminology {
             {
                 continue;
             }
-            
+
             for (Assertion include : includes)
             {
-                if(!testArchetypeAssertion(archetypeID, include))
+                if (!testArchetypeAssertion(archetypeID, include))
                 {
                     continue OUTER;
-                };
+                }
+                ;
             }
 
             for (Assertion exclude : excludes)
             {
-                if(testArchetypeAssertion(archetypeID, exclude))
+                if (testArchetypeAssertion(archetypeID, exclude))
                 {
                     continue OUTER;
-                };
+                }
+                ;
             }
             possibilities.add(archetypeID);
         }
-        
+
         if (possibilities.isEmpty())
         {
             return null;
         }
-        
+
         ArchetypeID choice = pick(possibilities);
         return m_archetypeStore.get(choice);
     }
@@ -676,14 +684,14 @@ public class LocatableGenerator extends Terminology {
                     right.getClass().getSimpleName()));
         }
 
-        ExpressionLeaf leftLeaf = (ExpressionLeaf)left;
+        ExpressionLeaf leftLeaf = (ExpressionLeaf) left;
         String leftType = leftLeaf.getType();
         if (ExpressionItem.STRING.equalsIgnoreCase(leftType) || "C_STRING".equalsIgnoreCase(leftType))
         {
             Object value = leftLeaf.getItem();
             if (value instanceof CString)
             {
-                leftRule = ((CString)value).getPattern();
+                leftRule = ((CString) value).getPattern();
             }
             else
             {
@@ -699,14 +707,14 @@ public class LocatableGenerator extends Terminology {
                     leftType));
         }
 
-        ExpressionLeaf rightLeaf = (ExpressionLeaf)right;
+        ExpressionLeaf rightLeaf = (ExpressionLeaf) right;
         String rightType = rightLeaf.getType();
         if (ExpressionItem.STRING.equalsIgnoreCase(rightType) || "C_STRING".equalsIgnoreCase(rightType))
         {
             Object value = rightLeaf.getItem();
             if (value instanceof CString)
             {
-                rightRule = ((CString)value).getPattern();
+                rightRule = ((CString) value).getPattern();
             }
             else
             {
@@ -782,14 +790,14 @@ public class LocatableGenerator extends Terminology {
                 match = true;
             }
         }
-        
+
         return match;
     }
 
     //
     // Value generation
     //
-    
+
     private CodePhrase generateCodePhrase(Archetype archetype, CCodePhrase domainType)
     {
         TerminologyID terminology;
@@ -825,14 +833,14 @@ public class LocatableGenerator extends Terminology {
             {
                 return chooseLanguage();
             }
-            
+
             List<String> codeList = domainType.getCodeList();
             if (codeList != null && !codeList.isEmpty())
             {
                 String code = pick(codeList);
                 return new CodePhrase(terminology, code);
             }
-            
+
             if (domainType.hasAssumedValue())
             {
                 return domainType.getAssumedValue();
@@ -841,7 +849,7 @@ public class LocatableGenerator extends Terminology {
             {
                 return domainType.getDefaultValue();
             }
-            
+
             if (terminology.equals(OPENEHR))
             {
                 // sorted by least likely to be a bad guess
@@ -908,7 +916,7 @@ public class LocatableGenerator extends Terminology {
         {
             terminology = OPENEHR;
         }
-        
+
         TerminologyAccess terminologyAccess = m_terminologyService.terminology(terminology.name());
         if (terminologyAccess != null)
         {
@@ -918,8 +926,8 @@ public class LocatableGenerator extends Terminology {
                 return pick(codes);
             }
         }
-        
-        return new CodePhrase(terminology, "999"+random.nextInt(10000));
+
+        return new CodePhrase(terminology, "999" + random.nextInt(10000));
     }
 
     private DvQuantity generateDvQuantity(Archetype archetype, CDvQuantity domainType)
@@ -927,7 +935,7 @@ public class LocatableGenerator extends Terminology {
         String units;
         double magnitudeValue;
         int precisionValue;
-        
+
         List<CDvQuantityItem> choices = domainType.getList();
         if (choices != null && !choices.isEmpty())
         {
@@ -935,7 +943,7 @@ public class LocatableGenerator extends Terminology {
             Interval<Double> magnitude = item.getMagnitude();
             Interval<Integer> precision = item.getPrecision();
             units = item.getUnits();
-            
+
             magnitudeValue = doubleFromInterval(magnitude);
             precisionValue = integerFromInterval(precision);
         }
@@ -951,7 +959,7 @@ public class LocatableGenerator extends Terminology {
             }
             units = "m";
             magnitudeValue = random.nextDouble() * 50;
-            precisionValue = 1+random.nextInt(4);
+            precisionValue = 1 + random.nextInt(4);
         }
         return new DvQuantity(units, magnitudeValue, precisionValue, m_measurementService);
     }
@@ -959,7 +967,7 @@ public class LocatableGenerator extends Terminology {
     private DvState generateDvState(Archetype archetype, CDvState domainType)
     {
         CodePhrase code = chooseInstructionState();
-        
+
         DvCodedText coded = codeToText(code);
         DvState state = new DvState(coded, random.nextBoolean());
         return state;
@@ -970,7 +978,7 @@ public class LocatableGenerator extends Terminology {
         Set<Ordinal> choices = domainType.getList();
         CodePhrase symbol;
         int value;
-        
+
         if (choices != null && !choices.isEmpty())
         {
             Ordinal choice = pick(choices);
@@ -980,7 +988,7 @@ public class LocatableGenerator extends Terminology {
         else
         {
             symbol = chooseProperty();
-            value = 1+random.nextInt(10);
+            value = 1 + random.nextInt(10);
         }
 
         DvCodedText codedSymbol = codeToText(symbol);
@@ -999,9 +1007,9 @@ public class LocatableGenerator extends Terminology {
                 return value;
             }
         }
-        
+
         // does not support date pattern restrictions, which are also not fully supported by the RI
-        
+
         DvDate value = new DvDate();
         if (primitive != null)
         {
@@ -1016,13 +1024,15 @@ public class LocatableGenerator extends Terminology {
                 }
                 if (lower != null)
                 {
-                    if (value.compareTo(lower) < 0) {
+                    if (value.compareTo(lower) < 0)
+                    {
                         return lower;
                     }
                 }
                 if (upper != null)
                 {
-                    if (value.compareTo(upper) > 0) {
+                    if (value.compareTo(upper) > 0)
+                    {
                         return upper;
                     }
                 }
@@ -1042,9 +1052,9 @@ public class LocatableGenerator extends Terminology {
                 return value;
             }
         }
-        
+
         // does not support date pattern restrictions, which are also not fully supported by the RI
-        
+
         DvDateTime value = new DvDateTime();
         if (primitive != null)
         {
@@ -1059,13 +1069,15 @@ public class LocatableGenerator extends Terminology {
                 }
                 if (lower != null)
                 {
-                    if (value.compareTo(lower) < 0) {
+                    if (value.compareTo(lower) < 0)
+                    {
                         return lower;
                     }
                 }
                 if (upper != null)
                 {
-                    if (value.compareTo(upper) > 0) {
+                    if (value.compareTo(upper) > 0)
+                    {
                         return upper;
                     }
                 }
@@ -1085,9 +1097,9 @@ public class LocatableGenerator extends Terminology {
                 return value;
             }
         }
-        
+
         // does not support date pattern restrictions, which are also not fully supported by the RI
-        
+
         DvTime value = new DvTime();
         if (primitive != null)
         {
@@ -1102,13 +1114,15 @@ public class LocatableGenerator extends Terminology {
                 }
                 if (lower != null)
                 {
-                    if (value.compareTo(lower) < 0) {
+                    if (value.compareTo(lower) < 0)
+                    {
                         return lower;
                     }
                 }
                 if (upper != null)
                 {
-                    if (value.compareTo(upper) > 0) {
+                    if (value.compareTo(upper) > 0)
+                    {
                         return upper;
                     }
                 }
@@ -1136,11 +1150,11 @@ public class LocatableGenerator extends Terminology {
                 }
             }
         }
-        
+
         int hours = random.nextInt(8);
         int minutes = random.nextInt(60);
         int seconds = random.nextInt(60);
-        
+
         DvDuration value = new DvDuration(0, 0, 0, 0, hours, minutes, seconds, 0.0);
         return value;
     }
@@ -1158,7 +1172,7 @@ public class LocatableGenerator extends Terminology {
                 return String.valueOf(Boolean.TRUE);
             }
         }
-        
+
         return String.valueOf(random.nextBoolean());
     }
 
@@ -1206,41 +1220,40 @@ public class LocatableGenerator extends Terminology {
     {
         return m_generatedID++;
     }
-    
+
     private DvText newName(String className)
     {
         CodePhrase language = chooseLanguage();
         CodePhrase charset = chooseCharset();
         return new DvText(className + "-" + newId(), language, charset, m_terminologyService);
     }
-    
+
     private String newNodeId()
     {
         return String.format("at999%04d", newId());
     }
-    
+
     private String newString()
     {
-        int wordCount = 1+random.nextInt(9);
+        int wordCount = 1 + random.nextInt(9);
         return StringGenerator.getWords(wordCount);
     }
-    
+
     private HierObjectID makeUID()
     {
         return new HierObjectID(makeUUID(), null);
     }
-    
+
     private UUID makeUUID()
     {
         return new UUID(java.util.UUID.randomUUID().toString());
     }
-    
+
     protected ObjectVersionID makeOVID()
     {
         return new ObjectVersionID(makeUID().root(), new HierObjectID("medrecord.generator"), new VersionTreeID("1"));
     }
 
-    
 
     private int integerFromInterval(Interval<Integer> interval)
     {
@@ -1248,7 +1261,7 @@ public class LocatableGenerator extends Terminology {
                 Math.max(interval.getLower(), 0);
         int upper = interval.getUpper() == null ? Integer.MAX_VALUE :
                 Math.max(interval.getUpper(), lower);
-        
+
         int value = random.nextInt(upper);
         if (value < lower)
         {
@@ -1263,7 +1276,7 @@ public class LocatableGenerator extends Terminology {
                 Math.max(interval.getLower(), 0);
         double upper = interval.getUpper() == null ? Double.MAX_VALUE :
                 Math.max(interval.getUpper(), lower);
-        
+
         double value = random.nextDouble() * upper;
         if (value < lower)
         {
@@ -1276,7 +1289,7 @@ public class LocatableGenerator extends Terminology {
     {
         return codeToText(code, null);
     }
-    
+
     private DvCodedText codeToText(CodePhrase code, String terminology)
     {
         String value = null;
@@ -1297,7 +1310,7 @@ public class LocatableGenerator extends Terminology {
             String codeString = code.getCodeString();
             value = terminologyAccess.rubricForCode(codeString, languageCodeString);
         }
-        
+
         if (value == null)
         {
             value = code.getCodeString();
@@ -1316,19 +1329,19 @@ public class LocatableGenerator extends Terminology {
         for (int i = 0; i < listSize(5) && i < m_generatedUIDs.size(); i++)
         {
             UIDBasedID target = pick(m_generatedUIDs);
-            DvEHRURI targetUri = new DvEHRURI("ehr://"+target.getValue());
+            DvEHRURI targetUri = new DvEHRURI("ehr://" + target.getValue());
             Link link = new Link(new DvText("I'm feeling lucky"), new DvText("generated link"), targetUri);
             links.add(link);
         }
         return links;
     }
-    
+
     private PartyProxy makeSelf()
     {
         PartySelf partySelf = new PartySelf();
         return partySelf;
     }
-    
+
     private PartyProxy makeSubject()
     {
         return makeSelf();
@@ -1338,7 +1351,7 @@ public class LocatableGenerator extends Terminology {
     {
         return makeSelf();
     }
-    
+
     private ItemList makeDescription()
     {
         ItemList description = new ItemList(newNodeId(), newName("itemtree"), null);
@@ -1348,7 +1361,7 @@ public class LocatableGenerator extends Terminology {
     //
     // Code selection
     //
-    
+
     private CodePhrase chooseCategory()
     {
         return choose(CATEGORIES);
@@ -1458,19 +1471,19 @@ public class LocatableGenerator extends Terminology {
     {
         return choose(LANGUAGES);
     }
-    
+
     private CodePhrase choose(CodePhrase[] phrases)
     {
         return pick(phrases);
     }
-    
+
     //
     // RM augmentation
     //
 
     /**
-     * Allows overriding the decision of whether to fill one child attribute out of a list of possible choices, 
-     * or instead provide a Collection instance.
+     * Allows overriding the decision of whether to fill one child attribute out of a list of possible choices, or
+     * instead provide a Collection instance.
      */
     private boolean forceMultiple(String rmTypeName, String attributeName)
     {
@@ -1509,7 +1522,7 @@ public class LocatableGenerator extends Terminology {
                         return true;
                 }
                 break;
-            
+
             // directory
             case "FOLDER":
                 switch (attributeName)
@@ -1519,7 +1532,7 @@ public class LocatableGenerator extends Terminology {
                         return true;
                 }
                 break;
-            
+
             // change control
             case "CONTRIBUTION":
                 switch (attributeName)
@@ -1536,7 +1549,7 @@ public class LocatableGenerator extends Terminology {
                         return true;
                 }
                 break;
-            
+
             // generic
             case "ATTESTATION":
                 switch (attributeName)
@@ -1568,9 +1581,9 @@ public class LocatableGenerator extends Terminology {
                         return true;
                 }
                 break;
-            
+
             // todo resource package uses Map...
-            
+
             // composition
             case "COMPOSITION":
                 switch (attributeName)
@@ -1605,7 +1618,7 @@ public class LocatableGenerator extends Terminology {
                         return true;
                 }
                 break;
-            
+
             // demographic
             case "AGENT":
             case "GROUP":
@@ -1633,18 +1646,18 @@ public class LocatableGenerator extends Terminology {
         return false;
     }
 
-    private void tweakMap(Archetype archetype, Map<String, Object> map, CComplexObject definition) throws IOException
+    private void tweakMap(Archetype archetype, Map<String, Object> map, CComplexObject definition)
     {
         String rmTypeName = toUnderscoreSeparated(definition.getRmTypeName());
         //log.debug(String.format("Extending map for type %s", rmTypeName));
-        
+
         boolean hasValue = hasValue(map);
         boolean hasName = hasName(map);
         if (!hasName)
         {
             addName(map, rmTypeName.toLowerCase());
         }
-        
+
         if (!hasValue)
         {
             switch (rmTypeName)
@@ -1677,15 +1690,15 @@ public class LocatableGenerator extends Terminology {
                     break;
 
                 case "DV_URI":
-                    addValue(map, "urn:generated:"+newName("uri"));
+                    addValue(map, "urn:generated:" + newName("uri"));
                     break;
                 case "DV_EHRURI":
                 case "DV_EHR_URI":
-                    addValue(map, "ehr://generated/"+newName("uri"));
+                    addValue(map, "ehr://generated/" + newName("uri"));
                     break;
             }
         }
-        
+
         switch (rmTypeName)
         {
             // domain types                    
@@ -1709,20 +1722,30 @@ public class LocatableGenerator extends Terminology {
                 }
                 map.put("defining_code", code);
                 if (!hasValue)
+                {
                     addValue(map, codeToText(code).getValue());
+                }
                 break;
-            
+
             case "DV_PROPORTION":
                 if (!map.containsKey("numerator"))
+                {
                     map.put("numerator", String.valueOf(generateReal(archetype, null)));
+                }
                 if (!map.containsKey("denominator"))
+                {
                     map.put("denominator", String.valueOf(generateReal(archetype, null)));
+                }
                 if (!map.containsKey("precision"))
+                {
                     map.put("precision", String.valueOf(generateInteger(archetype, null)));
+                }
                 if (!map.containsKey("type"))
+                {
                     map.put("type", ProportionKind.RATIO);
+                }
                 break;
-            
+
             case "DV_INTERVAL":
             case "DV_INTERVAL<DV_QUANTITY>":
             case "DV_INTERVAL<DV_REAL>":
@@ -1768,96 +1791,156 @@ public class LocatableGenerator extends Terminology {
                     }
                 }
                 break;
-            
+
             // identification
 //            case "ARCHETYPE_ID":
 //                map.put("value", "openEHR-EHR-ADMIN_ENTRY.admin_entry.v1");
 //                break;
             case "DV_IDENTIFIER":
                 if (!map.containsKey("issuer"))
-                    map.put("issuer", ""+newString());
+                {
+                    map.put("issuer", "" + newString());
+                }
                 if (!map.containsKey("assigner"))
-                    map.put("assigner", ""+newString());
+                {
+                    map.put("assigner", "" + newString());
+                }
                 if (!map.containsKey("id"))
-                    map.put("id", ""+newId());
+                {
+                    map.put("id", "" + newId());
+                }
                 if (!map.containsKey("type"))
-                    map.put("type", ""+newString());
+                {
+                    map.put("type", "" + newString());
+                }
                 break;
             case "PARTY_REF":
                 if (!map.containsKey("id"))
+                {
                     map.put("id", makeUID());
+                }
                 if (!map.containsKey("type"))
-                    map.put("type", ""+newString());
+                {
+                    map.put("type", "" + newString());
+                }
                 break;
             case "LOCATABLE_REF":
                 if (!map.containsKey("id"))
+                {
                     map.put("id", makeOVID());
+                }
                 if (!map.containsKey("namespace"))
+                {
                     map.put("namespace", newName("namespace").getValue());
+                }
                 if (!map.containsKey("type"))
+                {
                     map.put("type", newName("type").getValue());
+                }
                 break;
-            
+
             // composition
             case "COMPOSITION":
                 if (!map.containsKey("composer"))
+                {
                     map.put("composer", makeSubject());
+                }
                 if (!map.containsKey("category"))
+                {
                     map.put("category", codeToText(chooseCategory()));
+                }
                 if (map.containsKey("context"))
+                {
                     map.put("category", codeToText(CATEGORY_event));
+                }
                 map.remove("parent");
                 break;
             case "EVENT_CONTEXT":
                 if (!map.containsKey("start_time"))
+                {
                     map.put("start_time", generateDateTime(archetype, null));
+                }
                 if (!map.containsKey("setting"))
+                {
                     map.put("setting", codeToText(chooseSetting()));
+                }
                 map.remove("participations");
                 break;
             case "ACTION":
                 if (!map.containsKey("subject"))
+                {
                     map.put("subject", makeSubject());
+                }
                 if (!map.containsKey("description") || map.get("description") == null)
+                {
                     map.put("description", makeDescription());
+                }
                 if (!map.containsKey("time"))
+                {
                     map.put("time", generateDateTime(archetype, null));
+                }
                 break;
             case "ACTIVITY":
                 if (!map.containsKey("subject"))
+                {
                     map.put("subject", makeSubject());
+                }
                 if (!map.containsKey("description") || map.get("description") == null)
+                {
                     map.put("description", makeDescription());
+                }
                 if (!map.containsKey("timing"))
+                {
                     map.put("timing", new DvParsable(newString(), "txt"));
+                }
                 if (!map.containsKey("action_archetype_id"))
+                {
                     map.put("action_archetype_id", newString());
+                }
                 break;
             case "INSTRUCTION":
                 if (!map.containsKey("subject"))
+                {
                     map.put("subject", makeSubject());
+                }
                 if (!map.containsKey("narrative"))
+                {
                     map.put("narrative", new DvText(newString()));
+                }
                 if (!map.containsKey("description") || map.get("description") == null)
+                {
                     map.put("description", makeDescription());
+                }
                 break;
             case "ADMIN_ENTRY":
                 if (!map.containsKey("subject"))
+                {
                     map.put("subject", makeSubject());
+                }
                 if (!map.containsKey("description") || map.get("description") == null)
+                {
                     map.put("description", makeDescription());
+                }
                 break;
             case "EVALUATION":
                 if (!map.containsKey("subject"))
+                {
                     map.put("subject", makeSubject());
+                }
                 if (!map.containsKey("description") || map.get("description") == null)
+                {
                     map.put("description", makeDescription());
+                }
                 break;
             case "OBSERVATION":
                 if (!map.containsKey("subject"))
+                {
                     map.put("subject", makeSubject());
+                }
                 if (!map.containsKey("description") || map.get("description") == null)
+                {
                     map.put("description", makeDescription());
+                }
                 break;
             case "INSTRUCTION_DETAILS":
                 if (!map.containsKey("instructionId"))
@@ -1866,23 +1949,29 @@ public class LocatableGenerator extends Terminology {
                             makeOVID(), newName("namespace").getValue(), newName("type").getValue(), null));
                 }
                 if (!map.containsKey("activityId"))
+                {
                     map.put("activityId", newName("activity").getValue());
+                }
                 break;
-            
+
             // demographic
             case "PARTICIPATION":
                 if (!map.containsKey("performer"))
+                {
                     map.put("performer", makeSelf());
+                }
                 // todo at-term-binding-mapping isn't working for these
                 //if (!map.containsKey("mode"))
                 map.put("mode", codeToText(chooseParticipationMode()));
                 //if (!map.containsKey("function"))
                 map.put("function", codeToText(chooseParticipationFunction()));
 
-            // structure
+                // structure
             case "HISTORY":
                 if (!map.containsKey("origin"))
+                {
                     map.put("origin", generateDateTime(archetype, null));
+                }
                 break;
 
             // other
@@ -1890,27 +1979,43 @@ public class LocatableGenerator extends Terminology {
             case "POINT_EVENT":
             case "INTERVAL_EVENT":
                 if (!map.containsKey("time"))
+                {
                     map.put("time", generateDateTime(archetype, null));
+                }
                 break;
             case "DV_MULTIMEDIA":
                 if (!map.containsKey("mediaType"))
+                {
                     map.put("mediaType", chooseMediaType());
+                }
                 if (!map.containsKey("compressionAlgorithm"))
+                {
                     map.put("compressionAlgorithm", chooseCompression());
+                }
                 if (!map.containsKey("integrityCheckAlgorithm"))
+                {
                     map.put("integrityCheckAlgorithm", chooseChecksum());
+                }
                 if (!map.containsKey("uri"))
-                    map.put("uri", new DvURI("urn:generated:"+newName("uri")));
-                
+                {
+                    map.put("uri", new DvURI("urn:generated:" + newName("uri")));
+                }
+
         }
-        
+
         if (!map.containsKey("encoding"))
+        {
             map.put("encoding", chooseCharset());
+        }
         if (!map.containsKey("language"))
+        {
             map.put("language", chooseLanguage());
+        }
         if (!map.containsKey("territory"))
+        {
             map.put("territory", chooseCountry());
-        
+        }
+
         if (map.containsKey("value") && map.get("value") != null)
         {
             map.remove("nullFlavour");
@@ -1954,7 +2059,7 @@ public class LocatableGenerator extends Terminology {
     {
         // can map to different types here
         rmType = toUnderscoreSeparated(rmType);
-        
+
         switch (rmType)
         {
             case "EVENT":
@@ -1983,11 +2088,11 @@ public class LocatableGenerator extends Terminology {
         {
             return options[0];
         }
-        
+
         int pick = random.nextInt(options.length);
         return options[pick];
     }
-    
+
     private <T> T pick(Iterable<T> options)
     {
         if (options == null)
@@ -2003,17 +2108,17 @@ public class LocatableGenerator extends Terminology {
         {
             return optionList.get(0);
         }
-        
+
         int pick = random.nextInt(optionList.size());
         return optionList.get(pick);
     }
-    
+
     private boolean should(double probability)
     {
         return true;
         //return random.nextDouble() < probability;
     }
-    
+
     private int listSize(int maxSize)
     {
         maxSize = Math.max(1, maxSize);
@@ -2023,13 +2128,13 @@ public class LocatableGenerator extends Terminology {
         }
         return 1 + random.nextInt(maxSize - 1);
     }
-    
+
     private boolean should()
     {
         return true;
         //return random.nextBoolean();
     }
-    
+
     private int chooseOccurrences(boolean unique, int lower, int upper)
     {
         int occurrences;
@@ -2047,14 +2152,14 @@ public class LocatableGenerator extends Terminology {
         }
         return occurrences;
     }
-    
+
     private String toUnderscoreSeparated(String camelCase)
     {
         if (camelCase.indexOf("_") != -1)
         {
             return camelCase.toUpperCase();
         }
-        
+
         String[] array = StringUtils.splitByCharacterTypeCamelCase(camelCase);
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < array.length; i++)

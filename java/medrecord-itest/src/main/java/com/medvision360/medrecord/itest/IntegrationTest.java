@@ -51,7 +51,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 public class IntegrationTest extends RMTestBase
 {
     private final static Log log = LogFactory.getLog(IntegrationTest.class);
-    
+
     private TerminologyService m_terminologyService;
     private MeasurementService m_measurementService;
 
@@ -61,15 +61,15 @@ public class IntegrationTest extends RMTestBase
     private boolean m_adlMissingLanguageCompatible;
     private boolean m_adlEmptyPurposeCompatible;
     private ArchetypeLoader m_archetypeLoader;
-    
+
     private RMObjectBuilder m_rmObjectBuilder;
-    
+
     private LocatableGenerator m_locatableGenerator;
-    
+
     RIXmlConverter m_xmlConverter;
-    
+
     PVSerializer m_pvSerializer;
-    
+
     LocatableTransformer m_locatableTransformer;
 
     List<Context> m_baseXContexts;
@@ -77,15 +77,15 @@ public class IntegrationTest extends RMTestBase
     String m_locatableStorePath = "itest";
     LocatableStore m_locatableStore;
     LocatableStore m_fallbackStore;
-    
+
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
-        
+
         m_terminologyService = SimpleTerminologyService.getInstance();
         m_measurementService = SimpleMeasurementService.getInstance();
-        
+
         m_archetypeStore = new MemArchetypeStore();
 
         m_resolver = new PathMatchingResourcePatternResolver();
@@ -104,19 +104,19 @@ public class IntegrationTest extends RMTestBase
         systemValues.put(SystemValue.ENCODING, Terminology.CHARSET_UTF8);
         m_rmObjectBuilder = new RMObjectBuilder(systemValues);
 
-        m_locatableGenerator = new LocatableGenerator(m_archetypeStore, m_terminologyService, m_measurementService, 
+        m_locatableGenerator = new LocatableGenerator(m_archetypeStore, m_terminologyService, m_measurementService,
                 m_rmObjectBuilder);
-        
+
         m_xmlConverter = new RIXmlConverter(m_terminologyService, m_measurementService,
                 Terminology.CHARSET_UTF8, Terminology.L_en);
-        
+
         m_pvSerializer = new PVSerializer();
-        
+
         m_locatableTransformer = getLocatableTransformer();
-        
+
         m_locatableStore = getLocatableStore();
     }
-    
+
     @Override
     public void tearDown() throws Exception
     {
@@ -126,7 +126,7 @@ public class IntegrationTest extends RMTestBase
             c.close();
         }
     }
-    
+
     protected LocatableStore getLocatableStore() throws Exception
     {
         m_baseXContexts = new ArrayList<>();
@@ -134,7 +134,7 @@ public class IntegrationTest extends RMTestBase
 
         LocatableSelector basicEHR = LocatableSelectorBuilder
                 .start()
-                //.requireRMVersion("1.0.2")
+                        //.requireRMVersion("1.0.2")
                 .requireRMName("EHR")
                 .matchRMEntity("^(?:COMPOSITION|EHRSTATUS|ACTION|ADMIN_ENTRY|EVALUATION|INSTRUCTION|OBSERVATION)$")
                 .build();
@@ -142,7 +142,7 @@ public class IntegrationTest extends RMTestBase
 
         LocatableSelector basicDemographics = LocatableSelectorBuilder
                 .start()
-                //.requireRMVersion("1.0.2")
+                        //.requireRMVersion("1.0.2")
                 .requireRMName("DEMOGRAPHIC")
                 .matchRMEntity("^(?:PARTY_IDENTITY|PARTY_RELATIONSHIP|PERSON|ORGANISATION|ROLE|ADDRESS|CAPABILITY)$")
                 .build();
@@ -150,11 +150,11 @@ public class IntegrationTest extends RMTestBase
 
         LocatableSelector xmlFallback = LocatableSelectorBuilder.any();
         store.addDelegate(getStore("IntegrationTestFALLBACK", xmlFallback));
-        
+
         m_fallbackStore = new MemLocatableStore("IntegrationTestMEMORY");
-        
+
         store.addDelegate(m_fallbackStore);
-        
+
         store.clear();
         store.initialize();
 
@@ -175,21 +175,21 @@ public class IntegrationTest extends RMTestBase
                 m_locatableStorePath
         );
     }
-    
+
     protected LocatableTransformer getLocatableTransformer()
     {
         CompositeTransformer transformer = new CompositeTransformer();
         transformer.addDelegate(new UIDGenerator());
         return transformer;
     }
-    
+
     public void testEverything() throws Exception
     {
         m_archetypeLoader.loadAll("openehr");
         m_archetypeLoader.loadAll("medfit");
         m_archetypeLoader.loadAll("chiron");
         m_archetypeLoader.loadAll("mobiguide");
-        
+
         Iterable<ArchetypeID> allArchetypeIDs = m_archetypeStore.list();
         TreeSet<String> sortedIDs = new TreeSet<>();
         Iterables.addAll(sortedIDs, Iterables.transform(allArchetypeIDs, new Function<ArchetypeID, String>()
@@ -212,7 +212,7 @@ public class IntegrationTest extends RMTestBase
                         archetypeName));
                 continue;
             }
-            
+
             // generate
             log.debug(String.format("Generating instance of %s", archetypeName));
             Locatable instance;
@@ -229,26 +229,26 @@ public class IntegrationTest extends RMTestBase
             }
             String className = instance.getClass().getSimpleName();
             log.debug(String.format("Got %s for archetype %s", className, archetypeName));
-            
+
             // transform
             log.debug(String.format("Transforming instance of %s", archetypeName));
             m_locatableTransformer.transform(instance);
-        
+
             // insert
             m_locatableStore.insert(instance);
             log.debug(String.format("Inserted a %s", archetypeName));
             inserted++;
         }
-        
+
         int storedInMemory = Iterables.size(m_fallbackStore.list());
 
         failed += serializeAll();
-        
+
         log.info(String.format("Created %s instances using skeleton generation (skipped %s, failed %s)",
-                generated, Iterables.size(allArchetypeIDs)-generated, failed));
+                generated, Iterables.size(allArchetypeIDs) - generated, failed));
         log.info(String.format("Inserted %s locatables (%s in xml databases)",
                 inserted, inserted - storedInMemory));
-        
+
         assertEquals("No failures", 0, failed);
     }
 
@@ -258,14 +258,14 @@ public class IntegrationTest extends RMTestBase
         int retrieved = 0;
         int failed = 0;
         int serialized = 0;
-        
+
         Iterable<HierObjectID> allIDs = m_locatableStore.list();
         File base = new File("build" + File.separatorChar + "ser");
         if (!base.exists())
         {
             base.mkdirs();
         }
-        for(HierObjectID hierObjectID : allIDs)
+        for (HierObjectID hierObjectID : allIDs)
         {
             all++;
             String id = null;
@@ -280,7 +280,7 @@ public class IntegrationTest extends RMTestBase
                 m_pvSerializer.serialize(locatable, bos);
                 serialized++;
             }
-            catch (NotFoundException|IOException|ParseException|SerializeException e)
+            catch (NotFoundException | IOException | ParseException | SerializeException e)
             {
                 failed++;
                 log.error(String.format("Difficulty serializing %s: %s", id, e.getMessage(), e));
@@ -300,6 +300,7 @@ public class IntegrationTest extends RMTestBase
             "openEHR-DEMOGRAPHIC-ROLE.healthcare_provider_organisation.v1",
             "openEHR-DEMOGRAPHIC-ROLE.individual_provider.v1",
     };
+
     {
         Arrays.sort(skipArchetypes);
     }
@@ -311,7 +312,7 @@ public class IntegrationTest extends RMTestBase
         {
             return true;
         }
-        
+
         return false;
     }
 }
