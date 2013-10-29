@@ -1,11 +1,9 @@
 package com.medvision360.medrecord.spi.tck;
 
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -62,7 +60,7 @@ public class RMTestBase extends CompositionTestBase
     {
         assertEquals(orig.getUid(), other.getUid());
         assertEquals(orig.getArchetypeNodeId(), other.getArchetypeNodeId());
-        assertEquals(orig.getName(), other.getName());
+        assertEquals(orig.getName().getValue(), other.getName().getValue());
         assertEquals(orig.getArchetypeDetails().getArchetypeId().getValue(),
                 other.getArchetypeDetails().getArchetypeId().getValue());
     }
