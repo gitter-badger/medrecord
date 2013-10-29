@@ -33,15 +33,12 @@ import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.common.archetyped.Pathable;
 import org.openehr.rm.common.generic.PartyIdentified;
 import org.openehr.rm.common.generic.PartySelf;
-import org.openehr.rm.datatypes.quantity.datetime.DvDate;
-import org.openehr.rm.datatypes.quantity.datetime.DvDateTime;
 import org.openehr.rm.datatypes.quantity.datetime.DvDateTimeParser;
 import org.openehr.rm.datatypes.quantity.datetime.DvDuration;
-import org.openehr.rm.datatypes.quantity.datetime.DvTime;
 import org.openehr.rm.datatypes.text.CodePhrase;
 import org.openehr.rm.datatypes.text.DvCodedText;
 import org.openehr.rm.datatypes.text.DvText;
-import org.openehr.rm.datatypes.uri.DvURI;
+import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.measurement.MeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
 
@@ -161,6 +158,7 @@ public class PVParser extends AbstractPVParser
     private CodePhrase m_territory;
     private CodePhrase m_encoding;
     private DvCodedText m_categoryEvent;
+    private String m_rmVersion = "1.0.2";
 
     public PVParser(TerminologyService terminologyService, MeasurementService measurementService,
             CodePhrase encoding, CodePhrase language, CodePhrase territory)
@@ -193,6 +191,11 @@ public class PVParser extends AbstractPVParser
         }
         
         m_builder = RMObjectBuilder.getInstance(systemValues);
+    }
+
+    public void setRmVersion(String rmVersion)
+    {
+        m_rmVersion = rmVersion;
     }
 
     @Override
@@ -270,7 +273,7 @@ public class PVParser extends AbstractPVParser
         String rmEntity = node.getRmEntity();
         if (rmEntity == null)
         {
-            throw new ParseException(String.format("Missing /rm_type for %s", node));
+            throw new ParseException(String.format("Missing /rm_entity for %s", node));
         }
 
         try
@@ -280,7 +283,7 @@ public class PVParser extends AbstractPVParser
             parseNodeFields(node, valueMap);
             parseChildren(node, valueMap);
 
-            Object result = null;
+            Object result;
             try
             {
                 result = m_builder.construct(rmEntity, valueMap);
@@ -328,9 +331,17 @@ public class PVParser extends AbstractPVParser
         }
 
         String archetypeNodeId = node.findArchetypeNodeId();
-        if (archetypeNodeId != null)
+        if (archetypeNodeId != null && !valueMap.containsKey("archetypeNodeId"))
         {
             valueMap.put("archetypeNodeId", archetypeNodeId);
+        }
+        
+        String archetypeId = node.findArchetypeId();
+        if (archetypeId != null && !valueMap.containsKey("archetypeDetails"))
+        {
+            ArchetypeID archetypeID = new ArchetypeID(archetypeId);
+            Archetyped archetypeDetails = new Archetyped(archetypeID, m_rmVersion);
+            valueMap.put("archetypeDetails", archetypeDetails);
         }
     }
 
@@ -340,7 +351,7 @@ public class PVParser extends AbstractPVParser
         // node.level == root|archetypeNodeId
         //   node.children.level == attribute
         String rmEntity = node.getRmEntity();
-        Map<String, Class> attributes = null;
+        Map<String, Class> attributes;
         try
         {
             attributes = m_builder.retrieveAttribute(rmEntity);
@@ -393,8 +404,7 @@ public class PVParser extends AbstractPVParser
     {
         if ("PartyProxy".equals(rmEntity))
         {
-            String path = node.getPath();
-            if(path.startsWith("/subject"))
+            if(node.pathMatches("/subject"))
             {
                 return "PartySelf";
             }
@@ -613,7 +623,9 @@ public class PVParser extends AbstractPVParser
                 "INSTRUCTION".equalsIgnoreCase(rmEntity) ||
                 "ACTION".equalsIgnoreCase(rmEntity) ||
                 "ADMINENTRY".equalsIgnoreCase(rmEntity) ||
-                "CAREENTRY".equalsIgnoreCase(rmEntity))
+                "ADMIN_ENTRY".equalsIgnoreCase(rmEntity) ||
+                "CAREENTRY".equalsIgnoreCase(rmEntity) ||
+                "CARE_ENTRY".equalsIgnoreCase(rmEntity))
         {
             if (!valueMap.containsKey("subject"))
             {

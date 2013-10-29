@@ -30,7 +30,10 @@ public class PVConverterTest extends LocatableConverterTCKTestBase
     @Override
     protected LocatableParser getParser() throws Exception
     {
-        return new PVParser(new TestTerminologyService(), new TestMeasurementService(), encoding, lang, territory());
+        PVParser parser = new PVParser(new TestTerminologyService(), new TestMeasurementService(), encoding, lang, 
+            territory());
+        parser.setRmVersion("1.0.2");
+        return parser;
     }
 
     @Override
@@ -42,20 +45,22 @@ public class PVConverterTest extends LocatableConverterTCKTestBase
     public void testFillingInOptionalValues() throws Exception
     {
         String[] sample = {
-          "/archetype_node_id" , "at0001",
-          "/rm_entity" , "Composition",
-          "/archetype_details/archetype_id/value" , "unittest-EHR-COMPOSITION.composition.v1",
-          "/content/collection_type" , "LIST",
-          "/content[at0002][1]/rm_entity" , "AdminEntry",
-          "/content[at0002][1]/archetype_details/archetype_id/value" , "unittest-EHR-ADMIN_ENTRY.date.v2",
-          "/content[at0002][1]/data[at0003]/items/collection_type" , "LIST",
-          "/content[at0002][1]/data[at0003]/items[at0004][1]/rm_entity" , "Element",
-          "/content[at0002][1]/data[at0003]/items[at0004][1]/name/value" , "header",
-          "/content[at0002][1]/data[at0003]/items[at0004][1]/value/value" , "date",
-          "/content[at0002][1]/data[at0003]/items[at0005][2]/rm_entity" , "Element",
-          "/content[at0002][1]/data[at0003]/items[at0005][2]/name/value" , "value",
-          "/content[at0002][1]/data[at0003]/items[at0005][2]/value/value" , "2008-05-17",
+          "[%s]/archetype_node_id" , "at0001",
+          "[%s]/content/collection_type" , "LIST",
+          "[%s]/content[%s][1]/data[at0003]/items/collection_type" , "LIST",
+          "[%s]/content[%s][1]/data[at0003]/items[at0004][1]/rm_entity" , "Element",
+          "[%s]/content[%s][1]/data[at0003]/items[at0004][1]/name/value" , "header",
+          "[%s]/content[%s][1]/data[at0003]/items[at0004][1]/value/value" , "date",
+          "[%s]/content[%s][1]/data[at0003]/items[at0005][2]/rm_entity" , "Element",
+          "[%s]/content[%s][1]/data[at0003]/items[at0005][2]/name/value" , "value",
+          "[%s]/content[%s][1]/data[at0003]/items[at0005][2]/value/value" , "2008-05-17",
         };
+        for (int i = 0; i < sample.length; i++)
+        {
+            String path = sample[i];
+            sample[i] = String.format(path, "unittest-EHR-COMPOSITION.composition.v1",
+                    "unittest-EHR-ADMIN_ENTRY.date.v2");
+        }
 
         String json = toJSON(sample);
         System.out.println(json);
@@ -70,7 +75,6 @@ public class PVConverterTest extends LocatableConverterTCKTestBase
         assertTrue(result.contains("/language"));
         assertTrue(result.contains("/territory"));
         assertTrue(result.contains("/name"));
-        assertTrue(result.contains("/rm_version"));
         assertTrue(result.contains("/composer"));
         assertTrue(result.contains("/subject"));
         assertTrue(result.contains("DvDate"));

@@ -31,14 +31,18 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.medvision360.medrecord.spi.LocatableParser;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
 import org.openehr.rm.common.archetyped.Locatable;
+import org.openehr.rm.support.identification.ArchetypeID;
 
 @SuppressWarnings("rawtypes")
 public abstract class AbstractPVParser implements LocatableParser
 {
+    private static final String ROOT_ARCHETYPE = "^\\[([a-zA-Z][a-zA-Z0-9\\._-]+)\\]/(.*)$";
+    static final Pattern ROOT_ARCHETYPE_PATTERN = Pattern.compile(ROOT_ARCHETYPE);
+
     private static final String PATH_PART_FIRST = "(.+?)";
-    private static final String PATH_PART_ARCHETYPE_NODE_ID = "(?:\\[([a-zA-Z][a-zA-Z0-9]+)\\])?";
+    private static final String PATH_PART_ARCHETYPE_NODE_ID = "(?:\\[([a-zA-Z][a-zA-Z0-9\\._-]+)\\])?";
     private static final String PATH_PART_INDEX_ID = "(?:\\[([0-9]+)\\])??";
-    private static final Pattern PATH_PART_PATTERN = Pattern.compile(
+    static final Pattern PATH_PART_PATTERN = Pattern.compile(
             "^" + PATH_PART_FIRST + PATH_PART_ARCHETYPE_NODE_ID + PATH_PART_INDEX_ID + "$");
     protected String m_encoding;
 
@@ -105,6 +109,8 @@ public abstract class AbstractPVParser implements LocatableParser
         Node root = new Node();
         root.setPath("/");
         Iterator<Map.Entry<String, String>> it = pv.entrySet().iterator();
+        
+        String rootArchetypeId = null;
 
         OUTER:
         while (it.hasNext())
@@ -112,10 +118,28 @@ public abstract class AbstractPVParser implements LocatableParser
             Map.Entry<String, String> entry = it.next();
             String key = entry.getKey();
             String value = entry.getValue();
+            
+            Matcher rootArchetypeIdMatcher = ROOT_ARCHETYPE_PATTERN.matcher(key);
+            if (rootArchetypeIdMatcher.matches())
+            {
+                String newArchetypeId = rootArchetypeIdMatcher.group(1);
+                if (rootArchetypeId != null && !rootArchetypeId.equals(newArchetypeId))
+                {
+                    throw new ParseException(String.format("Multiple root archetypes: %s and %s",
+                            rootArchetypeId, newArchetypeId));
+                }
+                rootArchetypeId = newArchetypeId;
+                root.setPath("["+rootArchetypeId+"]/");
+                if(root.getArchetypeId() == null)
+                {
+                    root.setArchetypeId(rootArchetypeId);
+                }
+                key = rootArchetypeIdMatcher.group(2);
+            }
 
             String[] path = key.split("/");
-            String parentPath = "";
-            String currentPath = "";
+            String parentPath = root.getPath().substring(0, root.getPath().length() - 1);
+            String currentPath = parentPath;
 
             Node current = root;
 
