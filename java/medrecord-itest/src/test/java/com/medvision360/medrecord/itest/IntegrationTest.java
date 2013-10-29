@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -228,12 +227,6 @@ public class IntegrationTest extends RMTestBase
         {
             ArchetypeID archetypeID = new ArchetypeID(archetypeName);
             Archetype archetype = m_archetypeStore.get(archetypeID);
-            if (!supported(archetypeID))
-            {
-                log.debug(String.format("Skipping skeleton generation for archetype %s, it is not supported",
-                        archetypeName));
-                continue;
-            }
 
             // generate
             log.debug(String.format("Generating instance of %s", archetypeName));
@@ -344,30 +337,5 @@ public class IntegrationTest extends RMTestBase
             }
         }
         return serializeFailed;
-    }
-
-    private String[] skipArchetypes = new String[] {
-            // No archetypes found to match the slot at ..., but a value is required
-//            "openEHR-DEMOGRAPHIC-ORGANISATION.organisation.v1",
-//            "openEHR-DEMOGRAPHIC-PERSON.person-patient.v1",
-//            "openEHR-DEMOGRAPHIC-PERSON.person.v1",
-//            "openEHR-DEMOGRAPHIC-ROLE.healthcare_consumer.v1",
-//            "openEHR-DEMOGRAPHIC-ROLE.healthcare_provider_organisation.v1",
-//            "openEHR-DEMOGRAPHIC-ROLE.individual_provider.v1",
-    };
-
-    {
-        Arrays.sort(skipArchetypes);
-    }
-
-    private boolean supported(ArchetypeID archetypeID)
-    {
-        String archetypeName = archetypeID.getValue();
-        if (Arrays.binarySearch(skipArchetypes, archetypeName) < 0)
-        {
-            return true;
-        }
-
-        return false;
     }
 }

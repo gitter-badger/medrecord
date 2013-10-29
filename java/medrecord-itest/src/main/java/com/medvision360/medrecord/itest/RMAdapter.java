@@ -1,5 +1,6 @@
 package com.medvision360.medrecord.itest;
 
+import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.openehr.rm.datatypes.encapsulated.DvParsable;
 import org.openehr.rm.datatypes.quantity.DvQuantity;
 import org.openehr.rm.datatypes.quantity.ProportionKind;
 import org.openehr.rm.datatypes.text.CodePhrase;
+import org.openehr.rm.datatypes.text.DvCodedText;
 import org.openehr.rm.datatypes.text.DvText;
 import org.openehr.rm.datatypes.uri.DvURI;
 import org.openehr.rm.support.identification.ArchetypeID;
@@ -471,26 +473,17 @@ public class RMAdapter
                         }
                         catch (IllegalArgumentException e)
                         {
-                            // this is here to try and track down an obscure bug where sometimes we seem to be 
-                            // generating bad/weird/unsupported units
-                            String upperUnit = null;
-                            String lowerUnit = null;
-
-                            if (upper instanceof DvQuantity)
+                            // will happen if, for example, using different units
+                            if (upper != null)
                             {
-                                DvQuantity upperQ = (DvQuantity) upperC;
-                                upperUnit = upperQ.getUnits();
+                                valueMap.put("lower", upper);
+                                valueMap.put("upper", upper);
                             }
-                            if (lower instanceof DvQuantity)
+                            else
                             {
-                                DvQuantity lowerQ = (DvQuantity) lowerC;
-                                lowerUnit = lowerQ.getUnits();
+                                valueMap.put("lower", lower);
+                                valueMap.put("upper", lower);
                             }
-
-                            log.error(String.format(
-                                    "IllegalArgumentException: %s (upperUnit=%s, lowerUnit=%s)", e.getMessage(),
-                                    upperUnit, lowerUnit), e);
-                            throw e;
                         }
                     }
                     if (upper instanceof Double && lower instanceof Double)
@@ -757,6 +750,24 @@ public class RMAdapter
                     valueMap.put("uid", m_valueGenerator.generateUID());
                 }
                 break;
+            case "PARTY_RELATED":
+                Object name = valueMap.get("name");
+                if (name instanceof DvText)
+                {
+                    name = ((DvText)name).getValue();
+                }
+                valueMap.put("name", String.valueOf(name));
+                if (valueMap.containsKey("uid"))
+                {
+                    // todo weirdly, UID is required for PARTY_RELATIONSHIP
+                    valueMap.put("uid", m_valueGenerator.generateUID());
+                }
+                if (!valueMap.containsKey("relationship"))
+                {
+                    valueMap.put("relationship", m_valueGenerator.codeToText(
+                            m_valueGenerator.chooseSubjectRelationship()));
+                }
+                break;
             case "PERSON":
                 if (!valueMap.containsKey("uid"))
                 {
@@ -838,6 +849,7 @@ public class RMAdapter
         if (valueMap.containsKey("value") && valueMap.get("value") != null)
         {
             valueMap.remove("nullFlavour");
+            valueMap.remove("null_flavour");
         }
         else
         {
