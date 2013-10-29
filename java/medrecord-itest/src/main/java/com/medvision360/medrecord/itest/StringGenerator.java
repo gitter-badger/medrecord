@@ -70,6 +70,11 @@ public class StringGenerator
 
     public String generateWords(int wordCount)
     {
+        if (wordCount == 0)
+        {
+            return "";
+        }
+        
         StringBuilder b = new StringBuilder();
 
         for (int i = 0; i < wordCount; i++)
@@ -82,6 +87,7 @@ public class StringGenerator
             }
             b.append(SP);
         }
+        b.deleteCharAt(b.length()-1); // remove last space
 
         return b.toString();
     }
