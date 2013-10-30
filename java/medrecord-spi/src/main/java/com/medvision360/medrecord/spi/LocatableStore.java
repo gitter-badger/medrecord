@@ -14,19 +14,13 @@ import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
 import com.medvision360.medrecord.spi.exceptions.SerializeException;
+import com.medvision360.medrecord.spi.exceptions.ValidationException;
 import org.openehr.rm.common.archetyped.Locatable;
+import org.openehr.rm.ehr.EHR;
 import org.openehr.rm.support.identification.HierObjectID;
-import org.openehr.rm.support.identification.ObjectVersionID;
 
 /**
- * Central interface to a storage system for OpenEHR {@link Locatable} instances. Provides basic CRUD operations as well
- * as XQuery-based querying.
- * <p/>
- * Since <code>Locatable</code> subtypes are typically versioned objects, the <code>LocatableStore</code> API provides
- * some support for multi-versioning, though simple non-versioned implementations may choose to implement {@link
- * #update(Locatable)} to simply always replace the latest version of a locatable and 'forget' about all other history.
- * Stores that implement the full openEHR versioning model for (some types of) locatables SHOULD additionally implement
- * {@link VersioningStore}.
+ * Central interface to a storage system for OpenEHR {@link Locatable} instances. Provides basic CRUD operations.
  * <p/>
  * Since storage facilities for {@link Locatable} implementations typically need to provide strong ACID guarantees, the
  * <code>LocatableStore</code> interface extends from {@link TransactionalService} and clients SHOULD always use
@@ -63,28 +57,6 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
     public Locatable get(HierObjectID id) throws NotFoundException, IOException, ParseException;
 
     /**
-     * Retrieve the specified version of the specified locatable.
-     *
-     * @param id the identifier of the locatable version to retrieve.
-     * @return the specified version of the specified locatable.
-     * @throws NullPointerException if any of the provided arguments are null.
-     * @throws NotFoundException if the locatable version cannot be found in storage.
-     * @throws IOException if another error occurs interacting with storage.
-     */
-    public Locatable get(ObjectVersionID id) throws NotFoundException, IOException, ParseException;
-
-    /**
-     * Retrieve all versions of the specified locatable.
-     *
-     * @param id the identifier of the locatable to retrieve all versions for.
-     * @return an iterable of all versions of all locatables in this store. Cannot be empty.
-     * @throws NotFoundException if the locatable cannot be found in storage.
-     * @throws IOException if another error occurs interacting with storage.
-     * @see com.google.common.collect.Iterables for convenient utilities to work with Iterables.
-     */
-    public Iterable<Locatable> getVersions(HierObjectID id) throws NotFoundException, IOException, ParseException;
-
-    /**
      * Store a new locatable.
      *
      * @param locatable the locatable to store.
@@ -96,9 +68,28 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
      * model, but cannot be stored for another reason.
      * @throws DuplicateException if a locatable already exists with the same uid.
      * @throws IOException if another error occurs interacting with storage.
+     * @throws ValidationException if the provided locatable is not valid.
      */
     public Locatable insert(Locatable locatable)
-            throws DuplicateException, NotSupportedException, IOException, SerializeException;
+            throws DuplicateException, NotSupportedException, IOException, SerializeException, ValidationException;
+
+    /**
+     * Store a new locatable into an EHR.
+     *
+     * @param locatable the locatable to store.
+     * @param EHR the EHR to store this locatable in.
+     * @return the stored locatable with any modified attributes modified.
+     * @throws NullPointerException if any of the provided arguments are null.
+     * @throws IllegalArgumentException if the provided locatable does not properly implement the rules of the openehr
+     * object model.
+     * @throws NotSupportedException if the provided locatable (probably) does implement the rules of the openehr object
+     * model, but cannot be stored for another reason.
+     * @throws DuplicateException if a locatable already exists with the same uid.
+     * @throws IOException if another error occurs interacting with storage.
+     * @throws ValidationException if the provided locatable is not valid.
+     */
+    public Locatable insert(EHR EHR, Locatable locatable)
+            throws DuplicateException, NotSupportedException, IOException, SerializeException, ValidationException;
 
     /**
      * Store a new version of an existing locatable.
@@ -112,9 +103,10 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
      * model, but cannot be stored for another reason.
      * @throws NotFoundException if the locatable cannot be found in storage.
      * @throws IOException if another error occurs interacting with storage.
+     * @throws ValidationException if the provided locatable is not valid.
      */
     public Locatable update(Locatable locatable)
-            throws NotSupportedException, NotFoundException, IOException, SerializeException;
+            throws NotSupportedException, NotFoundException, IOException, SerializeException, ValidationException;
 
     /**
      * Mark all versions of a {@link Locatable} as deleted.
@@ -127,18 +119,6 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
     public void delete(HierObjectID id) throws NotFoundException, IOException;
 
     /**
-     * Mark a version of a {@link Locatable} as deleted. If this is the only version of the locatable, that entire
-     * locatable is marked as deleted. Otherwise, if this is the current version of the locatable, the previous version
-     * becomes the current version.
-     *
-     * @param id the locatable version to mark as deleted.
-     * @throws NullPointerException if any of the provided arguments are null.
-     * @throws NotFoundException if the locatable cannot be found in storage.
-     * @throws IOException if another error occurs interacting with storage.
-     */
-    public void delete(ObjectVersionID id) throws NotFoundException, IOException;
-
-    /**
      * Determine whether there is any version of the specified locatable in this store.
      *
      * @param id the identifier of the locatable to check for.
@@ -149,26 +129,6 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
     public boolean has(HierObjectID id) throws IOException;
 
     /**
-     * Determine whether the specified version of the specified locatable is stored in this store.
-     *
-     * @param id the identifier of the locatable version to check for.
-     * @return true if the locatable version is stored, false otherwise.
-     * @throws NullPointerException if any of the provided arguments are null.
-     * @throws IOException if another error occurs interacting with storage.
-     */
-    public boolean has(ObjectVersionID id) throws IOException;
-
-    /**
-     * Determine whether there is any version matching the specified locatable is in this store.
-     *
-     * @param id the identifier of the locatable version to check for.
-     * @return true if the locatable is stored, false otherwise.
-     * @throws NullPointerException if any of the provided arguments are null.
-     * @throws IOException if another error occurs interacting with storage.
-     */
-    public boolean hasAny(ObjectVersionID id) throws IOException;
-
-    /**
      * Return a naturally ordered set of the latest versions of all the locatables that exist in this store. The
      * returned result is immutable. The returned result is empty if there are 0 results.
      *
@@ -177,16 +137,29 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
      * @see com.google.common.collect.Iterables for convenient utilities to work with Iterables.
      */
     public Iterable<HierObjectID> list() throws IOException;
-
+    
     /**
-     * Return a naturally ordered set of the latest versions of all the locatables that exist in this store. The
-     * returned result is immutable. The returned result is empty if there are 0 results.
+     * Return a naturally ordered set of the latest versions of all the locatables that exist in this store that 
+     * belong to a particular EHR record. The returned result is immutable. The returned result is empty if there are
+     * 0 results.
      *
-     * @return an iterable of all versions of all locatables in this store. Can be empty.
+     * @return an iterable of all locatables in this store that belong to a particular EHR record. Can be empty.
      * @throws IOException if an error occurs interacting with storage.
      * @see com.google.common.collect.Iterables for convenient utilities to work with Iterables.
      */
-    public Iterable<ObjectVersionID> listVersions() throws IOException;
+    public Iterable<HierObjectID> list(EHR EHR) throws IOException, NotFoundException;
+
+    /**
+     * Return a naturally ordered set of the latest versions of all the locatables that exist in this store that 
+     * belong to a particular EHR record and are of a particular rmEntity. The returned result is immutable. The 
+     * returned result is empty if there are 0 results.
+     *
+     * @return an iterable of all locatables in this store that belong to a particular EHR record and are of a 
+     * particular rmEntity. Can be empty.
+     * @throws IOException if an error occurs interacting with storage.
+     * @see com.google.common.collect.Iterables for convenient utilities to work with Iterables.
+     */
+    public Iterable<HierObjectID> list(EHR EHR, String rmEntity) throws IOException, NotFoundException;
 
     /**
      * Prepares the store for operation. Ensure that any and all custom configuration of the underlying storage has been

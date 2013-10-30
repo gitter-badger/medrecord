@@ -11,7 +11,7 @@ import java.util.Comparator;
  * <p/>
  * Finally, sort by string comparison.
  */
-public class PathComparator implements Comparator<String>
+public class PathComparator implements Comparator<String> // todo move into utility package
 {
     @Override
     public int compare(String path1, String path2)

@@ -10,7 +10,6 @@ import com.medvision360.medrecord.spi.LocatableStore;
 import com.medvision360.medrecord.spi.tck.LocatableStoreTestBase;
 import org.basex.core.Context;
 import org.openehr.rm.common.archetyped.Locatable;
-import org.openehr.rm.support.identification.HierObjectID;
 
 public class DatabaseGeneratorTest extends LocatableStoreTestBase
 {
@@ -180,13 +179,8 @@ public class DatabaseGeneratorTest extends LocatableStoreTestBase
                 Locatable locatable = data.get(i);
                 i++;
                 store.insert(locatable);
-//                if (i % 50 == 0)
-//                {
-//                    System.out.print(".");
-//                }
                 if (i % 1000 == 0)
                 {
-//                    System.out.println();
                     long end = System.nanoTime();
                     double duration = (end - start) / 1000.0 / 1000.0 / 1000.0;
                     double per_second = i / duration;

@@ -26,7 +26,7 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
     @Override
     public void setUp() throws Exception
     {
-        ctx = new ArrayList<Context>();
+        ctx = new ArrayList<>();
         super.setUp();
     }
 
@@ -126,9 +126,9 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
         ehrStatus.set("/name/value", "TEST_EHR_MODIFIED");
         store.update(ehrStatus);
 
-        Locatable ecg = makeLocatable(ecgType, "My First Heartrate");
+        Locatable ecg = makeLocatable(ecgType, "My First Heart rate");
         ecg = store.insert(ecg);
-        ecg.set("/name/value", "My Second Heartrate");
+        ecg.set("/name/value", "My Second Heart rate");
         store.update(ecg);
 
         Locatable medicationList = makeLocatable(medicationListType, "My asperin addiction");
@@ -148,12 +148,9 @@ public class MultiDatabaseTest extends LocatableStoreTestBase
         String resultString = new String(result, "UTF-8");
         assertTrue(resultString.contains("Jane Doe-GotMarried"));
         assertTrue(resultString.contains("TEST_EHR_MODIFIED"));
-        assertTrue(resultString.contains("My Second Heartrate"));
+        assertTrue(resultString.contains("My Second Heart rate"));
         assertTrue(resultString.contains("I'm off the asperin"));
         assertTrue(resultString.contains("test finished"));
-        // todo confirm this does _not_ contain the locatable_version results!
-        //System.out.println("Query result:");
-        //System.out.println(resultString);
     }
 
     protected Locatable makeLocatable(Archetyped archetypeDetails, String name) throws Exception

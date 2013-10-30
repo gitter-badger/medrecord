@@ -1,8 +1,11 @@
 package com.medvision360.medrecord.spi.base;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import com.medvision360.medrecord.spi.LocatableSelector;
 import com.medvision360.medrecord.spi.LocatableSelectorBuilder;
-import com.medvision360.medrecord.spi.LocatableStore;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.TransactionException;
@@ -13,7 +16,8 @@ import org.openehr.rm.support.identification.UIDBasedID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbstractLocatableStore implements LocatableStore
+@SuppressWarnings("UnusedDeclaration")
+public abstract class AbstractLocatableStore
 {
     protected String m_name;
     protected LocatableSelector m_locatableSelector;
@@ -29,45 +33,42 @@ public abstract class AbstractLocatableStore implements LocatableStore
         this(name, LocatableSelectorBuilder.any());
     }
 
-    @Override
     public boolean supports(Locatable test)
     {
         checkNotNull(test, "locatable cannot be null");
         return m_locatableSelector.supports(test);
     }
 
-    @Override
     public boolean supports(Archetyped test)
     {
         checkNotNull(test, "archetyped cannot be null");
         return m_locatableSelector.supports(test);
     }
 
-    @Override
     public String getName()
     {
         return m_name;
     }
 
-    @Override
+    public void initialize() throws IOException
+    {
+    }
+
     public boolean supportsTransactions()
     {
         return false;
     }
 
-    @Override
     public void begin()
             throws TransactionException
     {
     }
 
-    @Override
     public void commit()
             throws TransactionException
     {
     }
 
-    @Override
     public void rollback()
             throws TransactionException
     {
@@ -93,8 +94,37 @@ public abstract class AbstractLocatableStore implements LocatableStore
         UIDBasedID uidBasedID = locatable.getUid();
         if (!(uidBasedID instanceof HierObjectID))
         {
-            return new HierObjectID(uidBasedID.getValue());
+            HierObjectID newId = new HierObjectID(uidBasedID.getValue());
+            setUid(locatable, newId);
+            return newId;
         }
         return (HierObjectID) uidBasedID;
+    }
+
+    protected void setUid(Locatable locatable, UIDBasedID uid) throws IllegalArgumentException
+    {
+        try
+        {
+            Method[] methods = Locatable.class.getDeclaredMethods();
+            Method setter = null;
+            for (Method method : methods)
+            {
+                if ("setUid".equals(method.getName()))
+                {
+                    setter = method;
+                    break;
+                }
+            }
+            if (setter == null)
+            {
+                throw new NoSuchMethodException("setUid");
+            }
+            setter.setAccessible(true);
+            setter.invoke(locatable, uid);
+        }
+        catch (NoSuchMethodException|InvocationTargetException |IllegalAccessException e)
+        {
+            throw new IllegalArgumentException(e);
+        }
     }
 }

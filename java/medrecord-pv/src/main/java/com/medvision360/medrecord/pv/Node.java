@@ -283,7 +283,7 @@ public class Node
     }
     
     @SuppressWarnings("ConstantConditions")
-    public boolean pathMatches(String path)
+    public boolean pathMatches(String path) // todo duplicates (partially) PathComparator
     {
         if (m_path == null)
         {
