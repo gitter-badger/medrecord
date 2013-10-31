@@ -33,15 +33,12 @@ import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.common.archetyped.Pathable;
 import org.openehr.rm.common.generic.PartyIdentified;
 import org.openehr.rm.common.generic.PartySelf;
-import org.openehr.rm.datatypes.quantity.datetime.DvDate;
-import org.openehr.rm.datatypes.quantity.datetime.DvDateTime;
 import org.openehr.rm.datatypes.quantity.datetime.DvDateTimeParser;
 import org.openehr.rm.datatypes.quantity.datetime.DvDuration;
-import org.openehr.rm.datatypes.quantity.datetime.DvTime;
 import org.openehr.rm.datatypes.text.CodePhrase;
 import org.openehr.rm.datatypes.text.DvCodedText;
 import org.openehr.rm.datatypes.text.DvText;
-import org.openehr.rm.datatypes.uri.DvURI;
+import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.measurement.MeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
 
@@ -53,92 +50,16 @@ public class PVParser extends AbstractPVParser
     /*
     Accepts input such as
         {
-          "/archetype_node_id" : "at0001",
-          "/rm_entity" : "Composition",
-          "/archetype_details/rm_entity" : "Archetyped",
-          "/archetype_details/archetype_id/rm_entity" : "ArchetypeID",
-          "/archetype_details/archetype_id/value" : "unittest-EHR-COMPOSITION.composition.v1",
-          "/archetype_details/rm_version" : "1.0.2",
-          "/category/rm_entity" : "DvCodedText",
-          "/category/defining_code/rm_entity" : "CodePhrase",
-          "/category/defining_code/code_string" : "event",
-          "/category/defining_code/terminology_id/rm_entity" : "TerminologyID",
-          "/category/defining_code/terminology_id/value" : "test",
-          "/category/language/rm_entity" : "CodePhrase",
-          "/category/language/code_string" : "en",
-          "/category/language/terminology_id/rm_entity" : "TerminologyID",
-          "/category/language/terminology_id/value" : "test",
-          "/category/value" : "event",
-          "/composer/rm_entity" : "PartyIdentified",
-          "/composer/external_ref/rm_entity" : "PartyRef",
-          "/composer/external_ref/id/rm_entity" : "HierObjectID",
-          "/composer/external_ref/id/value" : "1.3.3.1.2.42.1",
-          "/composer/external_ref/type" : "ORGANISATION",
-          "/composer/name" : "provider's name",
-          "/content/collection_type" : "LIST",
-          "/content[at0002][1]/rm_entity" : "AdminEntry",
-          "/content[at0002][1]/archetype_details/rm_entity" : "Archetyped",
-          "/content[at0002][1]/archetype_details/archetype_id/rm_entity" : "ArchetypeID",
-          "/content[at0002][1]/archetype_details/archetype_id/value" : "unittest-EHR-ADMIN_ENTRY.date.v2",
-          "/content[at0002][1]/archetype_details/rm_version" : "1.0.2",
-          "/content[at0002][1]/data[at0003]/rm_entity" : "ItemList",
-          "/content[at0002][1]/data[at0003]/items/collection_type" : "LIST",
-          "/content[at0002][1]/data[at0003]/items[at0004][1]/rm_entity" : "Element",
-          "/content[at0002][1]/data[at0003]/items[at0004][1]/name/rm_entity" : "DvText",
-          "/content[at0002][1]/data[at0003]/items[at0004][1]/name/value" : "header",
-          "/content[at0002][1]/data[at0003]/items[at0004][1]/value/rm_entity" : "DvText",
-          "/content[at0002][1]/data[at0003]/items[at0004][1]/value/value" : "date",
-          "/content[at0002][1]/data[at0003]/name/rm_entity" : "DvText",
-          "/content[at0002][1]/data[at0003]/name/value" : "item list",
-          "/content[at0002][1]/encoding/rm_entity" : "CodePhrase",
-          "/content[at0002][1]/encoding/code_string" : "UTF-8",
-          "/content[at0002][1]/encoding/terminology_id/rm_entity" : "TerminologyID",
-          "/content[at0002][1]/encoding/terminology_id/value" : "test",
-          "/content[at0002][1]/language/rm_entity" : "CodePhrase",
-          "/content[at0002][1]/language/code_string" : "en",
-          "/content[at0002][1]/language/terminology_id/rm_entity" : "TerminologyID",
-          "/content[at0002][1]/language/terminology_id/value" : "test",
-          "/content[at0002][1]/name/rm_entity" : "DvText",
-          "/content[at0002][1]/name/value" : "admin entry 1",
-          "/content[at0002][1]/provider/rm_entity" : "PartyIdentified",
-          "/content[at0002][1]/provider/external_ref/rm_entity" : "PartyRef",
-          "/content[at0002][1]/provider/external_ref/id/rm_entity" : "HierObjectID",
-          "/content[at0002][1]/provider/external_ref/id/value" : "1.3.3.1.2.42.1",
-          "/content[at0002][1]/provider/external_ref/type" : "ORGANISATION",
-          "/content[at0002][1]/provider/name" : "provider's name",
-          "/content[at0002][1]/subject/rm_entity" : "PartySelf",
-          "/content[at0002][1]/subject/external_ref/rm_entity" : "PartyRef",
-          "/content[at0002][1]/subject/external_ref/id/rm_entity" : "HierObjectID",
-          "/content[at0002][1]/subject/external_ref/id/value" : "1.2.4.5.6.12.1",
-          "/content[at0002][1]/subject/external_ref/type" : "PARTY",
-          "/content[at0002][1]/uid/rm_entity" : "HierObjectID",
-          "/content[at0002][1]/uid/value" : "1a7fb76a-7235-4dac-b4a6-f27d59e799ad",
-          "/context/rm_entity" : "EventContext",
-          "/context/setting/rm_entity" : "DvCodedText",
-          "/context/setting/defining_code/rm_entity" : "CodePhrase",
-          "/context/setting/defining_code/code_string" : "setting_code",
-          "/context/setting/defining_code/terminology_id/rm_entity" : "TerminologyID",
-          "/context/setting/defining_code/terminology_id/value" : "test",
-          "/context/setting/language/rm_entity" : "CodePhrase",
-          "/context/setting/language/code_string" : "en",
-          "/context/setting/language/terminology_id/rm_entity" : "TerminologyID",
-          "/context/setting/language/terminology_id/value" : "test",
-          "/context/setting/value" : "setting",
-          "/context/start_time/rm_entity" : "DvDateTime",
-          "/context/start_time/value" : "2006-02-01T12:00:09",
-          "/language/rm_entity" : "CodePhrase",
-          "/language/code_string" : "en",
-          "/language/terminology_id/rm_entity" : "TerminologyID",
-          "/language/terminology_id/value" : "test",
-          "/name/rm_entity" : "DvText",
-          "/name/value" : "composition",
-          "/territory/rm_entity" : "CodePhrase",
-          "/territory/code_string" : "se",
-          "/territory/terminology_id/rm_entity" : "TerminologyID",
-          "/territory/terminology_id/value" : "test",
-          "/uid/rm_entity" : "HierObjectID",
-          "/uid/value" : "d7b2dd2a-e344-4fde-8176-246cc57fef93"
-        }    
+          "[unittest-EHR-COMPOSITION.composition.v1]/archetype_node_id" : "at0001",
+          "[unittest-EHR-COMPOSITION.composition.v1]/content/collection_type" : "LIST",
+          "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items/collection_type" : "LIST",
+          "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items[at0004][1]/rm_entity" : "Element",
+          "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items[at0004][1]/name/value" : "header",
+          "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items[at0004][1]/value/value" : "date",
+          "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items[at0005][2]/rm_entity" : "Element",
+          "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items[at0005][2]/name/value" : "value",
+          "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items[at0005][2]/value/value" : "2008-05-17"
+        }
     Parsing happens in a few steps:
     - convert from bytes to a Jackson JsonNode structure
     - convert from the JsonNode structure to a tree of Nodes
@@ -161,6 +82,7 @@ public class PVParser extends AbstractPVParser
     private CodePhrase m_territory;
     private CodePhrase m_encoding;
     private DvCodedText m_categoryEvent;
+    private String m_rmVersion = "1.0.2";
 
     public PVParser(TerminologyService terminologyService, MeasurementService measurementService,
             CodePhrase encoding, CodePhrase language, CodePhrase territory)
@@ -193,6 +115,11 @@ public class PVParser extends AbstractPVParser
         }
         
         m_builder = RMObjectBuilder.getInstance(systemValues);
+    }
+
+    public void setRmVersion(String rmVersion)
+    {
+        m_rmVersion = rmVersion;
     }
 
     @Override
@@ -270,7 +197,7 @@ public class PVParser extends AbstractPVParser
         String rmEntity = node.getRmEntity();
         if (rmEntity == null)
         {
-            throw new ParseException(String.format("Missing /rm_type for %s", node));
+            throw new ParseException(String.format("Missing /rm_entity for %s", node));
         }
 
         try
@@ -280,7 +207,7 @@ public class PVParser extends AbstractPVParser
             parseNodeFields(node, valueMap);
             parseChildren(node, valueMap);
 
-            Object result = null;
+            Object result;
             try
             {
                 result = m_builder.construct(rmEntity, valueMap);
@@ -328,9 +255,17 @@ public class PVParser extends AbstractPVParser
         }
 
         String archetypeNodeId = node.findArchetypeNodeId();
-        if (archetypeNodeId != null)
+        if (archetypeNodeId != null && !valueMap.containsKey("archetypeNodeId"))
         {
             valueMap.put("archetypeNodeId", archetypeNodeId);
+        }
+        
+        String archetypeId = node.findArchetypeId();
+        if (archetypeId != null && !valueMap.containsKey("archetypeDetails"))
+        {
+            ArchetypeID archetypeID = new ArchetypeID(archetypeId);
+            Archetyped archetypeDetails = new Archetyped(archetypeID, m_rmVersion);
+            valueMap.put("archetypeDetails", archetypeDetails);
         }
     }
 
@@ -340,7 +275,7 @@ public class PVParser extends AbstractPVParser
         // node.level == root|archetypeNodeId
         //   node.children.level == attribute
         String rmEntity = node.getRmEntity();
-        Map<String, Class> attributes = null;
+        Map<String, Class> attributes;
         try
         {
             attributes = m_builder.retrieveAttribute(rmEntity);
@@ -393,8 +328,7 @@ public class PVParser extends AbstractPVParser
     {
         if ("PartyProxy".equals(rmEntity))
         {
-            String path = node.getPath();
-            if(path.startsWith("/subject"))
+            if(node.pathMatches("/subject"))
             {
                 return "PartySelf";
             }
@@ -613,7 +547,9 @@ public class PVParser extends AbstractPVParser
                 "INSTRUCTION".equalsIgnoreCase(rmEntity) ||
                 "ACTION".equalsIgnoreCase(rmEntity) ||
                 "ADMINENTRY".equalsIgnoreCase(rmEntity) ||
-                "CAREENTRY".equalsIgnoreCase(rmEntity))
+                "ADMIN_ENTRY".equalsIgnoreCase(rmEntity) ||
+                "CAREENTRY".equalsIgnoreCase(rmEntity) ||
+                "CARE_ENTRY".equalsIgnoreCase(rmEntity))
         {
             if (!valueMap.containsKey("subject"))
             {

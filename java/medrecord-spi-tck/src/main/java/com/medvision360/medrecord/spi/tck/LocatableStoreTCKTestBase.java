@@ -5,8 +5,8 @@ import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
+import org.openehr.rm.ehr.EHR;
 import org.openehr.rm.support.identification.HierObjectID;
-import org.openehr.rm.support.identification.ObjectVersionID;
 
 public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
 {
@@ -62,8 +62,6 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
 
         Iterable<HierObjectID> hierObjectIDs = store.list();
         assertEquals(0, Iterables.size(hierObjectIDs));
-        Iterable<ObjectVersionID> objectVersionIDs = store.listVersions();
-        int initialVersionSize = Iterables.size(objectVersionIDs); // don't need this to be 0!
 
         Locatable inserted = store.insert(orig);
         assertEqualish(orig, inserted);
@@ -80,9 +78,6 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
 
         hierObjectIDs = store.list();
         assertEquals(1, Iterables.size(hierObjectIDs));
-        objectVersionIDs = store.listVersions();
-        int afterInsertVersionSize = Iterables.size(objectVersionIDs);
-        assertTrue(afterInsertVersionSize > initialVersionSize); // don't need this to be +1!
 
         Locatable retrieved = store.get(uid);
         assertEqualish(orig, retrieved);
@@ -95,9 +90,6 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
         assertEqualish(modify, modifiedThenRetrieved);
         hierObjectIDs = store.list();
         assertEquals(1, Iterables.size(hierObjectIDs));
-        objectVersionIDs = store.listVersions();
-        int afterUpdateVersionSize = Iterables.size(objectVersionIDs);
-        assertTrue(afterUpdateVersionSize > afterInsertVersionSize); // don't need this to be +1!
 
         try
         {
@@ -118,78 +110,43 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
         assertEquals(0, Iterables.size(hierObjectIDs));
         // how many versions to expect here is probably a bit implementation-dependent...
     }
-
-    public void testBasicVersioning() throws Exception
+    
+    public void testEHRSupport() throws Exception
     {
+        Iterable<HierObjectID> hierObjectIDs;
+        EHR EHR = makeEHR();
+        
+        try
+        {
+            store.list(EHR);
+            fail("Should not allow listing non-existent EHR");
+        }
+        catch (NotFoundException e)
+        {
+        }
+        
         HierObjectID uid = new HierObjectID(makeUUID());
         Locatable orig = makeLocatable(uid, m_parent);
+        
+        Locatable inserted = store.insert(EHR, orig);
+        assertEqualish(orig, inserted);
+        
+        hierObjectIDs = store.list(EHR);
+        assertEquals(1, Iterables.size(hierObjectIDs));
+        assertEquals(inserted.getUid(), Iterables.getFirst(hierObjectIDs, null));
 
-        HierObjectID otherUid = new HierObjectID(makeUUID());
-        Locatable other = makeLocatable(otherUid, m_parent);
+        hierObjectIDs = store.list(EHR, "COMPOSITION");
+        assertEquals(1, Iterables.size(hierObjectIDs));
 
-        store.insert(orig);
-        store.insert(other);
-
-        Iterable<Locatable> versions = store.getVersions(uid);
-        assertTrue(Iterables.size(versions) > 0);
-        for (Locatable version : versions)
-        {
-            HierObjectID versionUid = (HierObjectID) version.getUid();
-            assertEquals(uid, versionUid);
-        }
-
-        Iterable<ObjectVersionID> objectVersionIDs = store.listVersions();
-        assertTrue(Iterables.size(objectVersionIDs) > 0);
-        ObjectVersionID ovid = Iterables.getFirst(objectVersionIDs, null);
-        assertNotNull(ovid);
-
-        assertTrue(store.has(ovid));
-        assertTrue(store.hasAny(ovid));
-
-        boolean foundOrigVersion = false;
-        for (ObjectVersionID objectVersionID : objectVersionIDs)
-        {
-            Locatable version = store.get(objectVersionID);
-            HierObjectID versionUid = (HierObjectID) version.getUid();
-            if (uid.equals(versionUid))
-            {
-                foundOrigVersion = true;
-                assertEqualish(orig, version);
-            }
-        }
-        assertTrue(foundOrigVersion);
-
-        store.delete(ovid);
-
-        HierObjectID hierObjectID = makeUID();
-        ObjectVersionID objectVersionID = makeOVID(hierObjectID);
-        assertFalse(store.has(objectVersionID));
-        assertFalse(store.hasAny(objectVersionID));
+        hierObjectIDs = store.list(EHR, "PERSON");
+        assertEquals(0, Iterables.size(hierObjectIDs));
     }
 
     public void testBasicNullArgumentsThrowNPE() throws Exception
     {
         try
         {
-            store.get((HierObjectID) null);
-            fail("Null argument should throw NPE");
-        }
-        catch (NullPointerException e)
-        {
-        }
-
-        try
-        {
-            store.get((ObjectVersionID) null);
-            fail("Null argument should throw NPE");
-        }
-        catch (NullPointerException e)
-        {
-        }
-
-        try
-        {
-            store.getVersions(null);
+            store.get(null);
             fail("Null argument should throw NPE");
         }
         catch (NullPointerException e)
@@ -216,7 +173,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
 
         try
         {
-            store.delete((HierObjectID) null);
+            store.delete(null);
             fail("Null argument should throw NPE");
         }
         catch (NullPointerException e)
@@ -225,7 +182,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
 
         try
         {
-            store.delete((ObjectVersionID) null);
+            store.has(null);
             fail("Null argument should throw NPE");
         }
         catch (NullPointerException e)
@@ -234,25 +191,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
 
         try
         {
-            store.has((HierObjectID) null);
-            fail("Null argument should throw NPE");
-        }
-        catch (NullPointerException e)
-        {
-        }
-
-        try
-        {
-            store.has((ObjectVersionID) null);
-            fail("Null argument should throw NPE");
-        }
-        catch (NullPointerException e)
-        {
-        }
-
-        try
-        {
-            store.hasAny(null);
+            store.list(null);
             fail("Null argument should throw NPE");
         }
         catch (NullPointerException e)
@@ -263,7 +202,6 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
     public void testUnknownIDThrowsNotFound() throws Exception
     {
         HierObjectID hierObjectID = makeUID();
-        ObjectVersionID objectVersionID = makeOVID(hierObjectID);
 
         try
         {
@@ -276,34 +214,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
 
         try
         {
-            store.get(objectVersionID);
-            fail("Unknown id should throw NFE");
-        }
-        catch (NotFoundException e)
-        {
-        }
-
-        try
-        {
-            store.getVersions(hierObjectID);
-            fail("Unknown id should throw NFE");
-        }
-        catch (NotFoundException e)
-        {
-        }
-
-        try
-        {
             store.delete(hierObjectID);
-            fail("Unknown id should throw NFE");
-        }
-        catch (NotFoundException e)
-        {
-        }
-
-        try
-        {
-            store.delete(objectVersionID);
             fail("Unknown id should throw NFE");
         }
         catch (NotFoundException e)

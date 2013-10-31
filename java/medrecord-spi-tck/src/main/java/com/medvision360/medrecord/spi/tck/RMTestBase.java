@@ -1,11 +1,9 @@
 package com.medvision360.medrecord.spi.tck;
 
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -24,11 +22,14 @@ import org.openehr.rm.datastructure.itemstructure.ItemList;
 import org.openehr.rm.datastructure.itemstructure.ItemStructure;
 import org.openehr.rm.datastructure.itemstructure.representation.Element;
 import org.openehr.rm.datatypes.quantity.datetime.DvDate;
+import org.openehr.rm.datatypes.quantity.datetime.DvDateTime;
 import org.openehr.rm.datatypes.text.DvCodedText;
 import org.openehr.rm.datatypes.text.DvText;
+import org.openehr.rm.ehr.EHR;
 import org.openehr.rm.ehr.EHRStatus;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
+import org.openehr.rm.support.identification.ObjectRef;
 import org.openehr.rm.support.identification.ObjectVersionID;
 import org.openehr.rm.support.identification.UIDBasedID;
 import org.openehr.rm.support.identification.VersionTreeID;
@@ -62,8 +63,9 @@ public class RMTestBase extends CompositionTestBase
     {
         assertEquals(orig.getUid(), other.getUid());
         assertEquals(orig.getArchetypeNodeId(), other.getArchetypeNodeId());
-        assertEquals(orig.getName(), other.getName());
-        assertEquals(orig.getArchetypeDetails(), other.getArchetypeDetails());
+        assertEquals(orig.getName().getValue(), other.getName().getValue());
+        assertEquals(orig.getArchetypeDetails().getArchetypeId().getValue(),
+                other.getArchetypeDetails().getArchetypeId().getValue());
     }
     
     protected void assertEqualish(Archetype orig, Archetype other)
@@ -84,6 +86,11 @@ public class RMTestBase extends CompositionTestBase
         }
     }
 
+    protected void assertEqualish(EHR orig, EHR other)
+    {
+        assertEquals(orig.getEhrID(), other.getEhrID());
+    }
+
     protected HierObjectID makeUID()
     {
         return new HierObjectID(makeUUID());
@@ -97,6 +104,21 @@ public class RMTestBase extends CompositionTestBase
     protected ObjectVersionID makeOVID(HierObjectID hierObjectID)
     {
         return new ObjectVersionID(hierObjectID.root(), new HierObjectID("medrecord.spi.tck"), new VersionTreeID("1"));
+    }
+    
+    protected EHR makeEHR() throws Exception
+    {
+        HierObjectID systemID = makeUID();
+        HierObjectID ehrID = makeUID();
+        DvDateTime now = new DvDateTime();
+        List<ObjectRef> emptyList = new ArrayList<>();
+        HierObjectID ehrStatusUid = makeUID();
+        ObjectRef ehrStatusRef = new ObjectRef(ehrStatusUid, "unittest", "EHR_STATUS");
+        HierObjectID directoryUid = makeUID();
+        ObjectRef directoryRef = new ObjectRef(directoryUid, "unittest", "VERSIONED_FOLDER");
+        
+        EHR ehr = new EHR(systemID, ehrID, now, emptyList, ehrStatusRef, directoryRef, emptyList);
+        return ehr;
     }
 
     protected Locatable makeLocatable() throws Exception

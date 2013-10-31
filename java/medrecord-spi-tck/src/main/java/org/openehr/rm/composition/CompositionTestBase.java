@@ -175,10 +175,10 @@ public class CompositionTestBase extends DataStructureTestBase2
     }
 
     /* field */
-    protected static CodePhrase lang = TestCodeSetAccess.ENGLISH;
-    protected static CodePhrase encoding = TestCodeSetAccess.UTF_8;
-    protected static TerminologyService ts = TestTerminologyService.getInstance();
-    protected static MeasurementService ms = TestMeasurementService.getInstance();
+    protected CodePhrase lang = TestCodeSetAccess.ENGLISH;
+    protected CodePhrase encoding = TestCodeSetAccess.UTF_8;
+    protected TerminologyService ts = TestTerminologyService.getInstance();
+    protected MeasurementService ms = TestMeasurementService.getInstance();
     protected String path;
     protected Object value;
 }

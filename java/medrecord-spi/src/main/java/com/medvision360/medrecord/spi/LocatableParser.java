@@ -13,9 +13,8 @@ import java.io.InputStream;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
 import org.openehr.rm.common.archetyped.Locatable;
 
-public interface LocatableParser extends LocatableSelector
-{ // todo javadoc / api spec / exceptions
-
+public interface LocatableParser extends LocatableSelector // todo javadoc / api spec / exceptions
+{
     public Locatable parse(InputStream is) throws IOException, ParseException;
 
     public Locatable parse(InputStream is, String encoding) throws IOException, ParseException;

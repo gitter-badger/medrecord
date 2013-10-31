@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>com.medvision360.medrecord.basex</OriginalElement>
+  <nodes>
+    <node x="372.0" y="343.5145469659185">com.medvision360.medrecord.basex.AbstractBaseXStore</node>
+    <node x="988.9891936824606" y="39.66749792186192">com.medvision360.medrecord.spi.LocatableStore</node>
+    <node x="1440.9334995843728" y="58.08395677472983">com.medvision360.medrecord.spi.ArchetypeStore</node>
+    <node x="160.033406068163" y="1048.8923524522029">com.medvision360.medrecord.basex.BaseXEHRStore</node>
+    <node x="489.5" y="0.0">com.medvision360.medrecord.spi.base.AbstractLocatableStore</node>
+    <node x="110.01080631753948" y="88.36118038237743">com.medvision360.medrecord.spi.EHRStore</node>
+    <node x="1059.4422277639237" y="1095.1271820448876">com.medvision360.medrecord.basex.BaseXArchetypeStore</node>
+    <node x="506.43373337489606" y="1049.153782211139">com.medvision360.medrecord.basex.BaseXLocatableStore</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.medvision360.medrecord.basex.BaseXEHRStore" target="com.medvision360.medrecord.basex.AbstractBaseXStore">
+      <point x="83.0" y="-103.5" />
+      <point x="407.79732959268495" y="1039.0423940149626" />
+      <point x="489.83333333333337" y="1037.8063175394848" />
+      <point x="-235.66666666666663" y="334.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.basex.AbstractBaseXStore" target="com.medvision360.medrecord.spi.base.AbstractLocatableStore">
+      <point x="0.0" y="-334.0" />
+      <point x="0.0" y="158.5" />
+    </edge>
+    <edge source="com.medvision360.medrecord.basex.BaseXLocatableStore" target="com.medvision360.medrecord.spi.LocatableStore">
+      <point x="133.0" y="-191.0" />
+      <point x="902.9615804239402" y="1019.265170407315" />
+      <point x="1219.794264339152" y="1016.7930174563592" />
+      <point x="0.0" y="136.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.basex.BaseXLocatableStore" target="com.medvision360.medrecord.basex.AbstractBaseXStore">
+      <point x="-133.0" y="-191.0" />
+      <point x="638.1976568994181" y="1031.625935162095" />
+      <point x="725.5" y="1034.0980881130506" />
+      <point x="0.0" y="334.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.basex.BaseXArchetypeStore" target="com.medvision360.medrecord.basex.AbstractBaseXStore">
+      <point x="-90.0" y="-103.0" />
+      <point x="1144.4979218620115" y="1035.2227763923524" />
+      <point x="961.1666666666665" y="1032.7506234413966" />
+      <point x="235.66666666666652" y="334.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.basex.BaseXEHRStore" target="com.medvision360.medrecord.spi.EHRStore">
+      <point x="-83.0" y="-103.5" />
+      <point x="196.0625" y="1065.0" />
+      <point x="193.3050706566916" y="925.3233582709892" />
+      <point x="0.0" y="114.5" />
+    </edge>
+    <edge source="com.medvision360.medrecord.basex.BaseXArchetypeStore" target="com.medvision360.medrecord.spi.ArchetypeStore">
+      <point x="90.0" y="-103.0" />
+      <point x="0.0" y="125.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.8090114324142569" x="973.0" y="733.5" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

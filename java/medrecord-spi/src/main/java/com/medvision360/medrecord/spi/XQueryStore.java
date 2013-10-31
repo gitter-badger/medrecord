@@ -12,6 +12,7 @@ import java.io.OutputStream;
 
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
 import org.openehr.rm.common.archetyped.Locatable;
+import org.openehr.rm.ehr.EHR;
 
 public interface XQueryStore extends LocatableStore
 {
@@ -41,7 +42,23 @@ public interface XQueryStore extends LocatableStore
      * @throws java.io.IOException if another error occurs interacting with storage.
      * @see com.google.common.collect.Iterables for convenient utilities to work with Iterables.
      */
-    public Iterable<Locatable> list(String XQuery) throws NotSupportedException, IOException;
+    public Iterable<Locatable> query(String XQuery) throws NotSupportedException, IOException;
+
+    /**
+     * Execute the provided query against the store, returning matched locatables in the specified EHR. The same 
+     * rules otherwise apply as for {@link #query(String)}.
+     *
+     * @param EHR the EHR record to constrain the queries to.
+     * @param XQuery the query to execute.
+     * @return an iterable of locatables. Can be empty if there are no matches.
+     * @throws NullPointerException if any of the provided arguments are null.
+     * @throws IllegalArgumentException if the provided query cannot be parsed or understood.
+     * @throws com.medvision360.medrecord.spi.exceptions.NotSupportedException if the provided query seems valid but it
+     * uses an XQuery feature the store does not support, or it cannot be supported by the store for another reason.
+     * @throws java.io.IOException if another error occurs interacting with storage.
+     * @see com.google.common.collect.Iterables for convenient utilities to work with Iterables.
+     */
+    public Iterable<Locatable> query(EHR EHR, String XQuery) throws NotSupportedException, IOException;
 
     /**
      * Execute the provided query against the store, writing results to the provided output stream. Typically the

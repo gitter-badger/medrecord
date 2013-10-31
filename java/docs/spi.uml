@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>com.medvision360.medrecord.spi</OriginalElement>
+  <nodes>
+    <node x="321.22399020807836" y="297.9804161566708">com.medvision360.medrecord.spi.LocatableSerializer</node>
+    <node x="1343.924112607099" y="1236.7111383108931">com.medvision360.medrecord.spi.LocatableSummary</node>
+    <node x="1641.924112607099" y="1236.7111383108931">com.medvision360.medrecord.spi.UIDFactory</node>
+    <node x="1910.924112607099" y="1236.7111383108931">com.medvision360.medrecord.spi.AuditService</node>
+    <node x="1512.30683540246" y="323.3482252141983">com.medvision360.medrecord.spi.LocatableStore</node>
+    <node x="2319.5351144940837" y="329.12423500611993">com.medvision360.medrecord.spi.ArchetypeStore</node>
+    <node x="5.223990208078334" y="297.9804161566708">com.medvision360.medrecord.spi.LocatableParser</node>
+    <node x="3121.9830949102407" y="352.23990208078334">com.medvision360.medrecord.spi.Engine</node>
+    <node x="1006.0301926691732" y="735.7123623011017">com.medvision360.medrecord.spi.ValidatingLocatableStore</node>
+    <node x="2210.6487148102815" y="874.5887392900854">com.medvision360.medrecord.spi.LocatableSelectorBuilder</node>
+    <node x="585.7135052383868" y="614.0728274173806">com.medvision360.medrecord.spi.CompositeValidator</node>
+    <node x="2739.5351144940837" y="339.62423500611993">com.medvision360.medrecord.spi.EHRStore</node>
+    <node x="1037.924112607099" y="1236.7111383108931">com.medvision360.medrecord.spi.EHRParser</node>
+    <node x="2782.0351144940837" y="631.6842105263158">com.medvision360.medrecord.spi.base.AbstractEHRStore</node>
+    <node x="678.5552083333334" y="124.0">com.medvision360.medrecord.spi.LocatableSelector</node>
+    <node x="2987.2932986536107" y="118.77600979192167">com.medvision360.medrecord.spi.StatusService</node>
+    <node x="1048.0232558139533" y="1407.7772337821298">com.medvision360.medrecord.spi.ArchetypeSerializer</node>
+    <node x="43.41464762924778" y="462.94920440636486">com.medvision360.medrecord.spi.LocatableTransformer</node>
+    <node x="225.9938800489595" y="811.9082007343941">com.medvision360.medrecord.spi.CompositeStore</node>
+    <node x="419.78875477210494" y="462.94920440636486">com.medvision360.medrecord.spi.CompositeService</node>
+    <node x="3308.353657945737" y="132.38800489596085">com.medvision360.medrecord.spi.AuditedService</node>
+    <node x="1613.9498164014688" y="773.846389228886">com.medvision360.medrecord.spi.ValidatingXQueryStore</node>
+    <node x="1018.8221143337998" y="324.35618115055075">com.medvision360.medrecord.spi.base.AbstractLocatableStore</node>
+    <node x="3234.278402219211" y="10.447980416156668">com.medvision360.medrecord.spi.NamedService</node>
+    <node x="2502.0491126070997" y="107.22399020807833">com.medvision360.medrecord.spi.TransactionalService</node>
+    <node x="2015.5871340779272" y="636.8488372093025">com.medvision360.medrecord.spi.XQueryStore</node>
+    <node x="3134.1848225214194" y="953.9314565483478">com.medvision360.medrecord.spi.LocatableEditor</node>
+    <node x="26.871399975228854" y="599.233170134639">com.medvision360.medrecord.spi.CompositeTransformer</node>
+    <node x="1823.4112607099144" y="1381.6572827417378">com.medvision360.medrecord.spi.ArchetypeParser</node>
+    <node x="1453.4112607099144" y="1381.6572827417378">com.medvision360.medrecord.spi.EHRSerializer</node>
+    <node x="701.2239902080784" y="320.4804161566708">com.medvision360.medrecord.spi.LocatableValidator</node>
+    <node x="2351.0351144940837" y="620.6842105263158">com.medvision360.medrecord.spi.base.AbstractArchetypeStore</node>
+    <node x="1610.2896785932858" y="653.3678090575274">com.medvision360.medrecord.spi.StoredEHR</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.medvision360.medrecord.spi.Engine" target="com.medvision360.medrecord.spi.TransactionalService">
+      <point x="-311.24999999999955" y="-279.5" />
+      <point x="3520.888541666667" y="250.0" />
+      <point x="3005.7796817625463" y="250.0" />
+      <point x="117.375" y="59.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.ArchetypeStore" target="com.medvision360.medrecord.spi.StatusService">
+      <point x="100.0" y="-125.0" />
+      <point x="3094.918223429213" y="280.0" />
+      <point x="3216.75" y="280.0" />
+      <point x="-23.375" y="37.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.StatusService" target="com.medvision360.medrecord.spi.NamedService">
+      <point x="0.0" y="-37.0" />
+      <point x="3240.125" y="77.0" />
+      <point x="3282.79033612374" y="77.0" />
+      <point x="-32.25" y="26.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.ValidatingLocatableStore" target="com.medvision360.medrecord.spi.base.AbstractLocatableStore">
+      <point x="-69.0" y="-202.5" />
+      <point x="0.0" y="158.5" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.CompositeStore" target="com.medvision360.medrecord.spi.CompositeService">
+      <point x="-241.0" y="-279.5" />
+      <point x="393.3506731946145" y="670.1823745410038" />
+      <point x="571.5368167876087" y="605.7980416156672" />
+      <point x="59.66666666666663" y="26.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.CompositeTransformer" target="com.medvision360.medrecord.spi.LocatableTransformer">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.ArchetypeStore" target="com.medvision360.medrecord.spi.TransactionalService">
+      <point x="-100.0" y="-125.0" />
+      <point x="2894.918223429213" y="260.0" />
+      <point x="2849.2796817625463" y="260.0" />
+      <point x="-39.125" y="59.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.LocatableSerializer" target="com.medvision360.medrecord.spi.LocatableSelector">
+      <point x="0.0" y="-59.5" />
+      <point x="496.0" y="280.0" />
+      <point x="754.1552083333336" y="280.0" />
+      <point x="-50.39999999999998" y="37.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.LocatableStore" target="com.medvision360.medrecord.spi.StatusService">
+      <point x="142.33333333333348" y="-136.0" />
+      <point x="2186.803571428572" y="270.0" />
+      <point x="3170.0" y="270.0" />
+      <point x="-70.125" y="37.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.LocatableValidator" target="com.medvision360.medrecord.spi.LocatableSelector">
+      <point x="0.0" y="-37.0" />
+      <point x="845.5" y="280.0" />
+      <point x="804.5552083333334" y="280.0" />
+      <point x="0.0" y="37.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.ValidatingXQueryStore" target="com.medvision360.medrecord.spi.XQueryStore">
+      <point x="0.0" y="-59.0" />
+      <point x="2122.4485924112605" y="927.3488372093025" />
+      <point x="2168.087134077927" y="927.3488372093025" />
+      <point x="0.0" y="48.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.StoredEHR" target="com.medvision360.medrecord.spi.LocatableStore">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.CompositeValidator" target="com.medvision360.medrecord.spi.LocatableValidator">
+      <point x="0.0" y="-81.0" />
+      <point x="759.6002861441397" y="527.9620563035497" />
+      <point x="762.8329253365974" y="486.28396572827444" />
+      <point x="758.4987760097919" y="477.50917992656036" />
+      <point x="753.1882904936762" y="462.79926560587523" />
+      <point x="-99.66666666666652" y="37.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.base.AbstractLocatableStore" target="com.medvision360.medrecord.spi.LocatableSelector">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.CompositeValidator" target="com.medvision360.medrecord.spi.CompositeService">
+      <point x="-129.0" y="-81.0" />
+      <point x="635.5035909177013" y="559.8335373317015" />
+      <point x="528.9019738663521" y="559.8335373317015" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.LocatableParser" target="com.medvision360.medrecord.spi.LocatableSelector">
+      <point x="0.0" y="-59.5" />
+      <point x="148.0" y="270.0" />
+      <point x="703.7552083333335" y="270.0" />
+      <point x="-100.79999999999995" y="37.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.ValidatingLocatableStore" target="com.medvision360.medrecord.spi.LocatableValidator">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.Engine" target="com.medvision360.medrecord.spi.AuditedService">
+      <point x="103.75000000000045" y="-279.5" />
+      <point x="3460.2679786311714" y="233.4186046511628" />
+      <point x="3427.008492707059" y="208.90208078335377" />
+      <point x="0.0" y="26.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.LocatableStore" target="com.medvision360.medrecord.spi.TransactionalService">
+      <point x="0.0" y="-136.0" />
+      <point x="2044.4702380952385" y="260.0" />
+      <point x="2771.0296817625463" y="260.0" />
+      <point x="-117.375" y="59.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.CompositeStore" target="com.medvision360.medrecord.spi.XQueryStore">
+      <point x="241.0" y="-279.5" />
+      <point x="1051.8696450428395" y="712.0538555691555" />
+      <point x="1831.0618382802936" y="755.7331701346391" />
+      <point x="-101.66666666666652" y="48.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.ValidatingLocatableStore" target="com.medvision360.medrecord.spi.LocatableStore">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.base.AbstractEHRStore" target="com.medvision360.medrecord.spi.EHRStore">
+      <point x="0.0" y="-92.5" />
+      <point x="0.0" y="114.5" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.CompositeTransformer" target="com.medvision360.medrecord.spi.CompositeService">
+      <point x="109.33333333333337" y="-37.0" />
+      <point x="305.10803808212415" y="562.091799265606" />
+      <point x="449.6220881054384" y="554.7368421052632" />
+      <point x="-59.66666666666663" y="26.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.EHRStore" target="com.medvision360.medrecord.spi.TransactionalService">
+      <point x="-88.0" y="-114.5" />
+      <point x="3133.1385416666667" y="260.0" />
+      <point x="2927.5296817625463" y="260.0" />
+      <point x="39.125" y="59.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.Engine" target="com.medvision360.medrecord.spi.NamedService">
+      <point x="311.25000000000045" y="-279.5" />
+      <point x="3806.441173245614" y="277.3880048959608" />
+      <point x="3751.441173245614" y="277.3880048959608" />
+      <point x="3547.9540251427993" y="120.96940024479801" />
+      <point x="3332.5804218030544" y="96.61321909424726" />
+      <point x="32.25" y="26.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.XQueryStore" target="com.medvision360.medrecord.spi.LocatableStore">
+      <point x="0.0" y="-48.0" />
+      <point x="2168.087134077927" y="462.3488372093025" />
+      <point x="1899.2188305064992" y="462.3488372093025" />
+      <point x="170.80000000000018" y="136.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.EHRStore" target="com.medvision360.medrecord.spi.StatusService">
+      <point x="88.0" y="-114.5" />
+      <point x="3309.1385416666667" y="280.0" />
+      <point x="3263.5" y="280.0" />
+      <point x="23.375" y="37.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.LocatableStore" target="com.medvision360.medrecord.spi.LocatableSelector">
+      <point x="-142.33333333333348" y="-136.0" />
+      <point x="1902.136904761905" y="270.0" />
+      <point x="905.3552083333334" y="270.0" />
+      <point x="100.80000000000007" y="37.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.ValidatingXQueryStore" target="com.medvision360.medrecord.spi.ValidatingLocatableStore">
+      <point x="-108.33333333333348" y="-59.0" />
+      <point x="1602.237658098735" y="1196.6438188494496" />
+      <point x="1288.9249295112784" y="1201.9975520195837" />
+      <point x="0.0" y="202.5" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.base.AbstractArchetypeStore" target="com.medvision360.medrecord.spi.ArchetypeStore">
+      <point x="0.0" y="-103.5" />
+      <point x="0.0" y="125.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.Engine" target="com.medvision360.medrecord.spi.StatusService">
+      <point x="-103.74999999999955" y="-279.5" />
+      <point x="3728.388541666667" y="240.0" />
+      <point x="3310.25" y="240.0" />
+      <point x="70.125" y="37.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.spi.CompositeStore" target="com.medvision360.medrecord.spi.LocatableStore">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.41189815981850264" x="1978.5" y="842.5" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

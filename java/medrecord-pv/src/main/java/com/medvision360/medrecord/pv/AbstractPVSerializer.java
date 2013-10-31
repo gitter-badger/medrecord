@@ -34,6 +34,7 @@ import org.openehr.rm.FullConstructor;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.datatypes.quantity.ProportionKind;
+import org.openehr.rm.support.identification.ArchetypeID;
 
 @SuppressWarnings("rawtypes")
 public abstract class AbstractPVSerializer implements LocatableSerializer
@@ -93,7 +94,9 @@ public abstract class AbstractPVSerializer implements LocatableSerializer
             pathName = toUnderscoreSeparated(name);
 
             Attribute attribute = attributes.get(name);
-            if (attribute.system() || "archetypeNodeId".equals(attribute.name()))
+            if (attribute.system()
+                    || "archetypeNodeId".equals(attribute.name())
+                    || "archetypeDetails".equals(attribute.name()))
             {
                 continue;
             }
@@ -174,31 +177,52 @@ public abstract class AbstractPVSerializer implements LocatableSerializer
             SerializeVisitor visitor)
             throws InvocationTargetException, IllegalAccessException, IOException
     {
-        Object archetypeNodeId = attributes.get("archetypeNodeId");
-        if (archetypeNodeId != null && pathShouldGetArchetypeNodeId(path))
+        String archetypeId = null;
+        if (obj instanceof Locatable)
         {
-            Object value = get(obj, "archetypeNodeId");
-
-            if (value != null)
+            Locatable locatable = (Locatable)obj;
+            Archetyped archetyped = locatable.getArchetypeDetails();
+            if (archetyped != null)
             {
-                if ("/".equals(path))
+                ArchetypeID archetypeIDObj = archetyped.getArchetypeId();
+                if (archetypeIDObj != null)
                 {
-                    visitor.pair("/archetype_node_id", value);
-                    return path;
+                    archetypeId = archetypeIDObj.getValue();
                 }
+            }
+        }
+        boolean isArchetyped = archetypeId != null;
+        
+        Object attribute = attributes.get("archetypeNodeId");
+        if (attribute != null)
+        {
+            Object archetypeNodeId = get(obj, "archetypeNodeId");
+            boolean haveArchetypeNodeId = archetypeNodeId != null;
 
+            String bracketedId = isArchetyped ? archetypeId : 
+                    haveArchetypeNodeId ? String.valueOf(archetypeNodeId) : null;
+            
+            if (bracketedId != null)
+            {
                 Matcher matcher = INDEX_PATH_PATTERN.matcher(path);
                 if (matcher.matches())
                 {
                     // change from /foo/bar/items[2]/ to /foo/bar/items[atXXX][2]/
                     String prefix = matcher.group(1);
                     String index = matcher.group(2);
-                    path = prefix + "[" + value.toString() + "][" + index + "]/";
+                    path = prefix + "[" + bracketedId.toString() + "][" + index + "]/";
                 }
                 else
                 {
                     // change from /foo/bar/blah/ to /foo/bar/blah[atXXX]/
-                    path = path.substring(0, path.length() - 1) + "[" + value.toString() + "]/";
+                    path = path.substring(0, path.length() - 1) + "[" + String.valueOf(bracketedId.toString())
+                            + "]/";
+                }
+                
+                String archetypeNodeIdString = String.valueOf(archetypeNodeId);
+                if (isArchetyped && haveArchetypeNodeId && !archetypeId.equals(archetypeNodeIdString))
+                {
+                    visitor.pair(path+"archetype_node_id", String.valueOf(archetypeNodeId));
                 }
             }
         }
@@ -215,13 +239,6 @@ public abstract class AbstractPVSerializer implements LocatableSerializer
 
         Object value = getter.invoke(target);
         return value;
-    }
-
-    protected boolean pathShouldGetArchetypeNodeId(String path)
-    {
-        // if we already have [archetype_id_here]/ or [archetype_node_id_here]/ then we don't want to add the 
-        // archetypeNodeId, but if we have foo[1]/ or foo[2]/ then we do want to add it in
-        return !path.endsWith("]/") || INDEX_PATH_PATTERN.matcher(path).matches();
     }
 
     protected Method getter(String attributeName, Class klass)

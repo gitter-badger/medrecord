@@ -9,7 +9,7 @@ import org.openehr.am.archetype.Archetype;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.support.identification.ArchetypeID;
 
-public interface ArchetypeStore // todo javadoc / api spec / exceptions
+public interface ArchetypeStore extends TransactionalService, StatusService // todo javadoc / api spec / exceptions
 {
     public Archetype get(Archetyped archetypeDetails) throws NotFoundException, IOException;
     

@@ -8,9 +8,8 @@
 package com.medvision360.medrecord.memstore;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,30 +17,29 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.google.common.collect.ImmutableSet;
 import com.medvision360.medrecord.spi.LocatableSelector;
 import com.medvision360.medrecord.spi.LocatableSelectorBuilder;
+import com.medvision360.medrecord.spi.LocatableStore;
 import com.medvision360.medrecord.spi.base.AbstractLocatableStore;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
+import com.medvision360.medrecord.spi.exceptions.SerializeException;
 import com.medvision360.medrecord.spi.exceptions.StatusException;
+import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
+import org.openehr.rm.ehr.EHR;
+import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
-import org.openehr.rm.support.identification.ObjectVersionID;
-import org.openehr.rm.support.identification.UID;
-import org.openehr.rm.support.identification.VersionTreeID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class MemLocatableStore extends AbstractLocatableStore
+public class MemLocatableStore extends AbstractLocatableStore implements LocatableStore
 {
-    private HierObjectID m_systemId;
     private Map<HierObjectID, Locatable> m_storage = new ConcurrentHashMap<>();
-    private Map<ObjectVersionID, Locatable> m_versions = new ConcurrentHashMap<>();
-    private long v = 1; // VersionTreeID: version cannot start with 0
+    private Map<EHR, Set<Locatable>> m_ehrMap = new ConcurrentHashMap<>();
 
     public MemLocatableStore(String name, LocatableSelector locatableSelector)
     {
         super(name, locatableSelector);
-        m_systemId = new HierObjectID(name);
     }
 
     public MemLocatableStore(String name)
@@ -51,7 +49,7 @@ public class MemLocatableStore extends AbstractLocatableStore
 
     public MemLocatableStore()
     {
-        this("MemStore");
+        this("MemLocatableStore");
     }
 
     @Override
@@ -69,42 +67,6 @@ public class MemLocatableStore extends AbstractLocatableStore
     }
 
     @Override
-    public Locatable get(ObjectVersionID id)
-            throws NotFoundException, IOException
-    {
-        checkNotNull(id, "id cannot be null");
-
-        Locatable result = m_versions.get(id);
-        if (result == null)
-        {
-            throw notFound(id);
-        }
-        return result;
-    }
-
-    @Override
-    public Iterable<Locatable> getVersions(HierObjectID id)
-            throws NotFoundException, IOException
-    {
-        checkNotNull(id, "id cannot be null");
-
-        List<Locatable> result = new ArrayList<>();
-        Collection<Locatable> all = m_versions.values();
-        for (Locatable locatable : all)
-        {
-            if (locatable.getUid().equals(id))
-            {
-                result.add(locatable);
-            }
-        }
-        if (result.size() == 0)
-        {
-            throw notFound(id);
-        }
-        return result;
-    }
-
-    @Override
     public Locatable insert(Locatable locatable)
             throws DuplicateException, NotSupportedException, IOException
     {
@@ -113,8 +75,24 @@ public class MemLocatableStore extends AbstractLocatableStore
         ensureNotFound(hierObjectID);
 
         m_storage.put(hierObjectID, locatable);
-        storeVersion(locatable);
 
+        return locatable;
+    }
+
+    @Override
+    public Locatable insert(EHR ehr, Locatable locatable)
+            throws DuplicateException, NotSupportedException, IOException, SerializeException
+    {
+        checkNotNull(ehr, "ehr cannot be null");
+        checkNotNull(locatable, "locatable cannot be null");
+        locatable = insert(locatable); // ensures UID
+        
+        if (!m_ehrMap.containsKey(ehr))
+        {
+            Set<Locatable> locatables = new HashSet<>();
+            m_ehrMap.put(ehr, locatables);
+        }
+        m_ehrMap.get(ehr).add(locatable);
         return locatable;
     }
 
@@ -127,7 +105,6 @@ public class MemLocatableStore extends AbstractLocatableStore
         ensureFound(hierObjectID);
 
         m_storage.put(hierObjectID, locatable);
-        storeVersion(locatable);
 
         return locatable;
     }
@@ -140,23 +117,6 @@ public class MemLocatableStore extends AbstractLocatableStore
         ensureFound(id);
 
         m_storage.remove(id);
-
-        List<ObjectVersionID> toDelete = new ArrayList<>();
-        Set<Map.Entry<ObjectVersionID, Locatable>> entrySet = m_versions.entrySet();
-        for (Map.Entry<ObjectVersionID, Locatable> entry : entrySet)
-        {
-            Locatable locatable = entry.getValue();
-            HierObjectID hierObjectID = getHierObjectID(locatable);
-            if (hierObjectID.equals(id))
-            {
-                ObjectVersionID objectVersionID = entry.getKey();
-                toDelete.add(objectVersionID);
-            }
-        }
-        for (ObjectVersionID objectVersionID : toDelete)
-        {
-            m_versions.remove(objectVersionID);
-        }
     }
 
     @Override
@@ -168,34 +128,6 @@ public class MemLocatableStore extends AbstractLocatableStore
     }
 
     @Override
-    public boolean has(ObjectVersionID id)
-            throws IOException
-    {
-        checkNotNull(id, "id cannot be null");
-        return m_versions.containsKey(id);
-    }
-
-    @Override
-    public boolean hasAny(ObjectVersionID id)
-            throws IOException
-    {
-        checkNotNull(id, "id cannot be null");
-        UID objectID = id.objectID();
-        HierObjectID hierObjectID = new HierObjectID(objectID, null);
-        return has(hierObjectID);
-    }
-
-    @Override
-    public void delete(ObjectVersionID id)
-            throws NotFoundException, IOException
-    {
-        checkNotNull(id, "id cannot be null");
-        ensureFound(id);
-
-        m_versions.remove(id);
-    }
-
-    @Override
     public Iterable<HierObjectID> list()
             throws IOException
     {
@@ -203,16 +135,44 @@ public class MemLocatableStore extends AbstractLocatableStore
     }
 
     @Override
-    public Iterable<ObjectVersionID> listVersions()
-            throws IOException
+    public Iterable<HierObjectID> list(EHR EHR) throws IOException, NotFoundException
     {
-        return ImmutableSet.copyOf(m_versions.keySet());
+        checkNotNull(EHR, "EHR cannot be null");
+        return doList(EHR, null);
     }
 
     @Override
-    public void initialize()
-            throws IOException
+    public Iterable<HierObjectID> list(EHR EHR, String rmEntity) throws IOException, NotFoundException
     {
+        checkNotNull(EHR, "EHR cannot be null");
+        checkNotNull(rmEntity, "rmEntity cannot be null");
+        return doList(EHR, rmEntity);
+    }
+
+    private Iterable<HierObjectID> doList(EHR EHR, String rmEntity) throws NotFoundException
+    {
+        if (!m_ehrMap.containsKey(EHR))
+        {
+            throw new NotFoundException(String.format("EHR %s not found", EHR));
+        }
+        Set<Locatable> locatables = m_ehrMap.get(EHR);
+        Set<HierObjectID> result = new HashSet<>();
+        for (Locatable locatable : locatables)
+        {
+            if (rmEntity != null)
+            {
+                Archetyped archetypeDetails = locatable.getArchetypeDetails();
+                ArchetypeID archetypeID = archetypeDetails.getArchetypeId();
+                String locatableRmEntity = archetypeID.rmEntity();
+                if (!rmEntity.equals(locatableRmEntity))
+                {
+                    continue;
+                }
+            }
+            HierObjectID locatableId = (HierObjectID) locatable.getUid();
+            result.add(locatableId);
+        }
+        return Collections.unmodifiableSet(result);
     }
 
     @Override
@@ -220,7 +180,6 @@ public class MemLocatableStore extends AbstractLocatableStore
             throws IOException
     {
         m_storage.clear();
-        m_versions.clear();
     }
 
     @Override
@@ -257,32 +216,4 @@ public class MemLocatableStore extends AbstractLocatableStore
             throw notFound(hierObjectID);
         }
     }
-
-    protected void ensureFound(ObjectVersionID id)
-            throws NotFoundException
-    {
-        if (!m_versions.containsKey(id))
-        {
-            throw notFound(id);
-        }
-    }
-
-    protected VersionTreeID nextVersion()
-    {
-        return new VersionTreeID("" + v++);
-    }
-
-    protected ObjectVersionID newObjectVersionID(UID uid)
-    {
-        return new ObjectVersionID(uid, m_systemId, nextVersion());
-    }
-
-    private void storeVersion(Locatable locatable)
-    {
-        HierObjectID hierObjectID = getHierObjectID(locatable);
-        UID uid = hierObjectID.root();
-        ObjectVersionID objectVersionID = newObjectVersionID(uid);
-        m_versions.put(objectVersionID, locatable);
-    }
-
 }

@@ -3,6 +3,8 @@ package com.medvision360.medrecord.spi.exceptions;
 @SuppressWarnings("UnusedDeclaration")
 public class TransformException extends RecordException
 {
+    private static final long serialVersionUID = 0x130L;
+    
     public TransformException()
     {
     }

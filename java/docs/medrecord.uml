@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>com.medvision360.medrecord</OriginalElement>
+  <nodes>
+    <node x="447.0" y="90.0">com.medvision360.medrecord.basex</node>
+    <node x="124.0" y="90.0">com.medvision360.medrecord.memstore</node>
+    <node x="593.0" y="90.0">com.medvision360.medrecord.riio</node>
+    <node x="296.0" y="90.0">com.medvision360.medrecord.engine</node>
+    <node x="0.0" y="90.0">com.medvision360.medrecord.pv</node>
+    <node x="307.5" y="0.0">com.medvision360.medrecord.spi</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.medvision360.medrecord.memstore" target="com.medvision360.medrecord.spi">
+      <point x="0.0" y="-15.0" />
+      <point x="200.0" y="60.0" />
+      <point x="334.5" y="60.0" />
+      <point x="-27.0" y="15.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.basex" target="com.medvision360.medrecord.spi">
+      <point x="0.0" y="-15.0" />
+      <point x="510.0" y="60.0" />
+      <point x="388.5" y="60.0" />
+      <point x="27.0" y="15.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.riio" target="com.medvision360.medrecord.spi">
+      <point x="0.0" y="-15.0" />
+      <point x="648.0" y="50.0" />
+      <point x="406.5" y="50.0" />
+      <point x="45.0" y="15.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.engine" target="com.medvision360.medrecord.spi">
+      <point x="-32.75" y="-15.0" />
+      <point x="328.75" y="70.0" />
+      <point x="352.5" y="70.0" />
+      <point x="-9.0" y="15.0" />
+    </edge>
+    <edge source="com.medvision360.medrecord.pv" target="com.medvision360.medrecord.spi">
+      <point x="0.0" y="-15.0" />
+      <point x="52.0" y="50.0" />
+      <point x="316.5" y="50.0" />
+      <point x="-45.0" y="15.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="351.5" y="60.0" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

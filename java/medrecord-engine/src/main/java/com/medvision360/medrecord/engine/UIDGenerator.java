@@ -2,23 +2,18 @@ package com.medvision360.medrecord.engine;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.UUID;
 
 import com.medvision360.medrecord.spi.LocatableTransformer;
+import com.medvision360.medrecord.spi.UIDFactory;
 import com.medvision360.medrecord.spi.exceptions.TransformException;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.composition.Composition;
-import org.openehr.rm.composition.content.ContentItem;
 import org.openehr.rm.composition.content.entry.Instruction;
 import org.openehr.rm.composition.content.entry.Observation;
 import org.openehr.rm.composition.content.navigation.Section;
-import org.openehr.rm.datastructure.itemstructure.ItemList;
-import org.openehr.rm.datastructure.itemstructure.representation.Element;
-import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.UIDBasedID;
 
-public class UIDGenerator implements LocatableTransformer
+public class UIDGenerator extends UIDFactory implements LocatableTransformer
 {
     @Override
     public void transform(Locatable locatable) throws TransformException
@@ -77,16 +72,6 @@ public class UIDGenerator implements LocatableTransformer
         }
     }
 
-    private void transformComposition(Composition composition) throws TransformException
-    {
-        transformAll(composition.getContent());
-    }
-
-    private void transformSection(Section section) throws TransformException
-    {
-        transformAll(section.getItems());
-    }
-
     protected void setUid(Locatable locatable, UIDBasedID uid) throws TransformException
     {
         try
@@ -114,15 +99,4 @@ public class UIDGenerator implements LocatableTransformer
         }
     }
 
-    protected HierObjectID makeUID()
-    {
-        return new HierObjectID(makeUUID());
-    }
-
-    protected String makeUUID()
-    {
-        return UUID.randomUUID().toString();
-    }
-
-    
 }

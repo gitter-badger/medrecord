@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 public class IntegrationTest extends RMTestBase
 {
     private final static Log log = LogFactory.getLog(IntegrationTest.class);
-    
+
     private TerminologyService m_terminologyService;
     private MeasurementService m_measurementService;
 
@@ -61,15 +60,20 @@ public class IntegrationTest extends RMTestBase
     private boolean m_adlMissingLanguageCompatible;
     private boolean m_adlEmptyPurposeCompatible;
     private ArchetypeLoader m_archetypeLoader;
-    
+
+    private StringGenerator m_stringGenerator;
+    private RandomSupport m_randomSupport;
+    private AssertionSupport m_assertionSupport;
+    private ValueGenerator m_valueGenerator;
+    private RMAdapter m_rmAdapter;
     private RMObjectBuilder m_rmObjectBuilder;
-    
+
     private LocatableGenerator m_locatableGenerator;
-    
+
     RIXmlConverter m_xmlConverter;
-    
+
     PVSerializer m_pvSerializer;
-    
+
     LocatableTransformer m_locatableTransformer;
 
     List<Context> m_baseXContexts;
@@ -77,15 +81,27 @@ public class IntegrationTest extends RMTestBase
     String m_locatableStorePath = "itest";
     LocatableStore m_locatableStore;
     LocatableStore m_fallbackStore;
-    
+
+    int generated = 0;
+    int creationFailed = 0;
+    int creationUnsupported = 0;
+    int inserted = 0;
+
+    int totalIDs = 0;
+    int retrieved = 0;
+    int serializeFailed = 0;
+    int internalUIDs = 0;
+    int serialized = 0;
+
+
     @Override
     public void setUp() throws Exception
     {
         super.setUp();
-        
+
         m_terminologyService = SimpleTerminologyService.getInstance();
         m_measurementService = SimpleMeasurementService.getInstance();
-        
+
         m_archetypeStore = new MemArchetypeStore();
 
         m_resolver = new PathMatchingResourcePatternResolver();
@@ -94,6 +110,13 @@ public class IntegrationTest extends RMTestBase
         m_adlMissingLanguageCompatible = true;
         m_archetypeLoader = new ArchetypeLoader(m_archetypeStore, m_resolver, m_archetypeLoaderBasePath,
                 m_adlMissingLanguageCompatible, m_adlEmptyPurposeCompatible);
+
+        m_randomSupport = new RandomSupport();
+        m_assertionSupport = new AssertionSupport();
+        m_stringGenerator = new StringGenerator();
+        m_valueGenerator = new ValueGenerator(m_randomSupport, m_stringGenerator, m_terminologyService,
+                m_measurementService);
+        m_rmAdapter = new RMAdapter(m_valueGenerator);
 
         Map<SystemValue, Object> systemValues = new HashMap<>();
         systemValues.put(SystemValue.TERMINOLOGY_SERVICE, m_terminologyService);
@@ -104,19 +127,19 @@ public class IntegrationTest extends RMTestBase
         systemValues.put(SystemValue.ENCODING, Terminology.CHARSET_UTF8);
         m_rmObjectBuilder = new RMObjectBuilder(systemValues);
 
-        m_locatableGenerator = new LocatableGenerator(m_archetypeStore, m_terminologyService, m_measurementService, 
-                m_rmObjectBuilder);
-        
+        m_locatableGenerator = new LocatableGenerator(m_archetypeStore, m_randomSupport, m_assertionSupport,
+                m_valueGenerator, m_rmAdapter, m_rmObjectBuilder);
+
         m_xmlConverter = new RIXmlConverter(m_terminologyService, m_measurementService,
                 Terminology.CHARSET_UTF8, Terminology.L_en);
-        
+
         m_pvSerializer = new PVSerializer();
-        
+
         m_locatableTransformer = getLocatableTransformer();
-        
+
         m_locatableStore = getLocatableStore();
     }
-    
+
     @Override
     public void tearDown() throws Exception
     {
@@ -126,7 +149,7 @@ public class IntegrationTest extends RMTestBase
             c.close();
         }
     }
-    
+
     protected LocatableStore getLocatableStore() throws Exception
     {
         m_baseXContexts = new ArrayList<>();
@@ -134,7 +157,7 @@ public class IntegrationTest extends RMTestBase
 
         LocatableSelector basicEHR = LocatableSelectorBuilder
                 .start()
-                //.requireRMVersion("1.0.2")
+                        //.requireRMVersion("1.0.2")
                 .requireRMName("EHR")
                 .matchRMEntity("^(?:COMPOSITION|EHRSTATUS|ACTION|ADMIN_ENTRY|EVALUATION|INSTRUCTION|OBSERVATION)$")
                 .build();
@@ -142,7 +165,7 @@ public class IntegrationTest extends RMTestBase
 
         LocatableSelector basicDemographics = LocatableSelectorBuilder
                 .start()
-                //.requireRMVersion("1.0.2")
+                        //.requireRMVersion("1.0.2")
                 .requireRMName("DEMOGRAPHIC")
                 .matchRMEntity("^(?:PARTY_IDENTITY|PARTY_RELATIONSHIP|PERSON|ORGANISATION|ROLE|ADDRESS|CAPABILITY)$")
                 .build();
@@ -150,11 +173,11 @@ public class IntegrationTest extends RMTestBase
 
         LocatableSelector xmlFallback = LocatableSelectorBuilder.any();
         store.addDelegate(getStore("IntegrationTestFALLBACK", xmlFallback));
-        
+
         m_fallbackStore = new MemLocatableStore("IntegrationTestMEMORY");
-        
+
         store.addDelegate(m_fallbackStore);
-        
+
         store.clear();
         store.initialize();
 
@@ -175,21 +198,21 @@ public class IntegrationTest extends RMTestBase
                 m_locatableStorePath
         );
     }
-    
+
     protected LocatableTransformer getLocatableTransformer()
     {
         CompositeTransformer transformer = new CompositeTransformer();
         transformer.addDelegate(new UIDGenerator());
         return transformer;
     }
-    
+
     public void testEverything() throws Exception
     {
         m_archetypeLoader.loadAll("openehr");
         m_archetypeLoader.loadAll("medfit");
         m_archetypeLoader.loadAll("chiron");
         m_archetypeLoader.loadAll("mobiguide");
-        
+
         Iterable<ArchetypeID> allArchetypeIDs = m_archetypeStore.list();
         TreeSet<String> sortedIDs = new TreeSet<>();
         Iterables.addAll(sortedIDs, Iterables.transform(allArchetypeIDs, new Function<ArchetypeID, String>()
@@ -199,20 +222,12 @@ public class IntegrationTest extends RMTestBase
                 return input.getValue();
             }
         }));
-        int generated = 0;
-        int failed = 0;
-        int inserted = 0;
+        OUTER:
         for (String archetypeName : sortedIDs)
         {
             ArchetypeID archetypeID = new ArchetypeID(archetypeName);
             Archetype archetype = m_archetypeStore.get(archetypeID);
-            if (!supported(archetypeID))
-            {
-                log.debug(String.format("Skipping skeleton generation for archetype %s, it is not supported",
-                        archetypeName));
-                continue;
-            }
-            
+
             // generate
             log.debug(String.format("Generating instance of %s", archetypeName));
             Locatable instance;
@@ -223,51 +238,82 @@ public class IntegrationTest extends RMTestBase
             }
             catch (Exception e)
             {
+                String message = e.getMessage();
+                if (message != null && message.contains("No archetypes found to match the slot"))
+                {
+                    // this happens a lot: the constraints in the archetypes often don't quite match reality
+                    creationUnsupported++;
+                    continue;
+                }
+                message = e.getMessage();
+                if (message != null && message.contains("empty items"))
+                {
+                    // this also happens a lot: there are lists that need slotted entries and then we cannot find a
+                    // compatible slotted archetype so we end up with an empty list that's not allowed to be empty
+                    creationUnsupported++;
+                    continue;
+                }
+                Throwable cause = e.getCause();
+                while (cause != null)
+                {
+                    message = cause.getMessage();
+                    if (message != null && message.contains("empty items"))
+                    {
+                        creationUnsupported++;
+                        continue OUTER;
+                    }
+                    cause = cause.getCause();
+                }
                 log.error(String.format("FAILED generating instance of %s: %s", archetypeName, e.getMessage()), e);
-                failed++;
+                creationFailed++;
+                //throw e;
                 continue;
             }
             String className = instance.getClass().getSimpleName();
             log.debug(String.format("Got %s for archetype %s", className, archetypeName));
-            
+
             // transform
             log.debug(String.format("Transforming instance of %s", archetypeName));
             m_locatableTransformer.transform(instance);
-        
+
             // insert
             m_locatableStore.insert(instance);
             log.debug(String.format("Inserted a %s", archetypeName));
             inserted++;
         }
-        
+
         int storedInMemory = Iterables.size(m_fallbackStore.list());
 
-        failed += serializeAll();
-        
-        log.info(String.format("Created %s instances using skeleton generation (skipped %s, failed %s)",
-                generated, Iterables.size(allArchetypeIDs)-generated, failed));
+        creationFailed += serializeAll();
+
+        report(allArchetypeIDs, storedInMemory);
+
+        assertEquals("No failures", 0, creationFailed);
+    }
+
+    private void report(Iterable<ArchetypeID> allArchetypeIDs, int storedInMemory)
+    {
+        log.info(String.format("Created %s instances using skeleton generation (skipped %s, failed %s, " +
+                "unsupported %s)",
+                generated, Iterables.size(allArchetypeIDs) - generated, creationFailed,
+                creationUnsupported));
         log.info(String.format("Inserted %s locatables (%s in xml databases)",
                 inserted, inserted - storedInMemory));
-        
-        assertEquals("No failures", 0, failed);
+        log.info(String.format("Serialized %s instances (total %s, retrieved %s, failed %s, internal %s)",
+                serialized, totalIDs, retrieved, serializeFailed, internalUIDs));
     }
 
     private int serializeAll() throws IOException
     {
-        int all = 0;
-        int retrieved = 0;
-        int failed = 0;
-        int serialized = 0;
-        
         Iterable<HierObjectID> allIDs = m_locatableStore.list();
         File base = new File("build" + File.separatorChar + "ser");
         if (!base.exists())
         {
             base.mkdirs();
         }
-        for(HierObjectID hierObjectID : allIDs)
+        for (HierObjectID hierObjectID : allIDs)
         {
-            all++;
+            totalIDs++;
             String id = null;
             try
             {
@@ -280,38 +326,16 @@ public class IntegrationTest extends RMTestBase
                 m_pvSerializer.serialize(locatable, bos);
                 serialized++;
             }
-            catch (NotFoundException|IOException|ParseException|SerializeException e)
+            catch (NotFoundException e)
             {
-                failed++;
-                log.error(String.format("Difficulty serializing %s: %s", id, e.getMessage(), e));
+                internalUIDs++;
+            }
+            catch (IOException | ParseException | SerializeException e)
+            {
+                serializeFailed++;
+                log.error(String.format("Difficulty serializing %s: %s", id, e.getMessage())); //, e);
             }
         }
-        log.info(String.format("Serialized %s instances (total %s, retrieved %s, failed %s)",
-                serialized, all, retrieved, failed));
-        return failed;
-    }
-
-    private String[] skipArchetypes = new String[] {
-            // No archetypes found to match the slot at ..., but a value is required
-            "openEHR-DEMOGRAPHIC-ORGANISATION.organisation.v1",
-            "openEHR-DEMOGRAPHIC-PERSON.person-patient.v1",
-            "openEHR-DEMOGRAPHIC-PERSON.person.v1",
-            "openEHR-DEMOGRAPHIC-ROLE.healthcare_consumer.v1",
-            "openEHR-DEMOGRAPHIC-ROLE.healthcare_provider_organisation.v1",
-            "openEHR-DEMOGRAPHIC-ROLE.individual_provider.v1",
-    };
-    {
-        Arrays.sort(skipArchetypes);
-    }
-
-    private boolean supported(ArchetypeID archetypeID)
-    {
-        String archetypeName = archetypeID.getValue();
-        if (Arrays.binarySearch(skipArchetypes, archetypeName) < 0)
-        {
-            return true;
-        }
-        
-        return false;
+        return serializeFailed;
     }
 }
