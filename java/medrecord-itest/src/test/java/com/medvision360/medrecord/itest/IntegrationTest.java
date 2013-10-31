@@ -5,9 +5,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.common.base.Function;
@@ -34,7 +37,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.basex.core.Context;
 import org.openehr.am.archetype.Archetype;
-import org.openehr.build.RMObjectBuilder;
 import org.openehr.build.SystemValue;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.support.identification.ArchetypeID;
@@ -50,6 +52,20 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 public class IntegrationTest extends RMTestBase
 {
     private final static Log log = LogFactory.getLog(IntegrationTest.class);
+    
+    public final static Set<String> archetypesToSkip;
+    static {
+        archetypesToSkip = new HashSet<>();
+        archetypesToSkip.addAll(Arrays.asList(
+                // recursion requiring an instance of themselves as content...
+                "openEHR-EHR-ACTION.follow_up.v1",
+                "openEHR-EHR-ACTION.imaging.v1",
+                "openEHR-EHR-ACTION.intravenous_fluid_administration.v1",
+                
+                // requires openEHR-EHR-SECTION.medications.v1 which we don't have
+                "openEHR-EHR-COMPOSITION.prescription.v1"
+        ));
+    }
 
     private TerminologyService m_terminologyService;
     private MeasurementService m_measurementService;
@@ -66,7 +82,6 @@ public class IntegrationTest extends RMTestBase
     private AssertionSupport m_assertionSupport;
     private ValueGenerator m_valueGenerator;
     private RMAdapter m_rmAdapter;
-    private RMObjectBuilder m_rmObjectBuilder;
 
     private LocatableGenerator m_locatableGenerator;
 
@@ -82,6 +97,7 @@ public class IntegrationTest extends RMTestBase
     LocatableStore m_locatableStore;
     LocatableStore m_fallbackStore;
 
+    int skipped = 0;
     int generated = 0;
     int creationFailed = 0;
     int creationUnsupported = 0;
@@ -98,6 +114,18 @@ public class IntegrationTest extends RMTestBase
     public void setUp() throws Exception
     {
         super.setUp();
+
+        skipped = 0;
+        generated = 0;
+        creationFailed = 0;
+        creationUnsupported = 0;
+        inserted = 0;
+    
+        totalIDs = 0;
+        retrieved = 0;
+        serializeFailed = 0;
+        internalUIDs = 0;
+        serialized = 0;
 
         m_terminologyService = SimpleTerminologyService.getInstance();
         m_measurementService = SimpleMeasurementService.getInstance();
@@ -125,10 +153,9 @@ public class IntegrationTest extends RMTestBase
         systemValues.put(SystemValue.CHARSET, Terminology.CHARSET_UTF8);
         systemValues.put(SystemValue.TERRITORY, Terminology.C_NL);
         systemValues.put(SystemValue.ENCODING, Terminology.CHARSET_UTF8);
-        m_rmObjectBuilder = new RMObjectBuilder(systemValues);
 
         m_locatableGenerator = new LocatableGenerator(m_archetypeStore, m_randomSupport, m_assertionSupport,
-                m_valueGenerator, m_rmAdapter, m_rmObjectBuilder);
+                m_valueGenerator, m_rmAdapter, systemValues);
 
         m_xmlConverter = new RIXmlConverter(m_terminologyService, m_measurementService,
                 Terminology.CHARSET_UTF8, Terminology.L_en);
@@ -226,10 +253,21 @@ public class IntegrationTest extends RMTestBase
         for (String archetypeName : sortedIDs)
         {
             ArchetypeID archetypeID = new ArchetypeID(archetypeName);
+            
+            if (archetypesToSkip.contains(archetypeID.getValue()))
+            {
+                log.info(String.format("Skipping problematic archetype %s", archetypeID.getValue()));
+                skipped++;
+                continue;
+            }
+            
             Archetype archetype = m_archetypeStore.get(archetypeID);
 
             // generate
-            log.debug(String.format("Generating instance of %s", archetypeName));
+            if (log.isDebugEnabled())
+            {
+                log.debug(String.format("Generating instance of %s", archetypeName));
+            }
             Locatable instance;
             try
             {
@@ -239,52 +277,42 @@ public class IntegrationTest extends RMTestBase
             catch (Exception e)
             {
                 String message = e.getMessage();
-                if (message != null && message.contains("No archetypes found to match the slot"))
-                {
-                    // this happens a lot: the constraints in the archetypes often don't quite match reality
-                    creationUnsupported++;
-                    continue;
-                }
-                message = e.getMessage();
-                if (message != null && message.contains("empty items"))
-                {
-                    // this also happens a lot: there are lists that need slotted entries and then we cannot find a
-                    // compatible slotted archetype so we end up with an empty list that's not allowed to be empty
-                    creationUnsupported++;
-                    continue;
-                }
-                Throwable cause = e.getCause();
-                while (cause != null)
-                {
-                    message = cause.getMessage();
-                    if (message != null && message.contains("empty items"))
-                    {
-                        creationUnsupported++;
-                        continue OUTER;
-                    }
-                    cause = cause.getCause();
-                }
-                log.error(String.format("FAILED generating instance of %s: %s", archetypeName, e.getMessage()), e);
+//                if (message != null && message.contains("No archetypes found to match the slot"))
+//                {
+//                    // this happens a lot: the constraints in the archetypes often don't quite match reality
+//                    creationUnsupported++;
+//                    continue;
+//                }
+                log.error(String.format("FAILED generating instance of %s: %s", archetypeName, message));
                 creationFailed++;
                 //throw e;
                 continue;
             }
             String className = instance.getClass().getSimpleName();
-            log.debug(String.format("Got %s for archetype %s", className, archetypeName));
+            if (log.isDebugEnabled())
+            {
+                log.debug(String.format("Got %s for archetype %s", className, archetypeName));
+            }
 
             // transform
-            log.debug(String.format("Transforming instance of %s", archetypeName));
+            if (log.isDebugEnabled())
+            {
+                log.debug(String.format("Transforming instance of %s", archetypeName));
+            }
             m_locatableTransformer.transform(instance);
 
             // insert
             m_locatableStore.insert(instance);
-            log.debug(String.format("Inserted a %s", archetypeName));
+            if (log.isDebugEnabled())
+            {
+                log.debug(String.format("Inserted a %s", archetypeName));
+            }
             inserted++;
         }
 
         int storedInMemory = Iterables.size(m_fallbackStore.list());
 
-        creationFailed += serializeAll();
+        serializeAll();
 
         report(allArchetypeIDs, storedInMemory);
 
@@ -295,15 +323,14 @@ public class IntegrationTest extends RMTestBase
     {
         log.info(String.format("Created %s instances using skeleton generation (skipped %s, failed %s, " +
                 "unsupported %s)",
-                generated, Iterables.size(allArchetypeIDs) - generated, creationFailed,
-                creationUnsupported));
+                generated, skipped, creationFailed, creationUnsupported));
         log.info(String.format("Inserted %s locatables (%s in xml databases)",
                 inserted, inserted - storedInMemory));
         log.info(String.format("Serialized %s instances (total %s, retrieved %s, failed %s, internal %s)",
                 serialized, totalIDs, retrieved, serializeFailed, internalUIDs));
     }
 
-    private int serializeAll() throws IOException
+    private void serializeAll() throws IOException
     {
         Iterable<HierObjectID> allIDs = m_locatableStore.list();
         File base = new File("build" + File.separatorChar + "ser");
@@ -336,6 +363,5 @@ public class IntegrationTest extends RMTestBase
                 log.error(String.format("Difficulty serializing %s: %s", id, e.getMessage())); //, e);
             }
         }
-        return serializeFailed;
     }
 }

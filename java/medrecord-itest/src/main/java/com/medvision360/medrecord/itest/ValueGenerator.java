@@ -45,7 +45,10 @@ import org.openehr.rm.datatypes.text.DvText;
 import org.openehr.rm.demographic.PartyIdentity;
 import org.openehr.rm.support.basic.Interval;
 import org.openehr.rm.support.identification.HierObjectID;
+import org.openehr.rm.support.identification.ObjectID;
+import org.openehr.rm.support.identification.ObjectRef;
 import org.openehr.rm.support.identification.ObjectVersionID;
+import org.openehr.rm.support.identification.PartyRef;
 import org.openehr.rm.support.identification.TerminologyID;
 import org.openehr.rm.support.identification.UUID;
 import org.openehr.rm.support.identification.VersionTreeID;
@@ -757,7 +760,10 @@ public class ValueGenerator
 
     public PartyIdentity generateIdentity()
     {
-        log.debug("generateIdentity");
+        if (log.isDebugEnabled())
+        {
+            log.debug("generateIdentity");
+        }
         DvText purpose = new DvText("legal identity");
         /*
         ItemList(String archetypeNodeId, DvText name, List<Element> items)
@@ -775,7 +781,10 @@ public class ValueGenerator
 
     public Set<PartyIdentity> generateIdentities()
     {
-        log.debug("generateIdentities");
+        if (log.isDebugEnabled())
+        {
+            log.debug("generateIdentities");
+        }
         Set<PartyIdentity> identities = new HashSet<>();
         int listSize = m_randomSupport.listSize(2);
         for (int i = 0; i < listSize; i++)
@@ -783,6 +792,15 @@ public class ValueGenerator
             identities.add(generateIdentity());
         }
         return identities;
+    }
+
+
+    public PartyRef generatePartyRef()
+    {
+        ObjectID id = generateUID();
+        String type = "PERSON";
+        PartyRef result = new PartyRef(id, type);
+        return result;
     }
 
     public CodePhrase chooseCategory()

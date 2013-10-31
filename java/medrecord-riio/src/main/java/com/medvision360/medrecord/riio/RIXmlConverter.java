@@ -146,14 +146,7 @@ public class RIXmlConverter implements LocatableParser, LocatableSerializer
         systemValues.put(SystemValue.ENCODING, charset);
         systemValues.put(SystemValue.LANGUAGE, language);
 
-        try
-        {
-            binding = new XMLBinding(systemValues);
-        }
-        catch (XMLBindingException e)
-        {
-            throw new IllegalStateException(e);
-        }
+		binding = new XMLBinding(systemValues);
     }
 
     @Override

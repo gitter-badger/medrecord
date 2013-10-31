@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
 
+import com.medvision360.medrecord.rmutil.AOMUtil;
 import com.medvision360.medrecord.spi.ArchetypeStore;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import org.apache.commons.logging.Log;
@@ -38,20 +39,15 @@ import org.openehr.am.archetype.constraintmodel.primitive.CPrimitive;
 import org.openehr.am.archetype.constraintmodel.primitive.CReal;
 import org.openehr.am.archetype.constraintmodel.primitive.CString;
 import org.openehr.am.archetype.constraintmodel.primitive.CTime;
-import org.openehr.am.archetype.ontology.ArchetypeOntology;
-import org.openehr.am.archetype.ontology.OntologyBinding;
-import org.openehr.am.archetype.ontology.OntologyBindingItem;
-import org.openehr.am.archetype.ontology.TermBindingItem;
 import org.openehr.am.openehrprofile.datatypes.basic.CDvState;
 import org.openehr.am.openehrprofile.datatypes.quantity.CDvOrdinal;
 import org.openehr.am.openehrprofile.datatypes.quantity.CDvQuantity;
 import org.openehr.am.openehrprofile.datatypes.text.CCodePhrase;
-import org.openehr.build.RMObjectBuilder;
 import org.openehr.build.RMObjectBuildingException;
+import org.openehr.build.SystemValue;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Link;
 import org.openehr.rm.common.archetyped.Locatable;
-import org.openehr.rm.datatypes.text.CodePhrase;
 import org.openehr.rm.datatypes.text.DvText;
 import org.openehr.rm.datatypes.uri.DvEHRURI;
 import org.openehr.rm.support.basic.Interval;
@@ -62,7 +58,7 @@ import org.openehr.rm.support.identification.UIDBasedID;
  * Programmatic generator of {@link Locatable} instances that match an {@link Archetype}.
  */
 @SuppressWarnings({"UnusedDeclaration", "unchecked", "rawtypes"})
-public class LocatableGenerator
+public class LocatableGenerator extends AOMUtil
 {
     private final static Log log = LogFactory.getLog(LocatableGenerator.class);
 
@@ -71,7 +67,6 @@ public class LocatableGenerator
     private AssertionSupport m_assertionSupport;
     private RandomSupport m_randomSupport;
     private ArchetypeStore m_archetypeStore;
-    private RMObjectBuilder m_rmObjectBuilder;
     private String m_rmVersion = "1.0.2";
     private boolean m_fillOptional = true;
     private Map<UIDBasedID, Locatable> m_generated = new WeakHashMap<>();
@@ -80,14 +75,14 @@ public class LocatableGenerator
 
     public LocatableGenerator(ArchetypeStore archetypeStore, RandomSupport randomSupport,
             AssertionSupport assertionSupport, ValueGenerator valueGenerator, RMAdapter rmAdapter,
-            RMObjectBuilder rmObjectBuilder)
+            Map<SystemValue, Object> systemValues)
     {
+        super(systemValues);
         m_archetypeStore = archetypeStore;
         m_randomSupport = randomSupport;
         m_assertionSupport = assertionSupport;
         m_valueGenerator = valueGenerator;
         m_rmAdapter = rmAdapter;
-        m_rmObjectBuilder = rmObjectBuilder;
     }
 
     public void setRmVersion(String rmVersion)
@@ -116,7 +111,10 @@ public class LocatableGenerator
     public Locatable generate(Archetype archetype)
             throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
     {
-        Object result = generateObject(archetype);
+        List<Archetype> parents = new ArrayList<>();
+        parents.add(archetype);
+
+        Object result = generateObject(parents);
         if (!(result instanceof Locatable))
         {
             throw new RMObjectBuildingException(String.format("Constructed a %s which is not a Locatable",
@@ -129,13 +127,17 @@ public class LocatableGenerator
     // Object walking and structure generation
     //
 
-    protected Object generateObject(Archetype archetype)
+    protected Object generateObject(List<Archetype> parents)
             throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
     {
+        Archetype archetype = current(parents);
         ArchetypeID archetypeID = archetype.getArchetypeId();
         String archetypeName = archetypeID.getValue();
         String className = m_rmAdapter.findConcreteClassName(archetypeID);
-        log.debug(String.format("Attempting to construct a %s to match %s", className, archetypeName));
+        if (log.isDebugEnabled())
+        {
+            log.debug(String.format("Attempting to construct a %s to match %s", className, archetypeName));
+        }
 
         Map<String, Object> map = new HashMap<>();
         Archetyped archetypeDetails = new Archetyped(archetypeID, null, m_rmVersion);
@@ -146,12 +148,12 @@ public class LocatableGenerator
         map.put("links", generateLinks());
 
         CComplexObject definition = archetype.getDefinition();
-        generateMap(archetype, map, definition);
+        generateMap(parents, map, definition);
 
-        return m_rmObjectBuilder.construct(className, map);
+        return construct(className, map);
     }
 
-    protected void generateMap(Archetype archetype, Map<String, Object> map, CComplexObject definition)
+    protected void generateMap(List<Archetype> parents, Map<String, Object> map, CComplexObject definition)
             throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
     {
         String rmTypeName = definition.getRmTypeName();
@@ -192,7 +194,7 @@ public class LocatableGenerator
                     continue;
                 }
                 boolean forceMultiple = m_rmAdapter.forceMultiple(rmTypeName, attributeName);
-                Object value = generateAttribute(archetype, attribute, map, forceMultiple);
+                Object value = generateAttribute(parents, attribute, map, forceMultiple);
                 log.debug(String.format("Generated attribute %s, %s: %s", attribute.path(),
                         attribute.getRmAttributeName(), value));
                 if (value != null)
@@ -205,7 +207,7 @@ public class LocatableGenerator
         m_rmAdapter.tweakValueMap(map, definition);
     }
 
-    protected Object generateAttribute(Archetype archetype, CAttribute attribute, Map<String, Object> map,
+    protected Object generateAttribute(List<Archetype> parents, CAttribute attribute, Map<String, Object> map,
             boolean forceMultiple)
             throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
     {
@@ -216,21 +218,24 @@ public class LocatableGenerator
         }
         if (attribute instanceof CSingleAttribute)
         {
-            if (!forceMultiple)
+            CObject choice = m_randomSupport.pick(children);
+            String choiceName = name(choice);
+            Object childValue = generateObject(parents, choice, choice.isRequired(), map);
+
+            if (forceMultiple)
             {
-                CObject choice = m_randomSupport.pick(children);
-                String choiceName = name(choice);
-                Object childValue = generateObject(archetype, choice, choice.isRequired(), map);
-                return childValue;
+                List<Object> container = new ArrayList<>();
+                container.add(childValue);
+                return container;
             }
             else
             {
-                return generateMultiple(archetype, attribute, map);
+                return childValue;
             }
         }
         else if (attribute instanceof CMultipleAttribute)
         {
-            return generateMultiple(archetype, attribute, map);
+            return generateMultiple(parents, attribute, map);
         }
         else
         {
@@ -239,11 +244,14 @@ public class LocatableGenerator
         }
     }
 
-    protected Object generateMultiple(Archetype archetype, CAttribute attribute, Map<String, Object> map)
+    protected Object generateMultiple(List<Archetype> parents, CAttribute attribute, Map<String, Object> map)
             throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
     {
         String attributeName = name(attribute);
-        log.debug(String.format("generateMultiple %s %s", attributeName, attribute.path()));
+        if (log.isDebugEnabled())
+        {
+            log.debug(String.format("generateMultiple %s %s", attributeName, attribute.path()));
+        }
         List<CObject> children = attribute.getChildren();
         Collection<Object> container = generateContainer(attribute);
         for (CObject child : children)
@@ -267,22 +275,7 @@ public class LocatableGenerator
             int size = m_randomSupport.chooseOccurrences(container instanceof Set, lower, upper);
             for (int i = 0; i < size; i++)
             {
-                Object childValue = generateObject(archetype, child, child.isRequired(), map);
-                log.debug(String.format("Generated child %s, %s: %s", child.path(),
-                        attribute.getRmAttributeName(), childValue));
-                if (childValue == null)
-                {
-                    if (!child.isRequired())
-                    {
-                        log.debug(String.format("Skip child %s, generated a null child", attribute.path()));
-                        continue;
-                    }
-                    else
-                    {
-                        throw new GenerateException(String.format("Generated a null child for %s", attribute.path()));
-                    }
-                }
-                container.add(childValue);
+                generateChild(parents, attribute, map, container, child);
             }
         }
         return container;
@@ -318,7 +311,35 @@ public class LocatableGenerator
         return container;
     }
 
-    protected Object generateObject(Archetype archetype, ArchetypeConstraint object, boolean required,
+    private void generateChild(List<Archetype> parents, CAttribute attribute, Map<String, Object> map,
+            Collection<Object> container, CObject child)
+            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
+    {
+        Object childValue = generateObject(parents, child, child.isRequired(), map);
+        if (log.isDebugEnabled())
+        {
+            log.debug(String.format("Generated child %s, %s: %s", child.path(),
+                    attribute.getRmAttributeName(), childValue));
+        }
+        if (childValue == null)
+        {
+            if (!child.isRequired())
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug(String.format("Skip child %s, generated a null child", attribute.path()));
+                }
+                return;
+            }
+            else
+            {
+                throw new GenerateException(String.format("Generated a null child for %s", attribute.path()));
+            }
+        }
+        container.add(childValue);
+    }
+
+    protected Object generateObject(List<Archetype> parents, ArchetypeConstraint object, boolean required,
             Map<String, Object> map)
             throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
     {
@@ -336,36 +357,39 @@ public class LocatableGenerator
         }
         String objectName = name(object);
         String objectPath = object.path();
-        log.debug(String.format("generateObject %s %s", objectName, objectPath));
+        if (log.isDebugEnabled())
+        {
+            log.debug(String.format("generateObject %s %s", objectName, objectPath));
+        }
         if (object instanceof ConstraintRef)
         {
             ConstraintRef ref = (ConstraintRef) object;
-            Object value = translateConstraintRef(archetype, ref);
+            Object value = translateConstraintRef(current(parents), ref);
             return value;
         }
         else if (object instanceof ArchetypeInternalRef)
         {
-            Object value = followArchetypeInternalRef(archetype, (ArchetypeInternalRef) object, required, map);
+            Object value = followArchetypeInternalRef(parents, (ArchetypeInternalRef) object, required, map);
             return value;
         }
         else if (object instanceof ArchetypeSlot)
         {
-            Object value = generateObjectForSlot(archetype, (ArchetypeSlot) object, required);
+            Object value = generateObjectForSlot(parents, (ArchetypeSlot) object, required);
             return value;
         }
         else if (object instanceof CDomainType)
         {
-            Object value = generateDomainType(archetype, (CDomainType) object);
+            Object value = generateDomainType(parents, (CDomainType) object);
             return value;
         }
         else if (object instanceof CComplexObject)
         {
-            Object value = generateComplexObject(archetype, (CComplexObject) object, required);
+            Object value = generateComplexObject(parents, (CComplexObject) object, required);
             return value;
         }
         else if (object instanceof CPrimitiveObject)
         {
-            Object value = generatePrimitive(archetype, (CPrimitiveObject) object);
+            Object value = generatePrimitive(parents, (CPrimitiveObject) object);
             return value;
         }
         else
@@ -375,12 +399,12 @@ public class LocatableGenerator
         }
     }
 
-    protected Object followArchetypeInternalRef(Archetype archetype, ArchetypeInternalRef ref, boolean required,
+    protected Object followArchetypeInternalRef(List<Archetype> parents, ArchetypeInternalRef ref, boolean required,
             Map<String, Object> map)
             throws GenerateException, RMObjectBuildingException, IOException, NotFoundException
     {
         String path = ref.getTargetPath();
-        ArchetypeConstraint constraint = archetype.node(path);
+        ArchetypeConstraint constraint = current(parents).node(path);
         if (constraint == null)
         {
             if (required)
@@ -395,86 +419,50 @@ public class LocatableGenerator
                 return null;
             }
         }
-        log.debug(String.format("Following ref %s to %s", ref.path(), path));
-        return generateObject(archetype, constraint, required, map);
-    }
-
-    protected Object translateConstraintRef(Archetype archetype, ConstraintRef ref)
-    {
-        String reference = ref.getReference();
-        ArchetypeOntology ontology = archetype.getOntology();
-        String primaryLanguage = ontology.getPrimaryLanguage();
-        //ArchetypeTerm term = ontology.constraintDefinition(primaryLanguage, reference);
-        List<OntologyBinding> termBindings = ontology.getTermBindingList();
-        for (OntologyBinding termBinding : termBindings)
+        if (log.isDebugEnabled())
         {
-            List<OntologyBindingItem> bindingItemList = termBinding.getBindingList();
-            for (OntologyBindingItem ontologyBindingItem : bindingItemList)
-            {
-                if (!(ontologyBindingItem instanceof TermBindingItem))
-                {
-                    continue;
-                }
-                TermBindingItem termBindingItem = (TermBindingItem) ontologyBindingItem;
-                String termCode = termBindingItem.getCode();
-                if (termCode.equals(reference))
-                {
-                    List<String> terms = termBindingItem.getTerms();
-                    for (String term : terms)
-                    {
-                        term = term.trim();
-                        if (term.startsWith("[") || term.startsWith("<"))
-                        {
-                            term = term.substring(1);
-                        }
-                        if (term.endsWith("]") || term.endsWith(">"))
-                        {
-                            term = term.substring(0, term.length() - 1);
-                        }
-                        CodePhrase phrase;
-                        try
-                        {
-                            phrase = (CodePhrase) CodePhrase.parseValue(term);
-                            log.debug(String.format("Mapped ref %s to %s", reference, phrase));
-                            return phrase;
-                        }
-                        catch (IllegalArgumentException | ClassCastException e)
-                        {
-                            log.warn(String.format("Could not parse term binding %s, skipping it", term));
-                            continue;
-                        }
-                    }
-                }
-            }
+            log.debug(String.format("Following ref %s to %s", ref.path(), path));
         }
-        log.debug(String.format("Returning ref %s, no term binding done", reference));
-        return reference;
+        return generateObject(parents, constraint, required, map);
     }
 
-    protected Object generateObjectForSlot(Archetype archetype, ArchetypeSlot slot, boolean required)
+    private Archetype current(List<Archetype> parents)
+    {
+        return parents.get(parents.size()-1);
+    }
+
+    protected Object generateObjectForSlot(List<Archetype> parents, ArchetypeSlot slot, boolean required)
             throws IOException, GenerateException, NotFoundException, RMObjectBuildingException
     {
-        Archetype slotArchetype = chooseArchetype(slot);
+        Archetype current = current(parents);
+        Archetype slotArchetype = chooseArchetype(parents, slot);
         if (slotArchetype != null)
         {
-            log.debug(String.format("Satisfy slot %s with archetype %s", slot.path(),
-                    slotArchetype.getArchetypeId().getValue()));
-            Object value = generateObject(archetype);
+            if (log.isDebugEnabled())
+            {
+                log.debug(String.format("Satisfy slot %s with archetype %s", slot.path(),
+                        slotArchetype.getArchetypeId().getValue()));
+            }
+            List<Archetype> newParents = new ArrayList<>();
+            newParents.addAll(parents);
+            newParents.add(slotArchetype);
+            Object value = generateObject(newParents);
             return value;
         }
         else if (required)
         {
-            throw new GenerateException(String.format("No archetypes found to match the slot at %s, " +
-                    "but a value is required", slot.path()));
+            throw new GenerateException(String.format("No archetypes found to match the slot at %s in archetype %s, " +
+                    "but a value is required", slot.path(), current.getArchetypeId().getValue()));
         }
         else
         {
-            log.warn(String.format("No archetypes found to match the slot at %s, skipping it", slot.path()));
+            log.debug(String.format("No archetypes found to match the slot at %s in archetype %s, skipping it",
+                    slot.path(), current.getArchetypeId().getValue()));
             return null;
         }
     }
 
-    protected Object generateComplexObject(Archetype archetype, CComplexObject object, boolean required)
+    protected Object generateComplexObject(List<Archetype> parents, CComplexObject object, boolean required)
             throws IOException, GenerateException, NotFoundException, RMObjectBuildingException
     {
         String rmType = object.getRmTypeName();
@@ -486,12 +474,15 @@ public class LocatableGenerator
         String objectPath = object.path();
         String className = m_rmAdapter.findConcreteClassName(rmType);
         Map<String, Object> map = new HashMap<>();
-        log.debug(String.format("Generate complex object entity %s at %s with class %s",
-                rmType, objectPath, className));
+        if (log.isDebugEnabled())
+        {
+            log.debug(String.format("Generate complex object entity %s at %s with class %s",
+                    rmType, objectPath, className));
+        }
         try
         {
-            generateMap(archetype, map, object);
-            return m_rmObjectBuilder.construct(className, map);
+            generateMap(parents, map, object);
+            return construct(className, map);
         }
         catch (IOException | GenerateException | NotFoundException | RMObjectBuildingException e)
         {
@@ -541,7 +532,7 @@ public class LocatableGenerator
 
     public Object generateCustomComplexObject(String rmType)
     {
-        rmType = m_rmAdapter.toUnderscoreSeparated(rmType);
+        rmType = m_rmAdapter.toRmEntityName(rmType);
 
         switch (rmType)
         {
@@ -565,7 +556,7 @@ public class LocatableGenerator
         }
     }
 
-    protected Object generateDomainType(Archetype archetype, CDomainType domainType) throws GenerateException
+    protected Object generateDomainType(List<Archetype> parents, CDomainType domainType) throws GenerateException
     {
         if (domainType instanceof CCodePhrase)
         {
@@ -590,7 +581,7 @@ public class LocatableGenerator
         }
     }
 
-    protected Object generatePrimitive(Archetype archetype, CPrimitiveObject primitiveObject) throws GenerateException
+    protected Object generatePrimitive(List<Archetype> parents, CPrimitiveObject primitiveObject) throws GenerateException
     {
         CPrimitive primitive = primitiveObject.getItem();
 
@@ -639,38 +630,91 @@ public class LocatableGenerator
         }
     }
 
-    protected Archetype chooseArchetype(ArchetypeSlot slot) throws IOException, GenerateException, NotFoundException
+    protected Archetype chooseArchetype(List<Archetype> parents, ArchetypeSlot slot)
+            throws IOException, GenerateException, NotFoundException
     {
         String rmType = slot.getRmTypeName();
         String nodeId = slot.getNodeId();
 
         Set<Assertion> includes = slot.getIncludes();
-        Set<Assertion> excludes = slot.getIncludes();
+        Set<Assertion> excludes = slot.getExcludes();
 
         Iterable<ArchetypeID> archetypes = m_archetypeStore.list();
         Set<ArchetypeID> possibilities = new HashSet<>();
         OUTER:
         for (ArchetypeID archetypeID : archetypes)
         {
-            String optionRmType = archetypeID.rmEntity();
-            if (!optionRmType.equalsIgnoreCase(rmType))
+            for (Archetype parent : parents)
             {
-                continue;
-            }
-
-            for (Assertion include : includes)
-            {
-                if (!m_assertionSupport.testArchetypeAssertion(archetypeID, include))
-                {
+                if (archetypeID.equals(parent.getArchetypeId())) {
+                    // prevent infinite recursion a la openEHR-EHR-CLUSTER.palpation.v1
+                    // and even silly one like
+                    //  openEHR-EHR-CLUSTER.symptom.v1.adl > 
+                    //    openEHR-EHR-CLUSTER.symptom-pain.v1.adl > 
+                    //      openEHR-EHR-CLUSTER.symptom.v1.adl >
+                    //        ...
                     continue OUTER;
                 }
             }
-
-            for (Assertion exclude : excludes)
+            
+            String optionRmType = archetypeID.rmEntity();
+            if (!optionRmType.equalsIgnoreCase(rmType))
             {
-                if (m_assertionSupport.testArchetypeAssertion(archetypeID, exclude))
+                Class<?> optionType;
+                try
                 {
-                    continue OUTER;
+                    optionType = retrieveRMType(optionRmType);
+                }
+                catch (RMObjectBuildingException e)
+                {
+                    log.warn(String.format("Archetype %s specifies unrecognized RM entity %s", archetypeID, 
+                            optionRmType));
+                    continue;
+                }
+
+                Class<?> expectedType;
+                try
+                {
+                    expectedType = retrieveRMType(rmType);
+                }
+                catch (RMObjectBuildingException e)
+                {
+                    log.warn(String.format("Archetype %s specifies unrecognized RM entity %s", archetypeID, 
+                            rmType));
+                    continue;
+                }
+                
+                if (!expectedType.isAssignableFrom(optionType))
+                {
+                    continue;
+                }
+            }
+
+            if (includes != null)
+            {
+                boolean included = false;
+                for (Assertion include : includes)
+                {
+                    if (m_assertionSupport.testArchetypeAssertion(archetypeID, include))
+                    {
+                        included = true;
+                        break; // any include is ok
+                    }
+                }
+                if (!included)
+                {
+                    continue;
+                }
+            }
+            
+            if (excludes != null)
+            {
+                for (Assertion exclude : excludes)
+                {
+                    if (m_assertionSupport.testArchetypeAssertion(archetypeID, exclude))
+                    {
+                        continue OUTER; // any exclude is not ok
+                    }
                 }
             }
             possibilities.add(archetypeID);
@@ -702,22 +746,4 @@ public class LocatableGenerator
         return links;
     }
 
-    protected String name(ArchetypeConstraint constraint)
-    {
-        if (constraint == null)
-        {
-            return null;
-        }
-        if (constraint instanceof CObject)
-        {
-            CObject object = (CObject) constraint;
-            return object.getRmTypeName();
-        }
-        else if (constraint instanceof CAttribute)
-        {
-            CAttribute attribute = (CAttribute) constraint;
-            return attribute.getRmAttributeName();
-        }
-        return constraint.getClass().getSimpleName();
-    }
 }

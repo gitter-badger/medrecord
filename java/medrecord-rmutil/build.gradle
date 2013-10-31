@@ -1,14 +1,6 @@
 // some standard settings for Java applications (language level etc)
 apply plugin: 'medvision-java'
 
-// do not update the license on code which we do not own
-import nl.javadude.gradle.plugins.license.License
-
-tasks.withType(License).each { licenseTask ->
-    licenseTask.exclude 'com/medvision360/medrecord/spi/AuditEntry.java'
-    licenseTask.exclude 'com/medvision360/medrecord/spi/AuditInfo.java'
-}
-
 import org.gradle.plugins.ide.idea.model.*
 apply plugin: 'idea'
 
@@ -59,23 +51,14 @@ idea.module.iml {
 }
 
 
-description = 'MEDvision360 MEDrecord Service Provider Interface'
+description = 'MEDvision360 MEDrecord Reference Model Utilities'
 
 dependencies {
-    compile project(':medrecord-rmutil')
-    compile "commons-logging:commons-logging:${ext.version.commonsLogging}"
     compile "com.google.guava:guava:${ext.version.guava}"
-    compile "openehr:adl-parser:${ext.version.openEhr}"
-    compile "openehr:adl-serializer:${ext.version.openEhr}"
-    compile "openehr:dadl-binding:${ext.version.openEhr}"
-    compile "openehr:dadl-parser:${ext.version.openEhr}"
-    compile "openehr:measure-serv:${ext.version.openEhr}"
-    compile "openehr:mini-termserv:${ext.version.openEhr}"
+    compile "commons-logging:commons-logging:${ext.version.commonsLogging}"
+    compile "org.apache.commons:commons-lang3:${ext.version.commonsLang3}"
     compile "openehr:openehr-aom:${ext.version.openEhr}"
     compile "openehr:openehr-rm-core:${ext.version.openEhr}"
     compile "openehr:openehr-rm-domain:${ext.version.openEhr}"
     compile "openehr:rm-builder:${ext.version.openEhr}"
-    compile "openehr:rm-skeleton:${ext.version.openEhr}"
-    compile "openehr:xml-binding:${ext.version.openEhr}"
-    compile "openehr:xml-serializer:${ext.version.openEhr}"
 }

@@ -163,6 +163,15 @@ public class AssertionSupport
         }
         else if (op.equals(OperatorKind.OP_MATCHES))
         {
+            if (!rightRule.startsWith("^"))
+            {
+                rightRule = "^.*?" + rightRule;
+            }
+            if (!rightRule.endsWith("$"))
+            {
+                rightRule = rightRule + ".*?$";
+            }
+            
             if (testValue.matches(rightRule))
             {
                 match = true;

@@ -10,11 +10,7 @@
 package com.medvision360.medrecord.pv;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Iterator;
@@ -22,26 +18,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import com.medvision360.medrecord.rmutil.RMUtil;
 import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.spi.exceptions.SerializeException;
-import org.apache.commons.lang3.StringUtils;
 import org.openehr.rm.Attribute;
-import org.openehr.rm.FullConstructor;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.datatypes.quantity.ProportionKind;
 import org.openehr.rm.support.identification.ArchetypeID;
 
 @SuppressWarnings("rawtypes")
-public abstract class AbstractPVSerializer implements LocatableSerializer
+public abstract class AbstractPVSerializer extends RMUtil implements LocatableSerializer
 {
-    private static final String OPENEHR_RM_PACKAGE = "org.openehr.rm.";
-    private static final Pattern INDEX_PATH_PATTERN = Pattern.compile("^(.*?)\\[([0-9]+)\\]/$");
-
     @Override
     public boolean supports(Locatable test)
     {
@@ -54,23 +44,6 @@ public abstract class AbstractPVSerializer implements LocatableSerializer
         return true;
     }
 
-    public String toUnderscoreSeparated(String camelCase)
-    {
-        String[] array = StringUtils.splitByCharacterTypeCamelCase(camelCase);
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < array.length; i++)
-        {
-            String s = array[i];
-            buf.append(s.substring(0, 1).toLowerCase());
-            buf.append(s.substring(1));
-            if (i != array.length - 1)
-            {
-                buf.append("_");
-            }
-        }
-        return buf.toString();
-    }
-
     protected void walk(Object obj, SerializeVisitor visitor, String path)
             throws InvocationTargetException, IllegalAccessException, IOException, SerializeException
     {
@@ -78,7 +51,7 @@ public abstract class AbstractPVSerializer implements LocatableSerializer
         {
             return;
         }
-        SortedMap<String, Attribute> attributes = attributeMap(obj.getClass());
+        SortedMap<String, Attribute> attributes = getAttributes(obj.getClass());
         String name;
         String pathName;
         Object value;
@@ -91,7 +64,7 @@ public abstract class AbstractPVSerializer implements LocatableSerializer
         while (names.hasNext())
         {
             name = names.next();
-            pathName = toUnderscoreSeparated(name);
+            pathName = toRmEntityName(name);
 
             Attribute attribute = attributes.get(name);
             if (attribute.system()
@@ -229,86 +202,6 @@ public abstract class AbstractPVSerializer implements LocatableSerializer
         return path;
     }
 
-    protected Object get(Object target, String name) throws InvocationTargetException, IllegalAccessException
-    {
-        Method getter = getter(name, target.getClass());
-        if (getter == null)
-        {
-            return null;
-        }
-
-        Object value = getter.invoke(target);
-        return value;
-    }
-
-    protected Method getter(String attributeName, Class klass)
-    {
-        Method[] methods = klass.getMethods();
-        String name = "get" + attributeName.substring(0, 1).toUpperCase() +
-                attributeName.substring(1);
-
-        for (Method method : methods)
-        {
-            if (method.getName().equals(name))
-            {
-                Type[] paras = method.getParameterTypes();
-                if (paras.length == 0)
-                {
-                    return method;
-                }
-            }
-        }
-        return null;
-    }
-
-    protected SortedMap<String, Attribute> attributeMap(Class rmClass)
-    {
-        SortedMap<String, Attribute> map = new TreeMap<>();
-        Constructor constructor = fullConstructor(rmClass);
-
-        if (constructor == null)
-        {
-            throw new IllegalArgumentException("Unknown RM Class: " +
-                    rmClass.getClass().getCanonicalName());
-        }
-
-        Annotation[][] annotations = constructor.getParameterAnnotations();
-
-        for (int i = 0; i < annotations.length; i++)
-        {
-            if (annotations[i].length == 0)
-            {
-                throw new IllegalArgumentException(
-                        "missing annotation at position " + i);
-            }
-            Attribute attribute = (Attribute) annotations[i][0];
-            map.put(attribute.name(), attribute);
-        }
-        return map;
-    }
-
-    protected Constructor fullConstructor(Class klass)
-    {
-        if (klass == null)
-        {
-            return null;
-        }
-        Constructor[] array = klass.getConstructors();
-        for (Constructor constructor : array)
-        {
-            if (constructor.isAnnotationPresent(FullConstructor.class))
-            {
-                return constructor;
-            }
-        }
-        return null;
-    }
-
-    protected boolean isOpenEHRRMClass(Object obj)
-    {
-        return obj.getClass().getName().contains(OPENEHR_RM_PACKAGE);
-    }
-
     protected String collectionType(Collection coll)
     {
         String result = "COLLECTION";
@@ -323,11 +216,6 @@ public abstract class AbstractPVSerializer implements LocatableSerializer
         }
 
         return result;
-    }
-
-    protected String indexPath(String fullPath, Object index)
-    {
-        return fullPath + "[" + index + "]/";
     }
 }
 /*

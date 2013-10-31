@@ -23,27 +23,20 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.medvision360.medrecord.rmutil.ExactPathComparator;
+import com.medvision360.medrecord.rmutil.Node;
+import com.medvision360.medrecord.rmutil.RMUtil;
 import com.medvision360.medrecord.spi.LocatableParser;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
 import org.openehr.rm.common.archetyped.Locatable;
-import org.openehr.rm.support.identification.ArchetypeID;
 
 @SuppressWarnings("rawtypes")
-public abstract class AbstractPVParser implements LocatableParser
+public abstract class AbstractPVParser extends RMUtil implements LocatableParser
 {
-    private static final String ROOT_ARCHETYPE = "^\\[([a-zA-Z][a-zA-Z0-9\\._-]+)\\]/(.*)$";
-    static final Pattern ROOT_ARCHETYPE_PATTERN = Pattern.compile(ROOT_ARCHETYPE);
-
-    private static final String PATH_PART_FIRST = "(.+?)";
-    private static final String PATH_PART_ARCHETYPE_NODE_ID = "(?:\\[([a-zA-Z][a-zA-Z0-9\\._-]+)\\])?";
-    private static final String PATH_PART_INDEX_ID = "(?:\\[([0-9]+)\\])??";
-    static final Pattern PATH_PART_PATTERN = Pattern.compile(
-            "^" + PATH_PART_FIRST + PATH_PART_ARCHETYPE_NODE_ID + PATH_PART_INDEX_ID + "$");
     protected String m_encoding;
 
     public AbstractPVParser(String encoding)
@@ -64,7 +57,7 @@ public abstract class AbstractPVParser implements LocatableParser
         JsonNode rootNode = mapper.readValue(is, JsonNode.class);
 
         Iterator<Map.Entry<String, JsonNode>> fields = rootNode.fields();
-        SortedMap<String, String> pv = new TreeMap<>(new PathComparator());
+        SortedMap<String, String> pv = new TreeMap<>(new ExactPathComparator());
         while (fields.hasNext())
         {
             Map.Entry<String, JsonNode> field = fields.next();

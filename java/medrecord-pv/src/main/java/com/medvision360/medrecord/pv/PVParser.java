@@ -13,7 +13,6 @@ package com.medvision360.medrecord.pv;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -24,13 +23,13 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.medvision360.medrecord.rmutil.Node;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
 import org.openehr.build.RMObjectBuilder;
 import org.openehr.build.RMObjectBuildingException;
 import org.openehr.build.SystemValue;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
-import org.openehr.rm.common.archetyped.Pathable;
 import org.openehr.rm.common.generic.PartyIdentified;
 import org.openehr.rm.common.generic.PartySelf;
 import org.openehr.rm.datatypes.quantity.datetime.DvDateTimeParser;
@@ -74,7 +73,9 @@ public class PVParser extends AbstractPVParser
        quite a bit of reflection.)
     
     For further inspiration, the openehr rm-skeleton module provides a good entry point for understanding how the 
-    conversion magic is set up within OpenEHR land itself. 
+    conversion magic is set up within OpenEHR land itself.
+    
+    todo support using archetypes to fill in fallbacks/defaults
     */
 
     private RMObjectBuilder m_builder;
@@ -275,7 +276,7 @@ public class PVParser extends AbstractPVParser
         // node.level == root|archetypeNodeId
         //   node.children.level == attribute
         String rmEntity = node.getRmEntity();
-        Map<String, Class> attributes;
+        Map<String, Class<?>> attributes;
         try
         {
             attributes = m_builder.retrieveAttribute(rmEntity);
@@ -301,8 +302,7 @@ public class PVParser extends AbstractPVParser
         {
             //   child.level == attribute
             String attributeName = child.getAttributeName();
-            attributeName = toCamelCase(attributeName);
-            attributeName = attributeName.substring(0, 1).toLowerCase() + attributeName.substring(1);
+            attributeName = toFieldName(attributeName);
 
             if (attributes.containsKey(attributeName))
             {
@@ -472,7 +472,8 @@ public class PVParser extends AbstractPVParser
         return null;
     }
     
-    private void guessDefaults(String rmEntity, Map<String, Object> valueMap, Map<String, Class> attributes)
+    @SuppressWarnings("ConstantConditions")
+    private void guessDefaults(String rmEntity, Map<String, Object> valueMap, Map<String, Class<?>> attributes)
     {
         // todo I don't know why a lot of these don't simply count as SystemValue in the RM....
         
@@ -557,38 +558,6 @@ public class PVParser extends AbstractPVParser
                 valueMap.put("subject", self);
             }
         }
-    }
-
-    
-
-
-    private void setParent(Object child, Object parent)
-            throws IllegalAccessException, InvocationTargetException
-    {
-        if (child instanceof Pathable && parent instanceof Pathable)
-        {
-            try
-            {
-                Method setParent = child.getClass().getMethod("setParent", Pathable.class);
-                setParent.invoke(child, (Pathable) parent);
-            }
-            catch (NoSuchMethodException e)
-            {
-            }
-        }
-    }
-
-    private String toCamelCase(String underScoreSeparated)
-    {
-        String[] array = underScoreSeparated.split("_");
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < array.length; i++)
-        {
-            String s = array[i];
-            buf.append(s.substring(0, 1).toUpperCase());
-            buf.append(s.substring(1));
-        }
-        return buf.toString();
     }
 }
 /*

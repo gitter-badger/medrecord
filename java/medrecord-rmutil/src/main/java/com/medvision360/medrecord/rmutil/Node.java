@@ -1,13 +1,16 @@
-package com.medvision360.medrecord.pv;
+package com.medvision360.medrecord.rmutil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import org.openehr.rm.support.identification.ArchetypeID;
 
+/**
+ * Represents a node in a tree constructed from paths and values.
+ */
 public class Node
 {
+    private RMUtil m_rmUtil;
     private String m_rmEntity;
     private String m_collectionType;
     private String m_archetypeNodeId;
@@ -20,8 +23,14 @@ public class Node
     private String m_path;
     private String m_level = "root";
 
+    public Node(RMUtil rmUtil)
+    {
+        m_rmUtil = rmUtil;
+    }
+
     public Node()
     {
+        this(new RMUtil());
     }
 
     public void setRmEntity(String rmEntity)
@@ -281,123 +290,10 @@ public class Node
         }
         return null;
     }
-    
-    @SuppressWarnings("ConstantConditions")
-    public boolean pathMatches(String path) // todo duplicates (partially) PathComparator
+
+    public boolean pathMatches(String path)
     {
-        if (m_path == null)
-        {
-            return path == null;
-        }
-        if (m_path.equals(path))
-        {
-            return true;
-        }
-        
-        Matcher matcher;
-        
-        // turn [root-archetype-id]/foo/bar into /foo/bar
-        String[] paths = m_path.split("/");
-        String rootArchetypeId = null;
-        matcher = AbstractPVParser.ROOT_ARCHETYPE_PATTERN.matcher(paths[0]);
-        if (matcher.matches())
-        {
-            rootArchetypeId = matcher.group(1);
-            String[] paths2 = new String[paths.length-1];
-            System.arraycopy(paths, 1, paths2, 0, paths2.length);
-            paths = paths2;
-        }
-        String[] otherPaths = path.split("/");
-        String otherRootArchetypeId = null;
-        matcher = AbstractPVParser.ROOT_ARCHETYPE_PATTERN.matcher(otherPaths[0]);
-        if (matcher.matches())
-        {
-            otherRootArchetypeId = matcher.group(1);
-            String[] paths2 = new String[otherPaths.length-1];
-            System.arraycopy(otherPaths, 1, paths2, 0, paths2.length);
-            otherPaths = paths2;
-        }
-        
-        // [root-archetype-id]/foo does not match [other-root-archetype-id/bar
-        // [root-archetype-id]/foo does match /foo
-        if (rootArchetypeId != null && otherRootArchetypeId != null && !rootArchetypeId.equals(otherRootArchetypeId))
-        {
-            return false;
-        }
-        
-        // foo/bar/blah does not match /foo/bar/blah/blahblah
-        if (paths.length != otherPaths.length)
-        {
-            return false;
-        }
-
-        for (int i = 0; i < paths.length; i++)
-        {
-            String pathPart = paths[i];
-            String otherPathPart = otherPaths[i];
-            
-            Matcher pathPartMatcher;
-            
-            pathPartMatcher = AbstractPVParser.PATH_PART_PATTERN.matcher(pathPart);
-            String attributeName = pathPart;
-            String archetypeNodeIdString = null;
-            int index = -1;
-            if (pathPartMatcher.matches())
-            {
-                attributeName = pathPartMatcher.group(1);
-                archetypeNodeIdString = pathPartMatcher.group(2);
-                String indexString = pathPartMatcher.group(3);
-                if (indexString != null)
-                {
-                    index = Integer.parseInt(indexString);
-                }
-            }
-
-            pathPartMatcher = AbstractPVParser.PATH_PART_PATTERN.matcher(otherPathPart);
-            String otherAttributeName = otherPathPart;
-            String otherArchetypeNodeIdString = null;
-            int otherIndex = -1;
-            if (pathPartMatcher.matches())
-            {
-                otherAttributeName = pathPartMatcher.group(1);
-                otherArchetypeNodeIdString = pathPartMatcher.group(2);
-                String indexString = pathPartMatcher.group(3);
-                if (indexString != null)
-                {
-                    otherIndex = Integer.parseInt(indexString);
-                }
-            }
-            
-            // foo/bar does not match /foo/blah
-            if (!attributeName.equals(otherAttributeName))
-            {
-                return false;
-            }
-            
-            // /foo/bar[at0001] does not match /foo/bar/[at0002]
-            if (archetypeNodeIdString == null)
-            {
-                if (otherArchetypeNodeIdString != null)
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (!archetypeNodeIdString.equals(otherArchetypeNodeIdString))
-                {
-                    return false;
-                }
-            }
-            
-            // foo/bar[1]/blah matches foo/bar/blah
-            if ((index != -1 || otherIndex != -1) && index != otherIndex)
-            {
-                return false;
-            }
-        }
-        
-        return true;
+        return m_rmUtil.fuzzyPathEquals(m_path, path);
     }
 
     public String toString()

@@ -1,26 +1,23 @@
 package com.medvision360.medrecord.itest;
 
-import java.nio.DoubleBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.measure.unit.Unit;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.medvision360.medrecord.rmutil.RMUtil;
 import org.openehr.am.archetype.constraintmodel.CComplexObject;
 import org.openehr.rm.datatypes.encapsulated.DvParsable;
-import org.openehr.rm.datatypes.quantity.DvQuantity;
 import org.openehr.rm.datatypes.quantity.ProportionKind;
 import org.openehr.rm.datatypes.text.CodePhrase;
-import org.openehr.rm.datatypes.text.DvCodedText;
 import org.openehr.rm.datatypes.text.DvText;
 import org.openehr.rm.datatypes.uri.DvURI;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.LocatableRef;
+import org.openehr.rm.support.identification.ObjectRef;
 import org.openehr.rm.support.identification.ObjectVersionID;
 
 /**
@@ -29,36 +26,13 @@ import org.openehr.rm.support.identification.ObjectVersionID;
  * expressed in java, and this adapter helps smooth over those.
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class RMAdapter
+public class RMAdapter extends RMUtil
 {
-    private final static Log log = LogFactory.getLog(RMAdapter.class);
-
     private ValueGenerator m_valueGenerator;
 
     public RMAdapter(ValueGenerator valueGenerator)
     {
         m_valueGenerator = valueGenerator;
-    }
-
-    public String toUnderscoreSeparated(String camelCase)
-    {
-        if (camelCase.indexOf("_") != -1)
-        {
-            return camelCase.toUpperCase();
-        }
-
-        String[] array = StringUtils.splitByCharacterTypeCamelCase(camelCase);
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < array.length; i++)
-        {
-            String s = array[i];
-            buf.append(s.toUpperCase());
-            if (i != array.length - 1)
-            {
-                buf.append("_");
-            }
-        }
-        return buf.toString();
     }
 
     public String findConcreteClassName(ArchetypeID archetypeID)
@@ -68,7 +42,7 @@ public class RMAdapter
 
     public String findConcreteClassName(String rmType)
     {
-        rmType = toUnderscoreSeparated(rmType);
+        rmType = toRmEntityName(rmType);
 
         switch (rmType)
         {
@@ -224,7 +198,6 @@ public class RMAdapter
             case "GROUP":
             case "ORGANISATION":
             case "PERSON":
-            case "ROLE":
                 switch (attributeName)
                 {
                     case "identities":
@@ -232,6 +205,17 @@ public class RMAdapter
                     case "relationships":
                     case "reverseRelationships":
                     case "roles":
+                        return true;
+                }
+                break;
+            case "ROLE":
+                switch (attributeName)
+                {
+                    case "identities":
+                    case "contacts":
+                    case "relationships":
+                    case "reverseRelationships":
+                    case "capabilities":
                         return true;
                 }
                 break;
@@ -322,12 +306,19 @@ public class RMAdapter
             case "GROUP":
             case "ORGANISATION":
             case "PERSON":
+                listToSet(valueMap, "identities");
+                listToSet(valueMap, "contacts");
+                listToSet(valueMap, "relationships");
+                listToSet(valueMap, "reverseRelationships");
+                listToSet(valueMap, "roles");
+                break;
             case "ROLE":
                 listToSet(valueMap, "identities");
                 listToSet(valueMap, "contacts");
                 listToSet(valueMap, "relationships");
                 listToSet(valueMap, "reverseRelationships");
                 listToSet(valueMap, "roles");
+                setToList(valueMap, "capabilities");
                 break;
             case "CONTACT":
                 setToList(valueMap, "addresses");
@@ -338,7 +329,7 @@ public class RMAdapter
     @SuppressWarnings("ConstantConditions")
     public void tweakValueMap(Map<String, Object> valueMap, CComplexObject definition)
     {
-        String rmTypeName = toUnderscoreSeparated(definition.getRmTypeName());
+        String rmTypeName = toRmEntityName(definition.getRmTypeName());
         //log.debug(String.format("Extending map for type %s", rmTypeName));
 
         boolean hasValue = hasValue(valueMap);
@@ -459,6 +450,7 @@ public class RMAdapter
             case "DV_INTERVAL<DV_REAL>":
             case "DV_INTERVAL<DV_INTEGER>":
             case "DV_INTERVAL<DV_DATE_TIME>":
+            case "DV_INTERVAL<DV_COUNT>":
                 if (valueMap.containsKey("upper") && valueMap.containsKey("lower"))
                 {
                     Object upper = valueMap.get("upper");
@@ -720,7 +712,7 @@ public class RMAdapter
             case "EHR_STATUS":
                 if (!valueMap.containsKey("uid"))
                 {
-                    // todo weirdly, UID is required for PARTY_RELATIONSHIP
+                    // todo weirdly, UID is required for EHR_STATUS
                     valueMap.put("uid", m_valueGenerator.generateUID());
                 }
                 if (!valueMap.containsKey("subject"))
@@ -729,12 +721,10 @@ public class RMAdapter
                 }
                 if (!valueMap.containsKey("isModifiable"))
                 {
-                    // todo weirdly, UID is required for PARTY_RELATIONSHIP
                     valueMap.put("isModifiable", Boolean.parseBoolean(m_valueGenerator.generateBoolean(null)));
                 }
                 if (!valueMap.containsKey("isQueryable"))
                 {
-                    // todo weirdly, UID is required for PARTY_RELATIONSHIP
                     valueMap.put("isQueryable", Boolean.parseBoolean(m_valueGenerator.generateBoolean(null)));
                 }
                 break;
@@ -757,6 +747,14 @@ public class RMAdapter
                     // todo weirdly, UID is required for PARTY_RELATIONSHIP
                     valueMap.put("uid", m_valueGenerator.generateUID());
                 }
+                if (!valueMap.containsKey("source"))
+                {
+                    valueMap.put("source", m_valueGenerator.generatePartyRef());
+                }
+                if (!valueMap.containsKey("target"))
+                {
+                    valueMap.put("target", m_valueGenerator.generatePartyRef());
+                }
                 break;
             case "PARTY_RELATED":
                 Object name = valueMap.get("name");
@@ -776,21 +774,73 @@ public class RMAdapter
                             m_valueGenerator.chooseSubjectRelationship()));
                 }
                 break;
+            case "AGENT":
+            case "GROUP":
+            case "ORGANISATION":
             case "PERSON":
                 if (!valueMap.containsKey("uid"))
                 {
                     // todo weirdly, UID is required for PERSON
                     valueMap.put("uid", m_valueGenerator.generateUID());
                 }
+                if (valueMap.containsKey("relationships"))
+                {
+                    // todo, for now simply avoid invalid relationships
+                    valueMap.put("relationships", null);
+                }
+                if (valueMap.containsKey("relationships"))
+                {
+                    // todo, for now simply avoid invalid relationships
+                    valueMap.put("reverseRelationships", null);
+                }
                 // todo generating a set of valid identities seems to be difficult, not sure why
                 valueMap.put("identities", m_valueGenerator.generateIdentities());
                 break;
-
+            case "ROLE":
+                if (!valueMap.containsKey("uid"))
+                {
+                    // todo weirdly, UID is required for ROLE
+                    valueMap.put("uid", m_valueGenerator.generateUID());
+                }
+                if (!valueMap.containsKey("performer"))
+                {
+                    valueMap.put("performer", m_valueGenerator.generatePartyRef());
+                }
+                if (valueMap.containsKey("relationships"))
+                {
+                    // todo, for now simply avoid invalid relationships
+                    valueMap.put("relationships", null);
+                }
+                if (valueMap.containsKey("relationships"))
+                {
+                    // todo, for now simply avoid invalid relationships
+                    valueMap.put("reverseRelationships", null);
+                }
+                break;
+            
             // structure
             case "HISTORY":
                 if (!valueMap.containsKey("origin"))
                 {
                     valueMap.put("origin", m_valueGenerator.generateDateTime(null));
+                }
+                break;
+            case "SECTION":
+            case "CLUSTER":
+                if (valueMap.containsKey("items"))
+                {
+                    Object items = valueMap.get("items");
+                    if (items != null)
+                    {
+                        if (items instanceof Collection)
+                        {
+                            Collection collection = (Collection) items;
+                            if (collection.isEmpty())
+                            {
+                                valueMap.put("items", null);
+                            }
+                        }
+                    }
                 }
                 break;
 

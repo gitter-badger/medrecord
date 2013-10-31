@@ -1,18 +1,19 @@
-package com.medvision360.medrecord.pv;
+package com.medvision360.medrecord.rmutil;
 
 import java.util.Comparator;
 
 /**
  * Logical sorting of archetype(ish) paths.
- * <p/>
  * Sort more specific node identifiers first (i.e.  /foo[at0001][1] < /foo).
- * <p/>
  * Sort longer paths (i.e. /foo/bar/blah < /foo/bar) first.
- * <p/>
  * Finally, sort by string comparison.
+ * <p/>
+ * To consider no archetype ids / no indices as equal to any archetype id / any index, you can use
+ * {@link RMUtil#fuzzyPathEquals(String, String)}.
  */
-public class PathComparator implements Comparator<String> // todo move into utility package
+public class ExactPathComparator implements Comparator<String>
 {
+
     @Override
     public int compare(String path1, String path2)
     {

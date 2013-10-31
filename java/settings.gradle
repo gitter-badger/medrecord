@@ -7,6 +7,7 @@ include(
         'medrecord-memstore',
         'medrecord-pv',
         'medrecord-riio',
+        'medrecord-rmutil',
         'medrecord-spi',
         'medrecord-spi-tck',
         'medrecord-tools-dumpadl'
