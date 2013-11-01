@@ -436,9 +436,10 @@ public class IntegrationTest extends RMTestBase
 
         if (!report.isValid())
         {
+            System.out.println("=================");
             System.out.println("VALIDATION REPORT");
             System.out.println("=================");
-            System.out.println("valid: " + report.isValid());
+            System.out.println("violations: " + Iterables.size(report.getErrors()));
             System.out.println();
         }
         Iterable<ValidationResult> results = report.getReport();
@@ -446,10 +447,10 @@ public class IntegrationTest extends RMTestBase
         {
             if (!report.isValid())
             {
-                System.out.print(result.isValid() ? "VALID:   " : "INVALID: ");
-                System.out.println(result.getPath());
-                System.out.print("         ");
-                System.out.println(result.getMessage());
+                if (!result.isValid())
+                {
+                    System.out.println(result.getMessage());
+                }
             }
             if (result.isValid())
             {
@@ -462,7 +463,7 @@ public class IntegrationTest extends RMTestBase
         }
         if (!report.isValid())
         {
-            System.out.println("=================");
+            System.out.println();
             invalid++;
         }
         else

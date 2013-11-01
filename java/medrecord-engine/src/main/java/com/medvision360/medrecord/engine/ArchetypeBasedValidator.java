@@ -2,7 +2,9 @@ package com.medvision360.medrecord.engine;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,7 @@ import org.openehr.build.RMObjectBuildingException;
 import org.openehr.build.SystemValue;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
+import org.openehr.rm.support.basic.Interval;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.ObjectID;
 import org.openehr.rm.support.identification.UIDBasedID;
@@ -190,7 +193,7 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
     private void validateChildren(BaseValidationReport validationReport, Archetype archetype, Locatable parent, 
             CAttribute attribute, Object value)
     {
-        // value != null
+        // value != null, attribute.isAllowed
 
         String path = attribute.path();
         List<CObject> children = attribute.getChildren();
@@ -200,23 +203,13 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
         }
         if (attribute instanceof CSingleAttribute)
         {
-            CSingleAttribute singleAttribute = (CSingleAttribute) attribute;
-            List<CObject> alternatives = singleAttribute.alternatives();
-
-            CObject alternative = validateNodeId(validationReport, archetype, parent, attribute, value, alternatives);
-            if (alternative != null)
-            {
-                boolean validRmEntity = validateRmEntity(validationReport, parent, archetype, attribute, value, 
-                        alternative);
-                if (validRmEntity)
-                {
-                    validateObject(validationReport, archetype, alternative, value);
-                }
-            }
+            // todo deal with forceMultiple
+            handleSingleAttribute(validationReport, archetype, parent, attribute, value);
         }
         else if (attribute instanceof CMultipleAttribute)
         {
-            // todo validate children
+            CMultipleAttribute multipleAttribute = (CMultipleAttribute) attribute;
+            handleMultipleAttribute(validationReport, archetype, parent, multipleAttribute, value);
         }
         else
         {
@@ -225,6 +218,253 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
             result.setValid(false);
             return;
         }
+    }
+
+    private void handleSingleAttribute(BaseValidationReport validationReport, Archetype archetype, Locatable parent,
+            CAttribute attribute, Object value)
+    {
+        CSingleAttribute singleAttribute = (CSingleAttribute) attribute;
+        List<CObject> alternatives = singleAttribute.alternatives();
+
+        CObject alternative = validateNodeId(validationReport, archetype, parent, attribute, value, alternatives);
+        if (alternative != null)
+        {
+            boolean validRmEntity = validateRmEntity(validationReport, parent, archetype, attribute, value, 
+                    alternative);
+            if (validRmEntity)
+            {
+                validateObject(validationReport, archetype, alternative, value);
+            }
+        }
+    }
+
+    private void handleMultipleAttribute(BaseValidationReport validationReport, Archetype archetype, Locatable parent,
+            CMultipleAttribute attribute, Object value)
+    {
+        if (value instanceof Collection<?>)
+        {
+            List<Object> matchedChildren = new ArrayList<>();
+            Map<Object, CObject> validChildren = new HashMap<>();
+
+            // check all constraints, putting all children visited into matchedChildren and all
+            // children that look valid into validChildren
+            validCollectionAgainstConstraints(validationReport, archetype, parent, attribute,
+                    (Collection<?>) value, matchedChildren, validChildren);
+
+            // check all children, reporting any unvisited children and recursing into all valid
+            // children to check them further
+            validateChildCollection(validationReport, archetype, parent, attribute, (Collection<?>) value,
+                    matchedChildren, validChildren);
+        }
+        else
+        {
+            // todo
+        }
+    }
+
+    private void validCollectionAgainstConstraints(BaseValidationReport validationReport, Archetype archetype,
+            Locatable parent, CMultipleAttribute attribute, Collection<?> collection, List<Object> matchedChildren,
+            Map<Object, CObject> validChildren)
+    {
+        List<CObject> members = attribute.members();
+        for (CObject constraint : members)
+        {
+            validateCollectionAgainstConstraint(validationReport, archetype, parent, collection, matchedChildren,
+                    validChildren,
+                    constraint);
+        }
+    }
+
+    private void validateCollectionAgainstConstraint(BaseValidationReport validationReport, Archetype archetype,
+            Locatable parent, Collection<?> collection, List<Object> matchedChildren,
+            Map<Object, CObject> validChildren, CObject constraint)
+    {
+        int occurred = 0;
+
+        String nodeId = constraint.getNodeId();
+        for (Object child : collection)
+        {
+            // check this child, putting it into matchedChildren if it matches, and putting it into validChildren if 
+            // it looks ok, and reporting on any violations
+            boolean matched = validateChildAgainstConstraint(validationReport, archetype, parent, matchedChildren, 
+                validChildren, constraint, occurred, nodeId, child);
+            if (matched)
+            {
+                occurred++;
+            }
+        }
+        
+        if (occurred > 0)
+        {
+            if (constraint.isAllowed())
+            {
+                BaseValidationResult result = validationReport.newResult(constraint.path());
+                result.setMessage(report("child found", constraint, parent, archetype));
+            }
+            // else we reported the offending children already
+        }
+        else if (constraint.isRequired())
+        {
+            BaseValidationResult result = validationReport.newResult(constraint.path());
+            result.setValid(false);
+            result.setMessage(report("required child missing", constraint, parent, archetype));
+        }
+        else
+        {
+            if (constraint.isAllowed())
+            {
+                BaseValidationResult result = validationReport.newResult(constraint.path());
+                result.setMessage(report("no optional child", constraint, parent, archetype));
+            }
+            else
+            {
+                BaseValidationResult result = validationReport.newResult(constraint.path());
+                result.setMessage(report("no forbidden child", constraint, parent, archetype));
+            }
+        }
+    }
+
+    private boolean validateChildAgainstConstraint(BaseValidationReport validationReport, Archetype archetype,
+            Locatable parent, List<Object> matchedChildren, Map<Object, CObject> validChildren, CObject constraint,
+            int occurredAlready, String nodeId, Object child)
+    {
+        try
+        {
+            if (!matchNodeId(nodeId, child))
+            {
+                return false;
+            }
+        }
+        catch (InvocationTargetException | IllegalAccessException e)
+        {
+            return false;
+        }
+
+        // this constraint applies to this child
+        matchedChildren.add(child);
+
+        if (!constraint.isAllowed())
+        {
+            BaseValidationResult result = validationReport.newResult(constraint.path());
+            result.setValid(false);
+            result.setMessage(report("forbidden child found",
+                    constraint, parent, archetype));
+            return true;
+        }
+        else if (!instanceOf(child, constraint))
+        {
+            BaseValidationResult result = validationReport.newResult(constraint.path());
+            result.setValid(false);
+            result.setMessage(report("forbidden child type found",
+                    child.getClass(), constraint, parent, archetype));
+            return true;
+        }
+        else if (!constraint.getOccurrences().isUpperUnbounded())
+        {
+            Interval<Integer> occurrences = constraint.getOccurrences();
+            int limit = occurrences.getUpper(); // say, 1
+            if(occurrences.isUpperIncluded())
+            {
+                limit++;                        // say, 2
+            }
+            if (occurredAlready + 1 >= limit)   // say (1 >= 2) == false
+            {
+                BaseValidationResult result = validationReport.newResult(constraint.path());
+                result.setValid(false);
+                if (limit == 2)
+                {
+                    result.setMessage(report("only one child allowed",
+                            constraint, parent, archetype));
+                }
+                else
+                {
+                    result.setMessage(report("only", limit - 1, "children allowed",
+                            constraint, parent, archetype));
+                }
+                return true;
+            }
+        }
+        // else unbounded number of kids, or not at limit, good good
+        validChildren.put(child, constraint);
+        return true;
+    }
+
+    private void validateChildCollection(BaseValidationReport validationReport, Archetype archetype, Locatable parent,
+            CMultipleAttribute attribute, Collection<?> collection, List<Object> matchedChildren,
+            Map<Object, CObject> validChildren)
+    {
+        // recurse for checked children, report any unchecked children
+        for (Object child : collection)
+        {
+            if (validChildren.containsKey(child))
+            {
+                CObject constraint = validChildren.get(child);
+                validateObject(validationReport, archetype, constraint, child); // recurse!
+            }
+            else if (matchedChildren.contains(child))
+            {
+                // already reported as violating the constraint
+            }
+            else
+            {
+                // does not match any constraint, report it
+                BaseValidationResult result = validationReport.newResult(attribute.path());
+                
+                if (child instanceof Locatable)
+                {
+                    Locatable locatableChild = (Locatable) child;
+                    if (locatableChild.getArchetypeDetails() != null)
+                    {
+                        // todo handle slotted children
+                        result.setValid(true);
+                        result.setMessage(report("todo archetyped child",
+                                locatableChild, locatableChild.getArchetypeDetails(),
+                                "is a child", attribute, parent, archetype));
+                    }
+                    else
+                    {
+                        result.setValid(false);
+                        if (locatableChild.getUid() == null)
+                        {
+                            result.setMessage(report("illegal child", locatableChild.getClass(),
+                                    "is a child", attribute, parent, archetype));
+                        }
+                        else
+                        {
+                            result.setMessage(report("illegal child", locatableChild,
+                                    "is a child", attribute, parent, archetype));
+                        }
+                    }
+                }
+                else
+                {
+                    result.setValid(false);
+                    result.setMessage(report("illegal child", child.getClass(), attribute, parent, archetype));
+                }
+            }
+        }
+    }
+
+    private boolean matchNodeId(String nodeId, Object child) throws InvocationTargetException, IllegalAccessException
+    {
+        boolean match = false;
+        Object childNodeIdObj = get(child, "archetypeNodeId");
+        if (childNodeIdObj == null)
+        {
+            if (nodeId == null)
+            {
+                match = true;
+            }
+        }
+        else if (childNodeIdObj instanceof String)
+        {
+            String childNodeId = (String) childNodeIdObj;
+            if (childNodeId.equals(nodeId))
+            {
+                match = true;
+            }
+        }
+        return match;
     }
 
     private CObject validateNodeId(BaseValidationReport validationReport, Archetype archetype, Locatable parent,
@@ -272,18 +512,21 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
         }
         else if (allowedNodeIds.size() == 0)
         {
-            result.setMessage(report("unrestricted nodeId", locatableNodeId, attribute, parent, archetype));
+            if (locatableNodeId != null)
+            {
+                result.setMessage(report("unrestricted nodeId", locatableNodeId, attribute, parent, archetype));
+            }
         }
         else if (locatableNodeId == null)
         {
             result.setValid(false);
-            result.setMessage(report("nodeId is null but should be one of",
+            result.setMessage(report("nodeId is null but should be",
                     allowedNodeIds, attribute, parent, archetype));
         }
         else
         {
             result.setValid(false);
-            result.setMessage(report("nodeId is", locatableNodeId, "but should be one of",
+            result.setMessage(report("nodeId is", locatableNodeId, "but should be",
                     allowedNodeIds, attribute, parent, archetype));
         }
         return matchedAlternative;
@@ -568,9 +811,13 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
         return reportPhrase(locatable.getUid());
     }
 
-    private String reportPhrase(Collection<?> noun)
+    private String reportPhrase(Collection<?> options)
     {
-        return " [" + toString(noun) + "]";
+        if (options.size() == 1)
+        {
+            return " \"" + String.valueOf(options.iterator().next()) + "\"";
+        }
+        return " one of [" + toString(options) + "]";
     }
 
     private String toString(Collection<?> allowedNodeIds)
