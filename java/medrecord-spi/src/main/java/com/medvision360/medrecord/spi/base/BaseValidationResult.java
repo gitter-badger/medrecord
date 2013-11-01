@@ -71,42 +71,54 @@ public class BaseValidationResult implements ValidationResult
     @Override
     public boolean isValid()
     {
-        throw new UnsupportedOperationException("todo implement BasicValidationResult.isValid()");
+        return m_valid;
     }
 
     @Override
     public long getLineNumber()
     {
-        throw new UnsupportedOperationException("todo implement BasicValidationResult.getLineNumber()");
+        return m_lineNumber;
     }
 
     @Override
     public long getRowNumber()
     {
-        throw new UnsupportedOperationException("todo implement BasicValidationResult.getRowNumber()");
+        return m_rowNumber;
     }
 
     @Override
     public String getMessage()
     {
-        throw new UnsupportedOperationException("todo implement BasicValidationResult.getMessage()");
+        return m_message;
     }
 
     @Override
     public String getProblematicFragment()
     {
-        throw new UnsupportedOperationException("todo implement BasicValidationResult.getProblematicFragment()");
+        return m_fragment;
     }
 
     @Override
     public String getPath()
     {
-        throw new UnsupportedOperationException("todo implement BasicValidationResult.getPath()");
+        return m_path;
     }
 
     @Override
     public Exception getDetails()
     {
-        throw new UnsupportedOperationException("todo implement BasicValidationResult.getDetails()");
+        return m_details;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder str = new StringBuilder();
+        str.append("{ValidationResult:");
+        str.append(isValid() ? "valid" : "invalid");
+        str.append(",path=").append(m_path);
+        str.append(",message=").append(m_message);
+        str.append("}");
+        return str.toString();
     }
 }

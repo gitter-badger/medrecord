@@ -169,7 +169,7 @@ public class RMUtil extends RMObjectBuilder
 
     protected Object get(Object target, String name) throws InvocationTargetException, IllegalAccessException
     {
-        Method getter = getter(name, target.getClass());
+        Method getter = getter(toFieldName(name), target.getClass());
         if (getter == null)
         {
             return null;

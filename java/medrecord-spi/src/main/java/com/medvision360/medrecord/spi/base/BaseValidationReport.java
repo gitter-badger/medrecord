@@ -18,6 +18,7 @@ public class BaseValidationReport implements ValidationReport
     public void add(ValidationResult result)
     {
         checkNotNull(result, "result cannot be null");
+        m_list.add(result);
     }
     
     public BaseValidationResult newResult(String path)
@@ -57,5 +58,20 @@ public class BaseValidationReport implements ValidationReport
                 return !input.isValid();
             }
         });
+    }
+    
+    @Override
+    public String toString()
+    {
+        StringBuilder str = new StringBuilder();
+        str.append("{ValidationReport:");
+        str.append(isValid() ? "valid" : "invalid");
+        int total = m_list.size();
+        int inValid = Iterables.size(getErrors());
+        str.append(",total=").append(total);
+        str.append(",valid=").append(total-inValid);
+        str.append(",invalid=").append(inValid);
+        str.append("}");
+        return str.toString();
     }
 }

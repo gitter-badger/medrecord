@@ -19,6 +19,7 @@ import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
 import com.medvision360.medrecord.spi.exceptions.ValidationException;
 import org.apache.commons.lang.StringUtils;
 import org.openehr.am.archetype.Archetype;
+import org.openehr.am.archetype.constraintmodel.ArchetypeConstraint;
 import org.openehr.am.archetype.constraintmodel.ArchetypeInternalRef;
 import org.openehr.am.archetype.constraintmodel.ArchetypeSlot;
 import org.openehr.am.archetype.constraintmodel.CAttribute;
@@ -34,6 +35,7 @@ import org.openehr.build.SystemValue;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.support.identification.ArchetypeID;
+import org.openehr.rm.support.identification.ObjectID;
 import org.openehr.rm.support.identification.UIDBasedID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -49,10 +51,10 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
     }
 
     @Override
-    public void check(Locatable locatable) throws ValidationException, NotSupportedException
+    public void check(Locatable value) throws ValidationException, NotSupportedException
     {
-        checkNotNull(locatable, "locatable cannot be null");
-        ValidationReport validationReport = validate(locatable);
+        checkNotNull(value, "value cannot be null");
+        ValidationReport validationReport = validate(value);
         if (!validationReport.isValid())
         {
             throw new ValidationException(validationReport);
@@ -81,72 +83,74 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
     }
 
     @Override
-    public ValidationReport validate(Locatable locatable) throws NotSupportedException
+    public ValidationReport validate(Locatable value) throws NotSupportedException
     {
-        checkNotNull(locatable, "locatable cannot be null");
-        checkSupport(locatable);
+        checkNotNull(value, "value cannot be null");
+        Archetyped archetypeDetails = value.getArchetypeDetails();
+        if (archetypeDetails == null)
+        {
+            throw new NotSupportedException(String.format(
+                    "cannot validate locatable %s, it does not have an archetype", value.getUid()));
+        }
+        checkSupport(value);
 
         BaseValidationReport validationReport = new BaseValidationReport();
+        BaseValidationResult result = validationReport.newResult("/");
 
-        Archetyped archetypeDetails = locatable.getArchetypeDetails();
         ArchetypeID archetypeID = archetypeDetails.getArchetypeId();
-
         Archetype archetype;
         try
         {
             archetype = m_archetypeStore.get(archetypeID);
+            result.setMessage(report("recognized archetype", archetypeID.getValue()));
         }
         catch (NotFoundException | IOException e)
         {
-            BaseValidationResult result = validationReport.newResult("/");
-            result.setMessage(String.format("Cannot find archetype %s: %s", archetypeID.getValue(), e.getMessage()));
+            result.setMessage(report("cannot find archetype", archetypeID.getValue(), e));
             result.setValid(false);
             result.setDetails(e);
             return validationReport;
         }
+        
         CComplexObject complexObject = archetype.getDefinition();
-        validateComplexObject(validationReport, archetype, locatable, complexObject);
+        validateComplexObject(validationReport, archetype, value, complexObject);
 
         return validationReport;
     }
 
-    private void validateComplexObject(BaseValidationReport validationReport, Archetype archetype, Locatable locatable,
+    private void validateComplexObject(BaseValidationReport validationReport, Archetype archetype, Locatable value,
             CComplexObject complexObject)
     {
-        String rmEntity = complexObject.getRmTypeName();
-        String path = complexObject.path();
-        validateRmEntity(validationReport, locatable, rmEntity, path);
+        validateRmEntity(validationReport, value, complexObject);
 
         String nodeId = complexObject.getNodeId();
-        validateNodeId(validationReport, locatable, nodeId, path);
+        validateNodeId(validationReport, complexObject, value, nodeId);
 
         List<CAttribute> attributes = complexObject.getAttributes();
         for (CAttribute attribute : attributes)
         {
-            validateAttribute(validationReport, archetype, locatable, attribute);
+            validateAttribute(validationReport, archetype, value, attribute);
         }
     }
 
-    private void validateAttribute(BaseValidationReport validationReport, Archetype archetype, Locatable locatable,
+    private void validateAttribute(BaseValidationReport validationReport, Archetype archetype, Locatable value,
             CAttribute attribute)
     {
-        UIDBasedID uid = locatable.getUid();
-        String archetypeId = locatable.getArchetypeDetails().getArchetypeId().getValue();
+        UIDBasedID uid = value.getUid();
 
         String attributeName = attribute.getRmAttributeName();
         String path = attribute.path();
         CAttribute.Existence existence = attribute.getExistence();
 
-        Object value;
+        Object attributeValue;
         try
         {
-            value = get(locatable, attributeName);
+            attributeValue = get(value, attributeName);
         }
         catch (InvocationTargetException | IllegalAccessException e)
         {
             BaseValidationResult result = validationReport.newResult(path);
-            result.setMessage(String.format("Cannot retrieve value at path %s for %s of archetype %s: %s",
-                    path, uid, archetypeId, e.getMessage()));
+            result.setMessage(report("cannot retrieve value", attribute, uid, archetype, e));
             result.setValid(false);
             result.setDetails(e);
             return;
@@ -154,48 +158,39 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
         switch (existence)
         {
             case NOT_ALLOWED:
-                if (nullOrEmpty(value))
+                if (nullOrEmpty(attributeValue))
                 {
                     BaseValidationResult result = validationReport.newResult(path);
-                    result.setMessage(
-                            String.format("Value at path %s not allowed for %s of archetype %s, and was not set",
-                                    attribute.path(), uid, archetypeId));
+                    result.setMessage(report("value not allowed is was not set", attribute, uid, archetype));
                 }
                 return;
             case OPTIONAL:
-                if (nullOrEmpty(value))
+                if (nullOrEmpty(attributeValue))
                 {
                     BaseValidationResult result = validationReport.newResult(path);
-                    result.setMessage(
-                            String.format("Value at path %s optional for %s of archetype %s, and was not set",
-                                    attribute.path(), uid, archetypeId));
+                    result.setMessage(report("value optional and is not set", attribute, uid, archetype));
                     return;
                 }
                 break;
             case REQUIRED:
             default:
-                if (value == null)
+                if (attributeValue == null)
                 {
                     BaseValidationResult result = validationReport.newResult(path);
                     result.setValid(false);
-                    result.setMessage(
-                            String.format("Value at path %s required for %s of archetype %s, but was null",
-                                    attribute.path(), uid, archetypeId));
+                    result.setMessage(report("value required but is not set", attribute, uid, archetype));
                     return;
                 }
                 break;
         }
 
-        validateChildren(validationReport, archetype, locatable, attribute, value);
+        validateChildren(validationReport, archetype, value, attribute, attributeValue);
     }
 
-    private void validateChildren(BaseValidationReport validationReport, Archetype archetype, Locatable locatable, 
-            CAttribute attribute,
-            Object value)
+    private void validateChildren(BaseValidationReport validationReport, Archetype archetype, Locatable parent, 
+            CAttribute attribute, Object value)
     {
         // value != null
-        UIDBasedID uid = locatable.getUid();
-        String archetypeId = locatable.getArchetypeDetails().getArchetypeId().getValue();
 
         String path = attribute.path();
         List<CObject> children = attribute.getChildren();
@@ -208,10 +203,11 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
             CSingleAttribute singleAttribute = (CSingleAttribute) attribute;
             List<CObject> alternatives = singleAttribute.alternatives();
 
-            CObject alternative = validateNodeId(validationReport, uid, archetypeId, path, value, alternatives);
+            CObject alternative = validateNodeId(validationReport, archetype, parent, attribute, value, alternatives);
             if (alternative != null)
             {
-                boolean validRmEntity = validateRmEntity(validationReport, uid, archetypeId, path, value, alternative);
+                boolean validRmEntity = validateRmEntity(validationReport, parent, archetype, attribute, value, 
+                        alternative);
                 if (validRmEntity)
                 {
                     validateObject(validationReport, archetype, alternative, value);
@@ -225,16 +221,14 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
         else
         {
             BaseValidationResult result = validationReport.newResult(path);
-            result.setMessage(String.format("Cannot process attribute at path %s for archetype %s: unrecognized " +
-                    "attribute type %s",
-                    path, archetypeId, attribute.getClass().getSimpleName()));
+            result.setMessage(report("unrecognized attribute", attribute.getClass(), attribute, parent, archetype));
             result.setValid(false);
             return;
         }
     }
 
-    private CObject validateNodeId(BaseValidationReport validationReport, UIDBasedID uid, String archetypeId,
-            String path, Object value, List<CObject> alternatives)
+    private CObject validateNodeId(BaseValidationReport validationReport, Archetype archetype, Locatable parent,
+            CAttribute attribute, Object value, List<CObject> alternatives)
     {
         CObject matchedAlternative = null;
         Set<String> allowedNodeIds = new HashSet<>();
@@ -257,7 +251,10 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
             }
             
             String nodeId = alternative.getNodeId();
-            allowedNodeIds.add(nodeId);
+            if (nodeId != null && !"".equals(nodeId))
+            {
+                allowedNodeIds.add(nodeId);
+            }
             if (locatableNodeId == null)
             {
                 continue;
@@ -268,105 +265,97 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
             }
         }
 
-        BaseValidationResult result = validationReport.newResult(path);
+        BaseValidationResult result = validationReport.newResult(attribute.path());
         if (matchedAlternative != null)
         {
-            result.setMessage(
-                    String.format(
-                            "Value at path %s has nodeId %s which is allowed for %s of archetype %s",
-                            path, locatableNodeId, uid, archetypeId));
+            result.setMessage(report("allowed nodeId", locatableNodeId, parent, archetype));
+        }
+        else if (allowedNodeIds.size() == 0)
+        {
+            result.setMessage(report("unrestricted nodeId", locatableNodeId, attribute, parent, archetype));
+        }
+        else if (locatableNodeId == null)
+        {
+            result.setValid(false);
+            result.setMessage(report("nodeId is null but should be one of",
+                    allowedNodeIds, attribute, parent, archetype));
         }
         else
         {
             result.setValid(false);
-            result.setMessage(
-                    String.format(
-                            "Value at path %s has nodeId %s but should be one of %s for %s of archetype %s",
-                            path, locatableNodeId, StringUtils.join(allowedNodeIds.toArray()), uid, archetypeId));
+            result.setMessage(report("nodeId is", locatableNodeId, "but should be one of",
+                    allowedNodeIds, attribute, parent, archetype));
         }
         return matchedAlternative;
     }
 
-    private void validateNodeId(BaseValidationReport validationReport, Locatable locatable, String nodeId, String path)
+    private void validateNodeId(BaseValidationReport validationReport, ArchetypeConstraint constraint, Locatable value,
+            String nodeId)
     {
         if (nodeId == null)
         {
             return;
         }
-        BaseValidationResult result = validationReport.newResult(path);
-        UIDBasedID uid = locatable.getUid();
-        String archetypeId = locatable.getArchetypeDetails().getArchetypeId().getValue();
+        BaseValidationResult result = validationReport.newResult(constraint.path());
 
-        String locatableNodeId = locatable.getArchetypeNodeId();
+        String locatableNodeId = value.getArchetypeNodeId();
         if (nodeId.equals(locatableNodeId))
         {
-            result.setMessage(String.format("at path %s nodeId is %s which is allowed for %s of archetype %s",
-                    path, nodeId, uid, archetypeId));
+            result.setMessage(report("allowed nodeId",
+                    locatableNodeId, constraint, value, value.getArchetypeDetails()));
         }
         else
         {
             result.setValid(false);
-            result.setMessage(String.format("at path %s nodeId is %s but should be %s for %s of archetype %s",
-                    path, locatableNodeId, nodeId, uid, archetypeId));
+            result.setMessage(report("nodeId is", locatableNodeId, "but should be",
+                    nodeId, constraint, value, value.getArchetypeDetails()));
         }
     }
 
-    private boolean validateRmEntity(BaseValidationReport validationReport, UIDBasedID uid, String archetypeId,
-            String path, Object value, CObject alternative)
+    private boolean validateRmEntity(BaseValidationReport validationReport, Locatable parent, Archetype archetype,
+            CAttribute attribute, Object value, CObject type)
     {
-        BaseValidationResult result = validationReport.newResult(path);
-        String rmEntity = alternative.getRmTypeName();
-        if (instanceOf(value, rmEntity))
+        BaseValidationResult result = validationReport.newResult(attribute.path());
+        String rmEntity = type.getRmTypeName();
+        if (instanceOf(value, type))
         {
-            result.setMessage(String.format(
-                    "value at path %s with nodeId %s has type %s which is allowed for %s of archetype %s",
-                    path, alternative.getNodeId(), value.getClass().getSimpleName(), uid, archetypeId));
+            result.setMessage(report("allowed", value.getClass(), attribute, parent, archetype)); 
             return true;
         }
         else
         {
             result.setValid(false);
-            result.setMessage(String.format(
-                    "value at path %s with nodeId %s has type %s but should be %s for %s of archetype %s",
-                    path, alternative.getNodeId(), value.getClass().getSimpleName(), rmEntity, uid, 
-                    archetypeId));
+            result.setMessage(report("", value.getClass(), "should be",
+                    rmEntity, attribute, parent, archetype)); 
             return false;
         }
     }
 
-    private void validateRmEntity(BaseValidationReport validationReport, Locatable value, String rmEntity,
-            String path)
+    private void validateRmEntity(BaseValidationReport validationReport, Locatable value, CObject type)
     {
-        BaseValidationResult result = validationReport.newResult(path);
-        UIDBasedID uid = value.getUid();
-        String archetypeId = value.getArchetypeDetails().getArchetypeId().getValue();
+        BaseValidationResult result = validationReport.newResult(type.path());
+        String rmEntity = type.getRmTypeName();
 
         if (instanceOf(value, rmEntity))
         {
-            result.setValid(false);
-            result.setMessage(
-                    String.format(
-                            "locatable has type %s which is allowed for %s of archetype %s",
-                            value.getClass().getSimpleName(), uid, archetypeId));
+            result.setMessage(report("allowed",
+                    value.getClass(), type, value, value.getArchetypeDetails())); 
         }
         else
         {
             result.setValid(false);
-            result.setMessage(
-                    String.format(
-                            "locatable has type %s but should be %s for %s of archetype %s",
-                            path, value.getClass().getSimpleName(), rmEntity, uid, archetypeId));
+            result.setMessage(report("", value.getClass(), "should be",
+                    rmEntity, type, value, value.getArchetypeDetails())); 
         }
     }
 
     private void validateObject(BaseValidationReport validationReport, Archetype archetype, CObject constraint, 
             Object value)
     {
-        // nodeId && rmEntity match, constraint != null, value != null
+        // nodeId && rmEntity match, constraint != null, value != null, constraint.isAllowed == true
         String archetypeId = archetype.getArchetypeId().getValue();
         String path = constraint.path();
         String nodeId = constraint.getNodeId();
-        String rmEntity = name(constraint);
 
         // todo validate object
         if (constraint instanceof ConstraintRef)
@@ -388,6 +377,11 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
         else if (constraint instanceof CComplexObject)
         {
             CComplexObject complexObject = (CComplexObject) constraint;
+            if (value instanceof Locatable)
+            {
+                Locatable locatable = (Locatable) value;
+                validateComplexObject(validationReport, archetype, locatable, complexObject);
+            }
         }
         else if (constraint instanceof CPrimitiveObject)
         {
@@ -440,5 +434,152 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
         {
             throw new NotSupportedException("Locatable not supported");
         }
+    }
+
+    private String report(String report, Object... nouns)
+    {
+        StringBuilder result = new StringBuilder(report);
+        for (Object noun : nouns)
+        {
+            if (noun == null)
+            {
+                continue;
+            }
+            if (noun instanceof Archetype)
+            {
+                result.append(reportPhrase((Archetype)noun));
+            }
+            else if (noun instanceof ArchetypeID)
+            {
+                result.append(reportPhrase((ArchetypeID)noun));
+            }
+            else if (noun instanceof Archetyped)
+            {
+                result.append(reportPhrase((Archetyped)noun));
+            }
+            else if (noun instanceof ObjectID)
+            {
+                result.append(reportPhrase((ObjectID)noun));
+            }
+            else if (noun instanceof CAttribute)
+            {
+                result.append(reportPhrase((CAttribute)noun));
+            }
+            else if (noun instanceof ArchetypeConstraint)
+            {
+                result.append(reportPhrase((ArchetypeConstraint)noun));
+            }
+            else if (noun instanceof Throwable)
+            {
+                result.append(reportPhrase((Throwable)noun));
+            }
+            else if (noun instanceof Class<?>)
+            {
+                result.append(reportPhrase((Class<?>)noun));
+            }
+            else if (noun instanceof Locatable)
+            {
+                result.append(reportPhrase((Locatable)noun));
+            }
+            else if (noun instanceof Collection<?>)
+            {
+                result.append(reportPhrase((Collection<?>)noun));
+            }
+//            else if (noun instanceof )
+//            {
+//                result.append(reportPhrase(()noun));
+//            }
+            else
+            {
+                result.append(" ");
+                result.append(String.valueOf(noun));
+            }
+        }
+        return result.toString();
+    }
+
+    private String reportPhrase(Archetype archetype)
+    {
+        return reportPhrase(archetype.getArchetypeId());
+    }
+    
+    private String reportPhrase(ArchetypeID archetypeID)
+    {
+        return reportArchetypePhrase(archetypeID.getValue());
+    }
+
+    private String reportPhrase(Archetyped archetyped)
+    {
+        return reportPhrase(archetyped.getArchetypeId());
+    }
+
+    private String reportArchetypePhrase(String value)
+    {
+        return " of archetype <" + value + ">";
+    }
+
+    private String reportPhrase(ObjectID id)
+    {
+        return " for " + id;
+    }
+
+    private String reportPhrase(CAttribute attribute)
+    {
+        String path = attribute.path();
+        if (path == null)
+        {
+            return "";
+        }
+        return " at path " + attribute.path();
+    }
+    
+    private String reportPhrase(ArchetypeConstraint constraint)
+    {
+        String path = constraint.path();
+        if (path == null)
+        {
+            return "";
+        }
+        return " at path " + constraint.path();
+    }
+    
+    private String reportPhrase(Throwable throwable)
+    {
+        String message = throwable.getMessage();
+        if (message == null)
+        {
+            return ": " + throwable.getClass().getSimpleName();
+        }
+        return ": " + throwable.getMessage();
+    }
+
+    private String reportPhrase(Class<?> klass)
+    {
+        return " type {" + klass.getSimpleName() + "}";
+    }
+
+    private String reportPhrase(Locatable locatable)
+    {
+        ObjectID id = locatable.getUid();
+        if (id == null)
+        {
+            return "";
+        }
+        return reportPhrase(locatable.getUid());
+    }
+
+    private String reportPhrase(Collection<?> noun)
+    {
+        return " [" + toString(noun) + "]";
+    }
+
+    private String toString(Collection<?> allowedNodeIds)
+    {
+        return StringUtils.join(allowedNodeIds.toArray(), ", ");
+    }
+
+    private boolean instanceOf(Object value, CObject type)
+    {
+        return instanceOf(value, type.getRmTypeName());
     }
 }

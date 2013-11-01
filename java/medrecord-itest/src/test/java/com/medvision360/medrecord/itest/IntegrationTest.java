@@ -1,6 +1,7 @@
 package com.medvision360.medrecord.itest;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.TreeSet;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.medvision360.medrecord.basex.BaseXLocatableStore;
+import com.medvision360.medrecord.engine.ArchetypeBasedValidator;
 import com.medvision360.medrecord.engine.ArchetypeLoader;
 import com.medvision360.medrecord.engine.UIDGenerator;
 import com.medvision360.medrecord.memstore.MemArchetypeStore;
@@ -29,7 +31,11 @@ import com.medvision360.medrecord.spi.LocatableSelector;
 import com.medvision360.medrecord.spi.LocatableSelectorBuilder;
 import com.medvision360.medrecord.spi.LocatableStore;
 import com.medvision360.medrecord.spi.LocatableTransformer;
+import com.medvision360.medrecord.spi.LocatableValidator;
+import com.medvision360.medrecord.spi.ValidationReport;
+import com.medvision360.medrecord.spi.ValidationResult;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
+import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
 import com.medvision360.medrecord.spi.exceptions.SerializeException;
 import com.medvision360.medrecord.spi.tck.RMTestBase;
@@ -96,6 +102,8 @@ public class IntegrationTest extends RMTestBase
     String m_locatableStorePath = "itest";
     LocatableStore m_locatableStore;
     LocatableStore m_fallbackStore;
+    
+    LocatableValidator m_locatableValidator;
 
     int skipped = 0;
     int generated = 0;
@@ -108,7 +116,19 @@ public class IntegrationTest extends RMTestBase
     int serializeFailed = 0;
     int internalUIDs = 0;
     int serialized = 0;
+    
+    int validated = 0;
+    int valid = 0;
+    int invalid = 0;
+    int validRule = 0;
+    int invalidRule = 0;
 
+    long generatedNs = 0;
+    long transformedNs = 0;
+    long insertedNs = 0;
+    long retrievedNs = 0;
+    long serializedNs = 0;
+    long validatedNs = 0;
 
     @Override
     public void setUp() throws Exception
@@ -126,7 +146,20 @@ public class IntegrationTest extends RMTestBase
         serializeFailed = 0;
         internalUIDs = 0;
         serialized = 0;
+    
+        validated = 0;
+        valid = 0;
+        invalid = 0;
+        validRule = 0;
+        invalidRule = 0;
 
+        generatedNs = 0;
+        transformedNs = 0;
+        insertedNs = 0;
+        retrievedNs = 0;
+        serializedNs = 0;
+        validatedNs = 0;
+    
         m_terminologyService = SimpleTerminologyService.getInstance();
         m_measurementService = SimpleMeasurementService.getInstance();
 
@@ -165,6 +198,8 @@ public class IntegrationTest extends RMTestBase
         m_locatableTransformer = getLocatableTransformer();
 
         m_locatableStore = getLocatableStore();
+
+        m_locatableValidator = new ArchetypeBasedValidator(m_archetypeStore, systemValues);
     }
 
     @Override
@@ -235,6 +270,7 @@ public class IntegrationTest extends RMTestBase
 
     public void testEverything() throws Exception
     {
+        long ct;
         m_archetypeLoader.loadAll("openehr");
         m_archetypeLoader.loadAll("medfit");
         m_archetypeLoader.loadAll("chiron");
@@ -271,21 +307,17 @@ public class IntegrationTest extends RMTestBase
             Locatable instance;
             try
             {
+                ct = System.nanoTime();
                 instance = m_locatableGenerator.generate(archetype);
+                generatedNs += System.nanoTime() - ct;
+
                 generated++;
             }
             catch (Exception e)
             {
                 String message = e.getMessage();
-//                if (message != null && message.contains("No archetypes found to match the slot"))
-//                {
-//                    // this happens a lot: the constraints in the archetypes often don't quite match reality
-//                    creationUnsupported++;
-//                    continue;
-//                }
                 log.error(String.format("FAILED generating instance of %s: %s", archetypeName, message));
                 creationFailed++;
-                //throw e;
                 continue;
             }
             String className = instance.getClass().getSimpleName();
@@ -299,35 +331,31 @@ public class IntegrationTest extends RMTestBase
             {
                 log.debug(String.format("Transforming instance of %s", archetypeName));
             }
+
+            ct = System.nanoTime();
             m_locatableTransformer.transform(instance);
+            transformedNs += System.nanoTime() - ct;
 
             // insert
+
+            ct = System.nanoTime();
             m_locatableStore.insert(instance);
+            insertedNs += System.nanoTime() - ct;
+
+            inserted++;
             if (log.isDebugEnabled())
             {
                 log.debug(String.format("Inserted a %s", archetypeName));
             }
-            inserted++;
         }
-
-        int storedInMemory = Iterables.size(m_fallbackStore.list());
 
         serializeAll();
 
-        report(allArchetypeIDs, storedInMemory);
+        validateAll();
 
+        report();
+        
         assertEquals("No failures", 0, creationFailed);
-    }
-
-    private void report(Iterable<ArchetypeID> allArchetypeIDs, int storedInMemory)
-    {
-        log.info(String.format("Created %s instances using skeleton generation (skipped %s, failed %s, " +
-                "unsupported %s)",
-                generated, skipped, creationFailed, creationUnsupported));
-        log.info(String.format("Inserted %s locatables (%s in xml databases)",
-                inserted, inserted - storedInMemory));
-        log.info(String.format("Serialized %s instances (total %s, retrieved %s, failed %s, internal %s)",
-                serialized, totalIDs, retrieved, serializeFailed, internalUIDs));
     }
 
     private void serializeAll() throws IOException
@@ -340,28 +368,131 @@ public class IntegrationTest extends RMTestBase
         }
         for (HierObjectID hierObjectID : allIDs)
         {
-            totalIDs++;
-            String id = null;
+            serialize(base, hierObjectID);
+        }
+    }
+
+    private void serialize(File base, HierObjectID hierObjectID)
+    {
+        totalIDs++;
+        String id = null;
+        try
+        {
+            id = hierObjectID.root().getValue();
+
+            long ct = System.nanoTime();
+            Locatable locatable = m_locatableStore.get(hierObjectID);
+            retrievedNs += System.nanoTime() - ct;
+
+            retrieved++;
+            
+            File target = new File(base, id + ".json");
+            FileOutputStream fis = new FileOutputStream(target);
+            BufferedOutputStream bos = new BufferedOutputStream(fis, 1024*16);
+            
+            ct = System.nanoTime();
+            m_pvSerializer.serialize(locatable, bos);
+            serializedNs += System.nanoTime() - ct;
+            
+            bos.flush();
+            fis.close();
+
+            serialized++;
+        }
+        catch (NotFoundException e)
+        {
+            internalUIDs++;
+        }
+        catch (IOException | ParseException | SerializeException e)
+        {
+            serializeFailed++;
+            log.error(String.format("Difficulty serializing %s: %s", id, e.getMessage())); //, e);
+        }
+    }
+
+    private void validateAll() throws IOException, ParseException, NotSupportedException
+    {
+        long ct = System.nanoTime();
+        for (HierObjectID hierObjectID : m_locatableStore.list())
+        {
+            Locatable locatable;
             try
             {
-                id = hierObjectID.root().getValue();
-                Locatable locatable = m_locatableStore.get(hierObjectID);
-                retrieved++;
-                File target = new File(base, id + ".json");
-                FileOutputStream fis = new FileOutputStream(target);
-                BufferedOutputStream bos = new BufferedOutputStream(fis);
-                m_pvSerializer.serialize(locatable, bos);
-                serialized++;
+                locatable = m_locatableStore.get(hierObjectID);
             }
             catch (NotFoundException e)
             {
-                internalUIDs++;
+                continue;
             }
-            catch (IOException | ParseException | SerializeException e)
+            validate(locatable);
+        }
+        validatedNs += System.nanoTime() - ct;
+    }
+
+    private void validate(Locatable locatable) throws NotSupportedException
+    {
+        ValidationReport report = m_locatableValidator.validate(locatable);
+        validated++;
+
+        if (!report.isValid())
+        {
+            System.out.println("VALIDATION REPORT");
+            System.out.println("=================");
+            System.out.println("valid: " + report.isValid());
+            System.out.println();
+        }
+        Iterable<ValidationResult> results = report.getReport();
+        for (ValidationResult result : results)
+        {
+            if (!report.isValid())
             {
-                serializeFailed++;
-                log.error(String.format("Difficulty serializing %s: %s", id, e.getMessage())); //, e);
+                System.out.print(result.isValid() ? "VALID:   " : "INVALID: ");
+                System.out.println(result.getPath());
+                System.out.print("         ");
+                System.out.println(result.getMessage());
+            }
+            if (result.isValid())
+            {
+                validRule++;
+            }
+            else
+            {
+                invalidRule++;
             }
         }
+        if (!report.isValid())
+        {
+            System.out.println("=================");
+            invalid++;
+        }
+        else
+        {
+            valid++;
+        }
     }
+
+    private void report() throws IOException
+    {
+        int storedInMemory = Iterables.size(m_fallbackStore.list());
+
+        log.info(String.format("Created %s instances using skeleton generation (skipped %s, failed %s, " +
+                "unsupported %s)",
+                generated, skipped, creationFailed, creationUnsupported));
+        log.info(String.format("Inserted %s locatables (%s in xml databases)",
+                inserted, inserted - storedInMemory));
+        log.info(String.format("Serialized %s instances (total %s, retrieved %s, failed %s, internal %s)",
+                serialized, totalIDs, retrieved, serializeFailed, internalUIDs));
+        log.info(String.format("Validated %s instances (valid %s, invalid %s, valid rules %s, invalid rules %s)",
+                validated, valid, invalid, validRule, invalidRule));
+        log.info(String.format("generated/s %.2f, transformed/s %.2f, inserted/s %.2f, validated/s %.2f, " +
+                "retrieved/s %.2f, serialized/s %.2f",
+                generated/(generatedNs/10E8),
+                generated/(transformedNs/10E8),
+                inserted/(insertedNs/10E8),
+                validated/(validatedNs/10E8),
+                retrieved/(retrievedNs/10E8),
+                serialized/(serializedNs/10E8)
+                ));
+    }
+
 }
