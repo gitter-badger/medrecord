@@ -195,8 +195,7 @@ public class BaseXLocatableStore extends AbstractBaseXStore implements XQuerySto
     {
         checkNotNull(XQuery, "XQuery cannot be null");
         checkNotNull(os, "os cannot be null");
-        XQuery cmd = new XQuery(XQuery);
-        cmd.execute(m_ctx, os);
+        xquery(XQuery, os);
     }
 
     ///
@@ -206,7 +205,7 @@ public class BaseXLocatableStore extends AbstractBaseXStore implements XQuerySto
     protected Locatable get(String path, Object argument) throws IOException, NotFoundException, ParseException
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        get(path, argument, os);
+        get(path, argument, os); // calls initialize()
         byte[] buffer = os.toByteArray();
         ByteArrayInputStream is = new ByteArrayInputStream(buffer);
         return m_parser.parse(is);
@@ -218,8 +217,16 @@ public class BaseXLocatableStore extends AbstractBaseXStore implements XQuerySto
         m_serializer.serialize(locatable, os);
         byte[] buffer = os.toByteArray();
         ByteArrayInputStream is = new ByteArrayInputStream(buffer);
-        replace(path, is);
+        replace(path, is); // calls initialize()
 
         return locatable;
     }
+
+    protected void xquery(String XQuery, OutputStream os) throws IOException
+    {
+        initialize();
+        org.basex.core.cmd.XQuery cmd = new XQuery(XQuery);
+        cmd.execute(m_ctx, os);
+    }
+
 }

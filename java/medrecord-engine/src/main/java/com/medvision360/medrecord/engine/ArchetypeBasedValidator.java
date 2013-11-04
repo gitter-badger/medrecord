@@ -14,10 +14,12 @@ import com.medvision360.medrecord.rmutil.AOMUtil;
 import com.medvision360.medrecord.spi.ArchetypeStore;
 import com.medvision360.medrecord.spi.LocatableValidator;
 import com.medvision360.medrecord.spi.ValidationReport;
+import com.medvision360.medrecord.spi.WrappedArchetype;
 import com.medvision360.medrecord.spi.base.BaseValidationReport;
 import com.medvision360.medrecord.spi.base.BaseValidationResult;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
+import com.medvision360.medrecord.spi.exceptions.ParseException;
 import com.medvision360.medrecord.spi.exceptions.ValidationException;
 import org.apache.commons.lang.StringUtils;
 import org.openehr.am.archetype.Archetype;
@@ -104,10 +106,11 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
         Archetype archetype;
         try
         {
-            archetype = m_archetypeStore.get(archetypeID);
+            WrappedArchetype wrappedArchetype = m_archetypeStore.get(archetypeID);
+            archetype = wrappedArchetype.getArchetype();
             result.setMessage(report("recognized archetype", archetypeID.getValue()));
         }
-        catch (NotFoundException | IOException e)
+        catch (NotFoundException | IOException | ParseException e)
         {
             result.setMessage(report("cannot find archetype", archetypeID.getValue(), e));
             result.setValid(false);
@@ -615,7 +618,7 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
         }
         else if (constraint instanceof CDomainType)
         {
-            CDomainType domainType = (CDomainType) constraint;
+            CDomainType<?> domainType = (CDomainType<?>) constraint;
         }
         else if (constraint instanceof CComplexObject)
         {

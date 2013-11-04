@@ -1,6 +1,6 @@
 /*
  * component:   "openEHR Reference Implementation"
- * description: "Class TestTerminologyID"
+ * description: "Class TestMeasurementService"
  * keywords:    "unit test"
  *
  * author:      "Rong Chen <rong@acode.se>"
@@ -8,33 +8,51 @@
  * copyright:   "Copyright (c) 2004 Acode HB, Sweden"
  * license:     "See notice at bottom of class"
  *
- * file:        "$URL: http://svn.openehr.org/ref_impl_java/BRANCHES/RM-1.0-update/libraries/src/test/org/openehr/rm/support/identification/TestTerminologyID.java $"
+ * file:        "$URL: http://svn.openehr.org/ref_impl_java/BRANCHES/RM-1.0-update/libraries/src/test/org/openehr/rm/support/measurement/TestMeasurementService.java $"
  * revision:    "$LastChangedRevision: 2 $"
  * last_change: "$LastChangedDate: 2005-10-12 23:20:08 +0200 (Wed, 12 Oct 2005) $"
  */
-package org.openehr.rm.support.identification;
+package com.medvision360.medrecord.spi.tck;
+
+import org.openehr.rm.support.measurement.MeasurementService;
 
 /**
- * TestTerminologyID
+ * Implementation of MeasurementService used for testing
  *
  * @author Rong Chen
  * @version 1.0
  */
-public class TestTerminologyID
+@SuppressWarnings("UnusedDeclaration")
+public class TestMeasurementService implements MeasurementService
 {
+    private static final long serialVersionUID = 0x130L;
 
-    /* fields */
-    public static final TerminologyID LANGUAGE;
-    public static final TerminologyID CHARSET;
-    public static final TerminologyID SNOMEDCT;
-
-    static
+    public boolean isValidUnitsString(String units)
     {
-        LANGUAGE = new TerminologyID("language-test");
+        return true;
+    }
 
-        CHARSET = new TerminologyID("charset-test");
+    public boolean unitsEquivalent(String units1, String units2)
+    {
+        return true;
+    }
 
-        SNOMEDCT = new TerminologyID("snomedct-test");
+    public static MeasurementService getInstance()
+    {
+        return new TestMeasurementService();
+    }
+
+    @Override
+    public boolean unitsComparable(String units1, String units2)
+    {
+        return true;
+    }
+
+    @Override
+    public int compare(String units1, Double value1, String units2,
+            Double value2)
+    {
+        return 0;
     }
 }
 
@@ -52,7 +70,7 @@ public class TestTerminologyID
  *  for the specific language governing rights and limitations under the
  *  License.
  *
- *  The Original Code is TestTerminologyID.java
+ *  The Original Code is TestMeasurementService.java
  *
  *  The Initial Developer of the Original Code is Rong Chen.
  *  Portions created by the Initial Developer are Copyright (C) 2003-2004

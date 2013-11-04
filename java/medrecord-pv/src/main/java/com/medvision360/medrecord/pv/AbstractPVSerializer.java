@@ -64,7 +64,7 @@ public abstract class AbstractPVSerializer extends RMUtil implements LocatableSe
         while (names.hasNext())
         {
             name = names.next();
-            pathName = toRmEntityName(name);
+            pathName = toAttributeName(name);
 
             Attribute attribute = attributes.get(name);
             if (attribute.system()

@@ -23,10 +23,12 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.InfoDB;
+import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.Replace;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.ehr.EHR;
+import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.UIDBasedID;
 
@@ -91,7 +93,7 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
 
     public AbstractBaseXStore(Context ctx, String name, String path)
     {
-        super(name, LocatableSelectorBuilder.any());
+        this(ctx, LocatableSelectorBuilder.any(), name, path);
     }
 
     @Override
@@ -108,6 +110,7 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
             createDb();
             optimizeNow();
         }
+        dbOpen();
     }
 
     public void clear() throws IOException
@@ -198,6 +201,11 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
         return cmd.exists();
     }
 
+    protected void dbOpen() throws BaseXException
+    {
+        new Open(m_name).execute(m_ctx);
+    }
+
     protected void dropDb() throws BaseXException
     {
         new DropDB(m_name).execute(m_ctx);
@@ -210,6 +218,7 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
 
     protected void optimizeNow() throws BaseXException
     {
+        // m_initialized should be true
         new Optimize().execute(m_ctx);
     }
 
@@ -287,6 +296,11 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
                 locatable.getUid().getValue();
     }
 
+    protected String path(ArchetypeID archetypeID)
+    {
+        return "archetype/" + archetypeID.getValue();
+    }
+
     protected String fullPath(String path)
     {
         return m_path + path;
@@ -312,6 +326,11 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
         return fullPath(path(EHR, locatable));
     }
 
+    protected String fullPath(ArchetypeID archetypeID)
+    {
+        return fullPath(path(archetypeID));
+    }
+
     protected String hPath(UIDBasedID uidBasedID)
     {
         String v = uidBasedID.getValue();
@@ -330,8 +349,9 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
         }
     }
 
-    protected boolean has(String path) throws BaseXException
+    protected boolean has(String path) throws IOException
     {
+        initialize();
         // note this does not invoke ensureNotDirty(), so with concurrent optimize,
         // insert()/update()/delete() may be a little, err, dirty
         Exists cmd = new Exists(path);
@@ -341,6 +361,7 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
 
     protected void get(String path, Object argument, ByteArrayOutputStream os) throws IOException, NotFoundException
     {
+        initialize();
         // if (path.startsWith("/"))
         // {
         //     path = path.substring(1);
@@ -358,8 +379,9 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
         }
     }
 
-    protected void replace(String path, ByteArrayInputStream is) throws BaseXException
+    protected void replace(String path, ByteArrayInputStream is) throws IOException
     {
+        initialize();
         ByteArrayOutputStream os;
         Replace cmd = new Replace(path);
         cmd.setInput(is);
@@ -377,6 +399,7 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
 
     protected void replace(String path) throws IOException
     {
+        initialize();
         Replace cmd = new Replace(path, "<empty/>");
         try
         {
@@ -390,6 +413,7 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
 
     protected void delete(String path) throws IOException
     {
+        initialize();
         Delete cmd = new Delete(path);
 
         try
@@ -402,8 +426,9 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
         }
     }
 
-    protected Iterable<HierObjectID> list(String path) throws BaseXException
+    protected Iterable<HierObjectID> list(String path) throws IOException
     {
+        initialize();
         ListDocs cmd = new ListDocs(path);
         cmd.execute(m_ctx);
         Iterable<String> resultStrings = cmd.list();

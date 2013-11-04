@@ -61,6 +61,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class RIXmlConverter implements LocatableParser, LocatableSerializer
 {
     // currently failing with
@@ -131,28 +133,35 @@ public class RIXmlConverter implements LocatableParser, LocatableSerializer
         }
     }
 
-    private XMLBinding binding;
-    private CodePhrase m_charset;
+    private XMLBinding m_binding;
+    private CodePhrase m_encoding;
+
+    public RIXmlConverter(Map<SystemValue, Object> systemValues)
+    {
+        m_encoding = checkNotNull((CodePhrase) systemValues.get(SystemValue.ENCODING), 
+                "systemValues.ENCODING cannot be null");
+        m_binding = new XMLBinding(systemValues);
+    }
 
     public RIXmlConverter(TerminologyService terminologyService, MeasurementService measurementService,
-            CodePhrase charset, CodePhrase language)
+            CodePhrase encoding, CodePhrase language)
     {
-        m_charset = charset;
+        m_encoding = encoding;
 
         Map<SystemValue, Object> systemValues = new HashMap<>();
         systemValues.put(SystemValue.TERMINOLOGY_SERVICE, terminologyService);
         systemValues.put(SystemValue.MEASUREMENT_SERVICE, measurementService);
-        systemValues.put(SystemValue.CHARSET, charset);
-        systemValues.put(SystemValue.ENCODING, charset);
+        systemValues.put(SystemValue.CHARSET, encoding);
+        systemValues.put(SystemValue.ENCODING, encoding);
         systemValues.put(SystemValue.LANGUAGE, language);
 
-		binding = new XMLBinding(systemValues);
+		m_binding = new XMLBinding(systemValues);
     }
 
     @Override
     public Locatable parse(InputStream is) throws IOException, ParseException
     {
-        return parse(is, m_charset.getCodeString());
+        return parse(is, m_encoding.getCodeString());
     }
 
     @Override
@@ -175,7 +184,7 @@ public class RIXmlConverter implements LocatableParser, LocatableSerializer
     @Override
     public void serialize(Locatable locatable, OutputStream os) throws IOException, SerializeException
     {
-        serialize(locatable, os, m_charset.getCodeString());
+        serialize(locatable, os, m_encoding.getCodeString());
     }
 
     @Override
@@ -326,7 +335,7 @@ public class RIXmlConverter implements LocatableParser, LocatableSerializer
     {
         try
         {
-            Object rmObject = binding.bindToRM(xmlBean);
+            Object rmObject = m_binding.bindToRM(xmlBean);
             if (!(rmObject instanceof Locatable))
             {
                 throw new ParseException(String.format("Binding resulted in %s, which is not a locatable",
@@ -348,7 +357,7 @@ public class RIXmlConverter implements LocatableParser, LocatableSerializer
     {
         try
         {
-            Object xmlObject = binding.bindToXML(locatable, true);
+            Object xmlObject = m_binding.bindToXML(locatable, true);
             if (!(xmlObject instanceof XmlObject))
             {
                 throw new SerializeException(String.format("Binding resulted in $s, which is not a XmlObject",

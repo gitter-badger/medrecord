@@ -1,15 +1,12 @@
 package com.medvision360.medrecord.spi.tck;
 
-import java.io.InputStream;
-
 import com.medvision360.medrecord.spi.ArchetypeStore;
+import com.medvision360.medrecord.spi.WrappedArchetype;
 import com.medvision360.medrecord.spi.exceptions.InUseException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
-import org.apache.commons.io.input.BOMInputStream;
 import org.openehr.am.archetype.Archetype;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.support.identification.ArchetypeID;
-import se.acode.openehr.parser.ADLParser;
 
 public abstract class ArchetypeStoreTCKTestBase extends RMTestBase
 {
@@ -64,7 +61,8 @@ public abstract class ArchetypeStoreTCKTestBase extends RMTestBase
         m_store.insert(orig);
         assertTrue(m_store.has(archetyped));
         assertTrue(m_store.has(archetypeID));
-        Archetype result = m_store.get(archetypeID);
+        WrappedArchetype wrappedResult = m_store.get(archetypeID);
+        Archetype result = wrappedResult.getArchetype();
         assertEqualish(orig, result);
         
         // not locked, so can delete

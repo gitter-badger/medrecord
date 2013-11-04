@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import com.medvision360.medrecord.spi.Terminology;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openehr.am.archetype.constraintmodel.primitive.CBoolean;
@@ -46,7 +47,6 @@ import org.openehr.rm.demographic.PartyIdentity;
 import org.openehr.rm.support.basic.Interval;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.ObjectID;
-import org.openehr.rm.support.identification.ObjectRef;
 import org.openehr.rm.support.identification.ObjectVersionID;
 import org.openehr.rm.support.identification.PartyRef;
 import org.openehr.rm.support.identification.TerminologyID;

@@ -8,8 +8,10 @@ import java.io.UnsupportedEncodingException;
 
 import com.medvision360.medrecord.memstore.MemArchetypeStore;
 import com.medvision360.medrecord.spi.ArchetypeStore;
+import com.medvision360.medrecord.spi.WrappedArchetype;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openehr.am.archetype.Archetype;
@@ -81,7 +83,7 @@ public class ArchetypeLoader
         load(resource.getFilename().replaceFirst("\\.adl$", ""), is);
     }
 
-    private void load(String name, InputStream is) throws ParseException
+    private void load(String name, InputStream is) throws ParseException, IOException
     {
         try
         {
@@ -93,17 +95,18 @@ public class ArchetypeLoader
         }
     }
         
-    private void load(String name, Reader reader) throws ParseException
+    private void load(String name, Reader reader) throws ParseException, IOException
     {
-        new ADLParser(reader, m_adlMissingLanguageCompatible, m_adlEmptyPurposeCompatible);
-        ADLParser parser = new ADLParser(reader, m_adlMissingLanguageCompatible, 
+        String source = IOUtils.toString(reader);
+        ADLParser parser = new ADLParser(source, m_adlMissingLanguageCompatible, 
                     m_adlEmptyPurposeCompatible);
         
         try
         {
             Archetype archetype = parser.parse();
             log.debug(String.format("Loaded archetype %s", archetype.getArchetypeId().getValue()));
-            m_store.insert(archetype);
+            WrappedArchetype wrappedArchetype = new WrappedArchetype(source, archetype);
+            m_store.insert(wrappedArchetype);
             log.debug(String.format("Inserted archetype %s", archetype.getArchetypeId().getValue()));
         }
         catch (DuplicateException e)

@@ -2,7 +2,9 @@ package com.medvision360.medrecord.spi;
 
 import java.io.IOException;
 
+import com.medvision360.medrecord.spi.exceptions.DisposalException;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
+import com.medvision360.medrecord.spi.exceptions.InitializationException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
@@ -18,6 +20,14 @@ import org.openehr.rm.support.terminology.TerminologyService;
 
 public interface Engine extends TransactionalService, NamedService, StatusService, AuditedService
 {
+    ///
+    /// Initialization and disposal
+    ///
+    public void initialize() throws InitializationException;
+    
+    public void dispose() throws DisposalException;
+    
+    
     ///
     /// Services
     ///
@@ -43,13 +53,13 @@ public interface Engine extends TransactionalService, NamedService, StatusServic
      */
     XQueryStore getLocatableStore();
     
-    LocatableEditor getEditor();
+    LocatableEditor getLocatableEditor();
 
     /**
      * The provided {@link LocatableValidator} is typically already automatically applied on {@link LocatableStore} 
      * insert/update methods, so normally the only reason to retrieve it is for some kind of pre-submission testing. 
      */
-    LocatableValidator getValidator();
+    LocatableValidator getLocatableValidator();
     
     LocatableParser getLocatableParser(String mimeType, String format) throws NotSupportedException;
 

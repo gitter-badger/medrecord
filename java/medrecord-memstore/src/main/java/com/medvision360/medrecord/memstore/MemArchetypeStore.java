@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.medvision360.medrecord.spi.WrappedArchetype;
 import com.medvision360.medrecord.spi.base.AbstractArchetypeStore;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.InUseException;
@@ -18,7 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MemArchetypeStore extends AbstractArchetypeStore
 {
-    private Map<ArchetypeID, Archetype> m_storage = new ConcurrentHashMap<>();
+    private Map<ArchetypeID, WrappedArchetype> m_storage = new ConcurrentHashMap<>();
     private Map<ArchetypeID, Boolean> m_locks = new ConcurrentHashMap<>();
     
     public MemArchetypeStore(String name)
@@ -32,14 +33,14 @@ public class MemArchetypeStore extends AbstractArchetypeStore
     }
 
     @Override
-    public Archetype get(Archetyped archetypeDetails) throws NotFoundException, IOException
+    public WrappedArchetype get(Archetyped archetypeDetails) throws NotFoundException, IOException
     {
         checkNotNull(archetypeDetails, "archetypeDetails cannot be null");
         return get(archetypeDetails.getArchetypeId());
     }
 
     @Override
-    public Archetype get(ArchetypeID archetypeID) throws NotFoundException, IOException
+    public WrappedArchetype get(ArchetypeID archetypeID) throws NotFoundException, IOException
     {
         checkNotNull(archetypeID, "archetypeID cannot be null");
         synchronized(m_storage)
@@ -67,10 +68,10 @@ public class MemArchetypeStore extends AbstractArchetypeStore
     }
 
     @Override
-    public void insert(Archetype archetype) throws DuplicateException, IOException
+    public WrappedArchetype insert(WrappedArchetype archetype) throws DuplicateException, IOException
     {
         checkNotNull(archetype, "archetype cannot be null");
-        ArchetypeID archetypeID = archetype.getArchetypeId();
+        ArchetypeID archetypeID = archetype.getArchetype().getArchetypeId();
         synchronized(m_storage)
         {
             if (m_storage.containsKey(archetypeID))
@@ -79,6 +80,16 @@ public class MemArchetypeStore extends AbstractArchetypeStore
             }
             m_storage.put(archetypeID, archetype);
         }
+        return archetype;
+    }
+
+    @Override
+    public WrappedArchetype insert(Archetype archetype) throws DuplicateException, IOException
+    {
+        checkNotNull(archetype, "archetype cannot be null");
+        WrappedArchetype wrappedArchetype = new WrappedArchetype("", archetype);
+        insert(wrappedArchetype);
+        return wrappedArchetype;
     }
 
     @Override

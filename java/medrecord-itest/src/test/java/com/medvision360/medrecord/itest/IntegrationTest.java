@@ -1,39 +1,33 @@
 package com.medvision360.medrecord.itest;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
-import com.medvision360.medrecord.basex.BaseXLocatableStore;
 import com.medvision360.medrecord.engine.ArchetypeBasedValidator;
 import com.medvision360.medrecord.engine.ArchetypeLoader;
+import com.medvision360.medrecord.engine.MedRecordEngine;
 import com.medvision360.medrecord.engine.UIDGenerator;
-import com.medvision360.medrecord.memstore.MemArchetypeStore;
 import com.medvision360.medrecord.memstore.MemLocatableStore;
-import com.medvision360.medrecord.pv.PVSerializer;
-import com.medvision360.medrecord.riio.RIXmlConverter;
 import com.medvision360.medrecord.spi.ArchetypeStore;
 import com.medvision360.medrecord.spi.CompositeStore;
 import com.medvision360.medrecord.spi.CompositeTransformer;
-import com.medvision360.medrecord.spi.LocatableSelector;
-import com.medvision360.medrecord.spi.LocatableSelectorBuilder;
+import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.spi.LocatableStore;
-import com.medvision360.medrecord.spi.LocatableTransformer;
 import com.medvision360.medrecord.spi.LocatableValidator;
+import com.medvision360.medrecord.spi.TransformingLocatableStore;
+import com.medvision360.medrecord.spi.TransformingXQueryStore;
 import com.medvision360.medrecord.spi.ValidationReport;
 import com.medvision360.medrecord.spi.ValidationResult;
+import com.medvision360.medrecord.spi.WrappedArchetype;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
@@ -41,16 +35,13 @@ import com.medvision360.medrecord.spi.exceptions.SerializeException;
 import com.medvision360.medrecord.spi.tck.RMTestBase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.basex.core.Context;
 import org.openehr.am.archetype.Archetype;
 import org.openehr.build.SystemValue;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.measurement.MeasurementService;
-import org.openehr.rm.support.measurement.SimpleMeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
-import org.openehr.terminology.SimpleTerminologyService;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
@@ -72,6 +63,8 @@ public class IntegrationTest extends RMTestBase
                 "openEHR-EHR-COMPOSITION.prescription.v1"
         ));
     }
+    
+    private MedRecordEngine m_engine;
 
     private TerminologyService m_terminologyService;
     private MeasurementService m_measurementService;
@@ -91,15 +84,9 @@ public class IntegrationTest extends RMTestBase
 
     private LocatableGenerator m_locatableGenerator;
 
-    RIXmlConverter m_xmlConverter;
+    LocatableSerializer m_pvSerializer;
 
-    PVSerializer m_pvSerializer;
-
-    LocatableTransformer m_locatableTransformer;
-
-    List<Context> m_baseXContexts;
     String m_locatableStoreName = "IntegrationTest";
-    String m_locatableStorePath = "itest";
     LocatableStore m_locatableStore;
     LocatableStore m_fallbackStore;
     
@@ -124,7 +111,6 @@ public class IntegrationTest extends RMTestBase
     int invalidRule = 0;
 
     long generatedNs = 0;
-    long transformedNs = 0;
     long insertedNs = 0;
     long retrievedNs = 0;
     long serializedNs = 0;
@@ -154,17 +140,19 @@ public class IntegrationTest extends RMTestBase
         invalidRule = 0;
 
         generatedNs = 0;
-        transformedNs = 0;
         insertedNs = 0;
         retrievedNs = 0;
         serializedNs = 0;
         validatedNs = 0;
+        
+        m_engine = new MedRecordEngine();
+        m_engine.setStoreValidation(false); // so we can split insert-able vs validate-able
+        m_engine.initialize();
+        
+        m_terminologyService = m_engine.getTerminologyService();
+        m_measurementService = m_engine.getMeasurementService();
+        m_archetypeStore = m_engine.getArchetypeStore();
     
-        m_terminologyService = SimpleTerminologyService.getInstance();
-        m_measurementService = SimpleMeasurementService.getInstance();
-
-        m_archetypeStore = new MemArchetypeStore();
-
         m_resolver = new PathMatchingResourcePatternResolver();
         m_archetypeLoaderBasePath = "archetypes";
         m_adlEmptyPurposeCompatible = true;
@@ -178,24 +166,13 @@ public class IntegrationTest extends RMTestBase
         m_valueGenerator = new ValueGenerator(m_randomSupport, m_stringGenerator, m_terminologyService,
                 m_measurementService);
         m_rmAdapter = new RMAdapter(m_valueGenerator);
-
-        Map<SystemValue, Object> systemValues = new HashMap<>();
-        systemValues.put(SystemValue.TERMINOLOGY_SERVICE, m_terminologyService);
-        systemValues.put(SystemValue.MEASUREMENT_SERVICE, m_measurementService);
-        systemValues.put(SystemValue.LANGUAGE, Terminology.L_en);
-        systemValues.put(SystemValue.CHARSET, Terminology.CHARSET_UTF8);
-        systemValues.put(SystemValue.TERRITORY, Terminology.C_NL);
-        systemValues.put(SystemValue.ENCODING, Terminology.CHARSET_UTF8);
+        
+        Map<SystemValue, Object> systemValues = m_engine.getSystemValues();
 
         m_locatableGenerator = new LocatableGenerator(m_archetypeStore, m_randomSupport, m_assertionSupport,
                 m_valueGenerator, m_rmAdapter, systemValues);
 
-        m_xmlConverter = new RIXmlConverter(m_terminologyService, m_measurementService,
-                Terminology.CHARSET_UTF8, Terminology.L_en);
-
-        m_pvSerializer = new PVSerializer();
-
-        m_locatableTransformer = getLocatableTransformer();
+        m_pvSerializer = m_engine.getLocatableSerializer("application/json", null);
 
         m_locatableStore = getLocatableStore();
 
@@ -206,37 +183,23 @@ public class IntegrationTest extends RMTestBase
     public void tearDown() throws Exception
     {
         super.tearDown();
-        for (Context c : m_baseXContexts)
-        {
-            c.close();
-        }
+        m_engine.dispose();
     }
 
     protected LocatableStore getLocatableStore() throws Exception
     {
-        m_baseXContexts = new ArrayList<>();
         CompositeStore store = new CompositeStore(m_locatableStoreName);
 
-        LocatableSelector basicEHR = LocatableSelectorBuilder
-                .start()
-                        //.requireRMVersion("1.0.2")
-                .requireRMName("EHR")
-                .matchRMEntity("^(?:COMPOSITION|EHRSTATUS|ACTION|ADMIN_ENTRY|EVALUATION|INSTRUCTION|OBSERVATION)$")
-                .build();
-        store.addDelegate(getStore("IntegrationTestEHR", basicEHR));
+        LocatableStore base = m_engine.getLocatableStore();
+        store.addDelegate(base);
 
-        LocatableSelector basicDemographics = LocatableSelectorBuilder
-                .start()
-                        //.requireRMVersion("1.0.2")
-                .requireRMName("DEMOGRAPHIC")
-                .matchRMEntity("^(?:PARTY_IDENTITY|PARTY_RELATIONSHIP|PERSON|ORGANISATION|ROLE|ADDRESS|CAPABILITY)$")
-                .build();
-        store.addDelegate(getStore("IntegrationTestDEMOGRAPHIC", basicDemographics));
-
-        LocatableSelector xmlFallback = LocatableSelectorBuilder.any();
-        store.addDelegate(getStore("IntegrationTestFALLBACK", xmlFallback));
-
-        m_fallbackStore = new MemLocatableStore("IntegrationTestMEMORY");
+        MemLocatableStore memStore = new MemLocatableStore("IntegrationTestMEMORY");
+        UIDGenerator uidGenerator = new UIDGenerator();
+        CompositeTransformer transformer = new CompositeTransformer();
+        transformer.addDelegate(uidGenerator);
+        TransformingLocatableStore transformingStore = new TransformingLocatableStore("IntegrationTestMEMORY", memStore, 
+                transformer);
+        m_fallbackStore = transformingStore;
 
         store.addDelegate(m_fallbackStore);
 
@@ -246,31 +209,10 @@ public class IntegrationTest extends RMTestBase
         return store;
     }
 
-    protected LocatableStore getStore(String name, LocatableSelector locatableSelector)
-    {
-        Context c = new Context();
-        m_baseXContexts.add(c);
-
-        return new BaseXLocatableStore(
-                c,
-                m_xmlConverter,
-                m_xmlConverter,
-                locatableSelector,
-                name,
-                m_locatableStorePath
-        );
-    }
-
-    protected LocatableTransformer getLocatableTransformer()
-    {
-        CompositeTransformer transformer = new CompositeTransformer();
-        transformer.addDelegate(new UIDGenerator());
-        return transformer;
-    }
-
     public void testEverything() throws Exception
     {
         long ct;
+        m_archetypeStore.clear();
         m_archetypeLoader.loadAll("openehr");
         m_archetypeLoader.loadAll("medfit");
         m_archetypeLoader.loadAll("chiron");
@@ -297,7 +239,8 @@ public class IntegrationTest extends RMTestBase
                 continue;
             }
             
-            Archetype archetype = m_archetypeStore.get(archetypeID);
+            WrappedArchetype wrappedArchetype = m_archetypeStore.get(archetypeID);
+            Archetype archetype = wrappedArchetype.getArchetype();
 
             // generate
             if (log.isDebugEnabled())
@@ -325,16 +268,6 @@ public class IntegrationTest extends RMTestBase
             {
                 log.debug(String.format("Got %s for archetype %s", className, archetypeName));
             }
-
-            // transform
-            if (log.isDebugEnabled())
-            {
-                log.debug(String.format("Transforming instance of %s", archetypeName));
-            }
-
-            ct = System.nanoTime();
-            m_locatableTransformer.transform(instance);
-            transformedNs += System.nanoTime() - ct;
 
             // insert
 
@@ -485,10 +418,9 @@ public class IntegrationTest extends RMTestBase
                 serialized, totalIDs, retrieved, serializeFailed, internalUIDs));
         log.info(String.format("Validated %s instances (valid %s, invalid %s, valid rules %s, invalid rules %s)",
                 validated, valid, invalid, validRule, invalidRule));
-        log.info(String.format("generated/s %.2f, transformed/s %.2f, inserted/s %.2f, validated/s %.2f, " +
+        log.info(String.format("generated/s %.2f, inserted/s %.2f, validated/s %.2f, " +
                 "retrieved/s %.2f, serialized/s %.2f",
                 generated/(generatedNs/10E8),
-                generated/(transformedNs/10E8),
                 inserted/(insertedNs/10E8),
                 validated/(validatedNs/10E8),
                 retrieved/(retrievedNs/10E8),

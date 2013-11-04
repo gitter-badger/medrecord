@@ -13,7 +13,9 @@ import java.util.WeakHashMap;
 
 import com.medvision360.medrecord.rmutil.AOMUtil;
 import com.medvision360.medrecord.spi.ArchetypeStore;
+import com.medvision360.medrecord.spi.WrappedArchetype;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
+import com.medvision360.medrecord.spi.exceptions.ParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openehr.am.archetype.Archetype;
@@ -95,21 +97,27 @@ public class LocatableGenerator extends AOMUtil
     //
 
     public Locatable generate(String archetypeName)
-            throws NotFoundException, IOException, RMObjectBuildingException, GenerateException
+            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException, ParseException
     {
         ArchetypeID archetypeID = new ArchetypeID(archetypeName);
         return generate(archetypeID);
     }
 
     public Locatable generate(ArchetypeID archetypeID)
-            throws NotFoundException, IOException, RMObjectBuildingException, GenerateException
+            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException, ParseException
     {
-        Archetype archetype = m_archetypeStore.get(archetypeID);
-        return generate(archetype);
+        WrappedArchetype wrappedArchetype = m_archetypeStore.get(archetypeID);
+        return generate(wrappedArchetype);
+    }
+
+    public Locatable generate(WrappedArchetype wrappedArchetype)
+            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException, ParseException
+    {
+        return generate(wrappedArchetype.getArchetype());
     }
 
     public Locatable generate(Archetype archetype)
-            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
+            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException, ParseException
     {
         List<Archetype> parents = new ArrayList<>();
         parents.add(archetype);
@@ -128,7 +136,7 @@ public class LocatableGenerator extends AOMUtil
     //
 
     protected Object generateObject(List<Archetype> parents)
-            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
+            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException, ParseException
     {
         Archetype archetype = current(parents);
         ArchetypeID archetypeID = archetype.getArchetypeId();
@@ -154,7 +162,7 @@ public class LocatableGenerator extends AOMUtil
     }
 
     protected void generateMap(List<Archetype> parents, Map<String, Object> map, CComplexObject definition)
-            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
+            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException, ParseException
     {
         String rmTypeName = definition.getRmTypeName();
         String path = definition.path();
@@ -209,7 +217,7 @@ public class LocatableGenerator extends AOMUtil
 
     protected Object generateAttribute(List<Archetype> parents, CAttribute attribute, Map<String, Object> map,
             boolean forceMultiple)
-            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
+            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException, ParseException
     {
         List<CObject> children = attribute.getChildren();
         if (children.size() == 0)
@@ -245,7 +253,7 @@ public class LocatableGenerator extends AOMUtil
     }
 
     protected Object generateMultiple(List<Archetype> parents, CAttribute attribute, Map<String, Object> map)
-            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
+            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException, ParseException
     {
         String attributeName = name(attribute);
         if (log.isDebugEnabled())
@@ -313,7 +321,7 @@ public class LocatableGenerator extends AOMUtil
 
     private void generateChild(List<Archetype> parents, CAttribute attribute, Map<String, Object> map,
             Collection<Object> container, CObject child)
-            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
+            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException, ParseException
     {
         Object childValue = generateObject(parents, child, child.isRequired(), map);
         if (log.isDebugEnabled())
@@ -341,7 +349,7 @@ public class LocatableGenerator extends AOMUtil
 
     protected Object generateObject(List<Archetype> parents, ArchetypeConstraint object, boolean required,
             Map<String, Object> map)
-            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException
+            throws RMObjectBuildingException, GenerateException, IOException, NotFoundException, ParseException
     {
         if (object == null)
         {
@@ -401,7 +409,7 @@ public class LocatableGenerator extends AOMUtil
 
     protected Object followArchetypeInternalRef(List<Archetype> parents, ArchetypeInternalRef ref, boolean required,
             Map<String, Object> map)
-            throws GenerateException, RMObjectBuildingException, IOException, NotFoundException
+            throws GenerateException, RMObjectBuildingException, IOException, NotFoundException, ParseException
     {
         String path = ref.getTargetPath();
         ArchetypeConstraint constraint = current(parents).node(path);
@@ -432,7 +440,7 @@ public class LocatableGenerator extends AOMUtil
     }
 
     protected Object generateObjectForSlot(List<Archetype> parents, ArchetypeSlot slot, boolean required)
-            throws IOException, GenerateException, NotFoundException, RMObjectBuildingException
+            throws IOException, GenerateException, NotFoundException, RMObjectBuildingException, ParseException
     {
         Archetype current = current(parents);
         Archetype slotArchetype = chooseArchetype(parents, slot);
@@ -463,7 +471,7 @@ public class LocatableGenerator extends AOMUtil
     }
 
     protected Object generateComplexObject(List<Archetype> parents, CComplexObject object, boolean required)
-            throws IOException, GenerateException, NotFoundException, RMObjectBuildingException
+            throws IOException, GenerateException, NotFoundException, RMObjectBuildingException, ParseException
     {
         String rmType = object.getRmTypeName();
         Object result = generateCustomComplexObject(rmType);
@@ -484,7 +492,7 @@ public class LocatableGenerator extends AOMUtil
             generateMap(parents, map, object);
             return construct(className, map);
         }
-        catch (IOException | GenerateException | NotFoundException | RMObjectBuildingException e)
+        catch (IOException | GenerateException | NotFoundException | RMObjectBuildingException | ParseException e)
         {
             if (!required)
             {
@@ -631,7 +639,7 @@ public class LocatableGenerator extends AOMUtil
     }
 
     protected Archetype chooseArchetype(List<Archetype> parents, ArchetypeSlot slot)
-            throws IOException, GenerateException, NotFoundException
+            throws IOException, GenerateException, NotFoundException, ParseException
     {
         String rmType = slot.getRmTypeName();
         String nodeId = slot.getNodeId();
@@ -726,7 +734,8 @@ public class LocatableGenerator extends AOMUtil
         }
 
         ArchetypeID choice = m_randomSupport.pick(possibilities);
-        return m_archetypeStore.get(choice);
+        WrappedArchetype wrappedResult = m_archetypeStore.get(choice);
+        return wrappedResult.getArchetype();
     }
 
     protected Set<Link> generateLinks()

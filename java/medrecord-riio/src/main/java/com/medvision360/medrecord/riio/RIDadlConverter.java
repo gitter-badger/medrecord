@@ -25,30 +25,39 @@ import org.openehr.rm.datatypes.text.CodePhrase;
 import org.openehr.rm.support.measurement.MeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class RIDadlConverter implements LocatableParser, LocatableSerializer
 {
-    private DADLBinding binding;
-    private CodePhrase m_charset;
+    private DADLBinding m_binding;
+    private CodePhrase m_encoding;
+
+    public RIDadlConverter(Map<SystemValue, Object> systemValues)
+    {
+        m_encoding = checkNotNull((CodePhrase) systemValues.get(SystemValue.ENCODING), 
+                "systemValues.ENCODING cannot be null");
+        m_binding = new DADLBinding(systemValues);
+    }
 
     public RIDadlConverter(TerminologyService terminologyService, MeasurementService measurementService,
-            CodePhrase charset, CodePhrase language)
+            CodePhrase encoding, CodePhrase language)
     {
-        m_charset = charset;
+        m_encoding = encoding;
 
         Map<SystemValue, Object> systemValues = new HashMap<>();
         systemValues.put(SystemValue.TERMINOLOGY_SERVICE, terminologyService);
         systemValues.put(SystemValue.MEASUREMENT_SERVICE, measurementService);
-        systemValues.put(SystemValue.CHARSET, charset);
-        systemValues.put(SystemValue.ENCODING, charset);
+        systemValues.put(SystemValue.CHARSET, encoding);
+        systemValues.put(SystemValue.ENCODING, encoding);
         systemValues.put(SystemValue.LANGUAGE, language);
 
-        binding = new DADLBinding(systemValues);
+        m_binding = new DADLBinding(systemValues);
     }
 
     @Override
     public Locatable parse(InputStream is) throws IOException, ParseException
     {
-        return parse(is, m_charset.getCodeString());
+        return parse(is, m_encoding.getCodeString());
     }
 
     @Override
@@ -58,7 +67,7 @@ public class RIDadlConverter implements LocatableParser, LocatableSerializer
         {
             DADLParser parser = new DADLParser(is);
             ContentObject content = parser.parse();
-            Object object = binding.bind(content);
+            Object object = m_binding.bind(content);
             if (!(object instanceof Locatable))
             {
                 throw new ParseException(String.format("DADL parsing returned a %s, need a Locatable",
@@ -76,7 +85,7 @@ public class RIDadlConverter implements LocatableParser, LocatableSerializer
     @Override
     public void serialize(Locatable locatable, OutputStream os) throws IOException, SerializeException
     {
-        serialize(locatable, os, m_charset.getCodeString());
+        serialize(locatable, os, m_encoding.getCodeString());
     }
 
     @Override
@@ -84,7 +93,7 @@ public class RIDadlConverter implements LocatableParser, LocatableSerializer
     {
         try
         {
-            List<String> result = binding.toDADL(locatable);
+            List<String> result = m_binding.toDADL(locatable);
             OutputStreamWriter osw = new OutputStreamWriter(os, encoding);
             for (String line : result)
             {

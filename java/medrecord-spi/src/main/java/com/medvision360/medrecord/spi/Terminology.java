@@ -1,4 +1,4 @@
-package com.medvision360.medrecord.itest;
+package com.medvision360.medrecord.spi;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

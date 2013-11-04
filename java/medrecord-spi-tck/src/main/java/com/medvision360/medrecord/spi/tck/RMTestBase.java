@@ -15,7 +15,6 @@ import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.common.archetyped.Pathable;
 import org.openehr.rm.common.generic.PartySelf;
 import org.openehr.rm.composition.Composition;
-import org.openehr.rm.composition.CompositionTestBase;
 import org.openehr.rm.composition.content.ContentItem;
 import org.openehr.rm.composition.content.entry.AdminEntry;
 import org.openehr.rm.datastructure.itemstructure.ItemList;
@@ -33,7 +32,6 @@ import org.openehr.rm.support.identification.ObjectRef;
 import org.openehr.rm.support.identification.ObjectVersionID;
 import org.openehr.rm.support.identification.UIDBasedID;
 import org.openehr.rm.support.identification.VersionTreeID;
-import org.openehr.rm.support.terminology.TestCodeSetAccess;
 import se.acode.openehr.parser.ADLParser;
 
 public class RMTestBase extends CompositionTestBase

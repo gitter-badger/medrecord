@@ -4,12 +4,12 @@ import java.io.IOException;
 
 import com.medvision360.medrecord.spi.base.AbstractLocatableStore;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
-import com.medvision360.medrecord.spi.exceptions.IOValidationException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
 import com.medvision360.medrecord.spi.exceptions.SerializeException;
 import com.medvision360.medrecord.spi.exceptions.StatusException;
+import com.medvision360.medrecord.spi.exceptions.TransformException;
 import com.medvision360.medrecord.spi.exceptions.ValidationException;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
@@ -18,30 +18,24 @@ import org.openehr.rm.support.identification.HierObjectID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class ValidatingLocatableStore extends AbstractLocatableStore implements LocatableStore
+public class TransformingLocatableStore extends AbstractLocatableStore implements LocatableStore
 {
     protected LocatableStore m_delegate;
-    protected LocatableValidator m_validator;
-    protected boolean m_validateOnRetrieve = false;
-
-    public ValidatingLocatableStore(String name, LocatableSelector locatableSelector,
-            LocatableStore delegate, LocatableValidator validator)
+    protected LocatableTransformer m_transformer;
+    
+    public TransformingLocatableStore(String name, LocatableSelector locatableSelector,
+            LocatableStore delegate, LocatableTransformer transformer)
     {
         super(name, locatableSelector);
         m_delegate = checkNotNull(delegate, "delegate cannot be null");
-        m_validator = checkNotNull(validator, "validator cannot be null");
+        m_transformer = checkNotNull(transformer, "transformer cannot be null");
     }
 
-    public ValidatingLocatableStore(String name, LocatableStore delegate, LocatableValidator validator)
+    public TransformingLocatableStore(String name, LocatableStore delegate, LocatableTransformer transformer)
     {
         super(name);
         m_delegate = checkNotNull(delegate, "delegate cannot be null");
-        m_validator = checkNotNull(validator, "validator cannot be null");
-    }
-
-    public void setValidateOnRetrieve(boolean validateOnRetrieve)
-    {
-        m_validateOnRetrieve = validateOnRetrieve;
+        m_transformer = checkNotNull(transformer, "transformer cannot be null");
     }
 
     @Override
@@ -59,10 +53,7 @@ public class ValidatingLocatableStore extends AbstractLocatableStore implements 
     @Override
     public Locatable get(HierObjectID id) throws NotFoundException, IOException, ParseException
     {
-        checkNotNull(id, "id cannot be null");
-        Locatable result = m_delegate.get(id);
-        validateOnRetrieve(result);
-        return result;
+        return m_delegate.get(id);
     }
 
     @Override
@@ -70,7 +61,14 @@ public class ValidatingLocatableStore extends AbstractLocatableStore implements 
             throws DuplicateException, NotSupportedException, IOException, SerializeException, ValidationException
     {
         checkNotNull(locatable, "locatable cannot be null");
-        validate(locatable);
+        try
+        {
+            transform(locatable);
+        }
+        catch (TransformException e)
+        {
+            throw new IOException(e);
+        }
         return m_delegate.insert(locatable);
     }
 
@@ -80,7 +78,14 @@ public class ValidatingLocatableStore extends AbstractLocatableStore implements 
     {
         checkNotNull(EHR, "EHR cannot be null");
         checkNotNull(locatable, "locatable cannot be null");
-        validate(locatable);
+        try
+        {
+            transform(locatable);
+        }
+        catch (TransformException e)
+        {
+            throw new IOException(e);
+        }
         return m_delegate.insert(EHR, locatable);
     }
 
@@ -89,7 +94,14 @@ public class ValidatingLocatableStore extends AbstractLocatableStore implements 
             throws NotSupportedException, NotFoundException, IOException, SerializeException, ValidationException
     {
         checkNotNull(locatable, "locatable cannot be null");
-        validate(locatable);
+        try
+        {
+            transform(locatable);
+        }
+        catch (TransformException e)
+        {
+            throw new IOException(e);
+        }
         return m_delegate.update(locatable);
     }
 
@@ -141,33 +153,8 @@ public class ValidatingLocatableStore extends AbstractLocatableStore implements 
         return m_delegate.reportStatus();
     }
 
-    protected void validate(Locatable locatable) throws ValidationException
+    protected void transform(Locatable locatable) throws TransformException
     {
-        try
-        {
-            m_validator.check(locatable);
-        }
-        catch (NotSupportedException e)
-        {
-            // ignore
-        }
+        m_transformer.transform(locatable);
     }
-
-    protected void validateOnRetrieve(Locatable result) throws IOValidationException
-    {
-        try
-        {
-            m_validator.check(result);
-        }
-        catch (NotSupportedException e)
-        {
-            // ignore
-        }
-        catch (ValidationException e)
-        {
-            throw new IOValidationException(e);
-        }
-    }
-
-
 }

@@ -5,7 +5,13 @@ apply plugin: 'medvision-java'
 import nl.javadude.gradle.plugins.license.License
 
 tasks.withType(License).each { licenseTask ->
-    licenseTask.exclude 'org/openehr/rm/**'
+    licenseTask.exclude 'com/medvision360/medrecord/spi/tck/CompositionTestBase.java'
+    licenseTask.exclude 'com/medvision360/medrecord/spi/tck/DataStructureTestBase.java'
+    licenseTask.exclude 'com/medvision360/medrecord/spi/tck/TestCodeSetAccess.java'
+    licenseTask.exclude 'com/medvision360/medrecord/spi/tck/TestMeasurementService.java'
+    licenseTask.exclude 'com/medvision360/medrecord/spi/tck/TestTerminologyAccess.java'
+    licenseTask.exclude 'com/medvision360/medrecord/spi/tck/TestTerminologyID.java'
+    licenseTask.exclude 'com/medvision360/medrecord/spi/tck/TestTerminologyService.java'
 }
 
 description = 'MEDvision360 MEDrecord Service Provider Interface Test Compatibility Kit'

@@ -16,7 +16,7 @@ import org.openehr.rm.support.identification.ObjectRef;
 /**
  * An EHR record backed by a store.
  */
-public class StoredEHR extends EHR
+public class StoredEHR extends DeletableEHR
 {
     private static final long serialVersionUID = 0x130L;
     private final static ArrayList<ObjectRef> EMPTY_LIST = new ArrayList<>();
@@ -32,26 +32,27 @@ public class StoredEHR extends EHR
             @Attribute(name = "contributions", required = true) List<ObjectRef> contributions,
             @Attribute(name = "ehrStatus", required = true) ObjectRef ehrStatus,
             @Attribute(name = "directory") ObjectRef directory,
-            @Attribute(name = "compositions", required = true) List<ObjectRef> compositions)
+            @Attribute(name = "compositions", required = true) List<ObjectRef> compositions,
+            @Attribute(name = "deleted", required = true) boolean deleted)
     {
-        super(ehrStore.getSystemID(), ehrID, timeCreated, contributions, ehrStatus, directory, compositions);
+        super(ehrStore.getSystemID(), ehrID, timeCreated, contributions, ehrStatus, directory, compositions, deleted);
         m_compositionStore = compositionStore;
     }
 
     public StoredEHR(
-            @Attribute(name = "store", required = true) EHRStore ehrStore,
-            @Attribute(name = "compositionStore", required = true) LocatableStore compositionStore,
-            @Attribute(name = "ehrID", required = true) HierObjectID ehrID,
-            @Attribute(name = "ehrStatus", required = true) ObjectRef ehrStatus)
+            EHRStore ehrStore,
+            LocatableStore compositionStore,
+            HierObjectID ehrID,
+            ObjectRef ehrStatus)
     {
-        this(ehrStore, compositionStore, ehrID, new DvDateTime(), EMPTY_LIST, ehrStatus, null, EMPTY_LIST);
+        this(ehrStore, compositionStore, ehrID, new DvDateTime(), EMPTY_LIST, ehrStatus, null, EMPTY_LIST, false);
     }
 
     public StoredEHR(
-            @Attribute(name = "store", required = true) EHRStore ehrStore,
-            @Attribute(name = "compositionStore", required = true) LocatableStore compositionStore,
-            @Attribute(name = "uidFactory", required = true) UIDFactory uidFactory,
-            @Attribute(name = "ehrStatus", required = true) ObjectRef ehrStatus)
+            EHRStore ehrStore,
+            LocatableStore compositionStore,
+            UIDFactory uidFactory,
+            ObjectRef ehrStatus)
     {
         this(ehrStore, compositionStore, uidFactory.makeUID(), ehrStatus);
     }
@@ -71,7 +72,7 @@ public class StoredEHR extends EHR
             Iterable<HierObjectID> list = m_compositionStore.list(this, "COMPOSITION");
             for (HierObjectID id : list)
             {
-                result.add(new ObjectRef(id, "local", "COMPOSITION"));
+                result.add(new ObjectRef(id, "LOCAL", "COMPOSITION"));
             }
             return result;
         }

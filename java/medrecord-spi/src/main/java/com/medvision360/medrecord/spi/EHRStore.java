@@ -19,11 +19,11 @@ public interface EHRStore extends TransactionalService, StatusService // todo ja
     public EHR insert(EHR EHR)
             throws DuplicateException, NotSupportedException, IOException, SerializeException;
 
-    public void delete(HierObjectID id) throws NotFoundException, IOException;
+    public void delete(HierObjectID id) throws NotFoundException, IOException, ParseException, SerializeException;
 
-    public void undelete(HierObjectID id) throws NotFoundException, IOException;
+    public void undelete(HierObjectID id) throws NotFoundException, IOException, ParseException, SerializeException;
 
-    public boolean has(HierObjectID id) throws IOException;
+    public boolean has(HierObjectID id) throws IOException, ParseException;
 
     public Iterable<HierObjectID> list() throws IOException;
 

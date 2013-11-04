@@ -11,21 +11,19 @@
  * for the specific language governing rights and limitations under the
  * License.
  */
-package org.openehr.rm.composition;
+package com.medvision360.medrecord.spi.tck;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.measure.Measure;
 
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.common.generic.PartyIdentified;
 import org.openehr.rm.common.generic.PartySelf;
+import org.openehr.rm.composition.EventContext;
 import org.openehr.rm.composition.content.ContentItem;
 import org.openehr.rm.composition.content.entry.Observation;
 import org.openehr.rm.composition.content.navigation.Section;
-import org.openehr.rm.datastructure.DataStructureTestBase2;
 import org.openehr.rm.datastructure.history.Event;
 import org.openehr.rm.datastructure.history.History;
 import org.openehr.rm.datastructure.history.PointEvent;
@@ -42,10 +40,7 @@ import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.PartyRef;
 import org.openehr.rm.support.measurement.MeasurementService;
-import org.openehr.rm.support.measurement.TestMeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
-import org.openehr.rm.support.terminology.TestCodeSetAccess;
-import org.openehr.rm.support.terminology.TestTerminologyService;
 
 /**
  * EntryTestBase
@@ -54,7 +49,7 @@ import org.openehr.rm.support.terminology.TestTerminologyService;
  * @version 1.0
  */
 @SuppressWarnings({"UnusedDeclaration", "Convert2Diamond"})
-public class CompositionTestBase extends DataStructureTestBase2
+public class CompositionTestBase extends DataStructureTestBase
 {
 
     public CompositionTestBase(String test)

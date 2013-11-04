@@ -62,6 +62,18 @@ public class LocatableSelectorBuilder
         return result;
     }
 
+    public LocatableSelectorBuilder include(LocatableSelector rule)
+    {
+        m_requirements.add(new LocatableSelectorRule(rule));
+        return this;
+    }
+
+    public LocatableSelectorBuilder exclude(LocatableSelector rule)
+    {
+        m_requirements.add(new InverseRule(new LocatableSelectorRule(rule)));
+        return this;
+    }
+
     public LocatableSelectorBuilder include(Rule rule)
     {
         m_requirements.add(rule);
@@ -132,6 +144,28 @@ public class LocatableSelectorBuilder
         boolean match(Locatable test);
 
         boolean match(Archetyped test);
+    }
+    
+    public static class LocatableSelectorRule implements Rule
+    {
+        private LocatableSelector m_delegate;
+
+        public LocatableSelectorRule(LocatableSelector delegate)
+        {
+            m_delegate = delegate;
+        }
+
+        @Override
+        public boolean match(Locatable test)
+        {
+            return m_delegate.supports(test);
+        }
+
+        @Override
+        public boolean match(Archetyped test)
+        {
+            return m_delegate.supports(test);
+        }
     }
 
     public static class InverseRule implements Rule

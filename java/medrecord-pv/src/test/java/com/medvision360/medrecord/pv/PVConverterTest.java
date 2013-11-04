@@ -10,8 +10,8 @@ import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.spi.tck.LocatableConverterTCKTestBase;
 import org.openehr.am.archetype.Archetype;
 import org.openehr.rm.common.archetyped.Locatable;
-import org.openehr.rm.support.measurement.TestMeasurementService;
-import org.openehr.rm.support.terminology.TestTerminologyService;
+import com.medvision360.medrecord.spi.tck.TestMeasurementService;
+import com.medvision360.medrecord.spi.tck.TestTerminologyService;
 
 public class PVConverterTest extends LocatableConverterTCKTestBase
 {

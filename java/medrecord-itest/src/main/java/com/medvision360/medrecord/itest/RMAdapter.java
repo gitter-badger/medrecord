@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.measure.unit.Unit;
 
 import com.medvision360.medrecord.rmutil.RMUtil;
+import com.medvision360.medrecord.spi.Terminology;
 import org.openehr.am.archetype.constraintmodel.CComplexObject;
 import org.openehr.rm.datatypes.encapsulated.DvParsable;
 import org.openehr.rm.datatypes.quantity.ProportionKind;
@@ -17,7 +18,6 @@ import org.openehr.rm.datatypes.text.DvText;
 import org.openehr.rm.datatypes.uri.DvURI;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.LocatableRef;
-import org.openehr.rm.support.identification.ObjectRef;
 import org.openehr.rm.support.identification.ObjectVersionID;
 
 /**

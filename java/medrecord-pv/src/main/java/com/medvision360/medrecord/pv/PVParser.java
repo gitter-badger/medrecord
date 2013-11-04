@@ -41,6 +41,8 @@ import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.measurement.MeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 // based on XMLBinding from reference implementation
 
 @SuppressWarnings("rawtypes")
@@ -85,6 +87,24 @@ public class PVParser extends AbstractPVParser
     private DvCodedText m_categoryEvent;
     private String m_rmVersion = "1.0.2";
 
+    public PVParser(Map<SystemValue, Object> systemValues)
+    {
+        super(((CodePhrase) systemValues.get(SystemValue.ENCODING)).getCodeString());
+        m_encoding = checkNotNull((CodePhrase) systemValues.get(SystemValue.ENCODING), 
+                "systemValues.ENCODING cannot be null");
+        m_language = checkNotNull((CodePhrase) systemValues.get(SystemValue.LANGUAGE), 
+                "systemValues.LANGUAGE cannot be null");
+        m_territory = checkNotNull((CodePhrase) systemValues.get(SystemValue.TERRITORY), 
+                "systemValues.TERRITORY cannot be null");
+        
+        TerminologyService terminologyService = checkNotNull(
+                (TerminologyService) systemValues.get(SystemValue.TERMINOLOGY_SERVICE), 
+                "systemValues.TERMINOLOGY_SERVICE cannot be null");
+        findCategoryEvent(terminologyService);
+        
+        m_builder = RMObjectBuilder.getInstance(systemValues);
+    }
+
     public PVParser(TerminologyService terminologyService, MeasurementService measurementService,
             CodePhrase encoding, CodePhrase language, CodePhrase territory)
     {
@@ -100,7 +120,14 @@ public class PVParser extends AbstractPVParser
         m_language = language;
         systemValues.put(SystemValue.TERRITORY, territory);
         m_territory = territory;
+
+        findCategoryEvent(terminologyService);
         
+        m_builder = RMObjectBuilder.getInstance(systemValues);
+    }
+
+    private void findCategoryEvent(TerminologyService terminologyService)
+    {
         Iterator<CodePhrase> it = terminologyService
                 .terminology(TerminologyService.OPENEHR)
                 .codesForGroupName("composition category", m_language.getCodeString())
@@ -114,8 +141,6 @@ public class PVParser extends AbstractPVParser
                 break;
             }
         }
-        
-        m_builder = RMObjectBuilder.getInstance(systemValues);
     }
 
     public void setRmVersion(String rmVersion)
@@ -215,14 +240,15 @@ public class PVParser extends AbstractPVParser
             }
             catch (RMObjectBuildingException e)
             {
-                if (e.getMessage() != null && e.getMessage().contains("type unknown"))
+                if (shouldRetryWithGuess(e))
                 {
-                    String guess = guessRmEntity(rmEntity, node);
-                    if (guess == null)
+                    rmEntity = guessRmEntity(rmEntity, node);
+                    if (rmEntity == null)
                     {
                         throw e;
                     }
-                    result = m_builder.construct(guess, valueMap);
+                    //rmEntity = guess;
+                    result = m_builder.construct(rmEntity, valueMap);
                 }
                 else
                 {
@@ -241,6 +267,15 @@ public class PVParser extends AbstractPVParser
         {
             throw new ParseException(String.format("Problem while parsing %s: %s", node, e.getMessage()), e);
         }
+    }
+
+    private boolean shouldRetryWithGuess(RMObjectBuildingException e)
+    {
+        String message = e.getMessage();
+        return message != null &&
+                (message.contains("type unknown") ||
+                 message.contains("Missing @FullConstructor") ||
+                 message.contains("type abstract"));
     }
 
     private void parseNodeFields(Node node, Map<String, Object> valueMap)
@@ -283,14 +318,14 @@ public class PVParser extends AbstractPVParser
         }
         catch (RMObjectBuildingException e)
         {
-            if (e.getMessage() != null && e.getMessage().contains("RM type unknown"))
+            if (shouldRetryWithGuess(e))
             {
-                String guess = guessRmEntity(rmEntity, node);
-                if (guess == null)
+                rmEntity = guessRmEntity(rmEntity, node);
+                if (rmEntity == null)
                 {
                     throw e;
                 }
-                attributes = m_builder.retrieveAttribute(guess);
+                attributes = m_builder.retrieveAttribute(rmEntity);
             }
             else
             {

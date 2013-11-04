@@ -1,6 +1,6 @@
 /*
  * component:   "openEHR Reference Implementation"
- * description: "Class TestTerminologyService"
+ * description: "Class TestTerminologyID"
  * keywords:    "unit test"
  *
  * author:      "Rong Chen <rong@acode.se>"
@@ -8,71 +8,35 @@
  * copyright:   "Copyright (c) 2004 Acode HB, Sweden"
  * license:     "See notice at bottom of class"
  *
- * file:        "$URL: http://svn.openehr.org/ref_impl_java/BRANCHES/RM-1.0-update/libraries/src/test/org/openehr/rm/support/terminology/TestTerminologyService.java $"
- * revision:    "$LastChangedRevision: 50 $"
- * last_change: "$LastChangedDate: 2006-08-10 13:21:46 +0200 (Thu, 10 Aug 2006) $"
+ * file:        "$URL: http://svn.openehr.org/ref_impl_java/BRANCHES/RM-1.0-update/libraries/src/test/org/openehr/rm/support/identification/TestTerminologyID.java $"
+ * revision:    "$LastChangedRevision: 2 $"
+ * last_change: "$LastChangedDate: 2005-10-12 23:20:08 +0200 (Wed, 12 Oct 2005) $"
  */
-package org.openehr.rm.support.terminology;
+package com.medvision360.medrecord.spi.tck;
 
-import java.util.List;
-import java.util.Map;
+import org.openehr.rm.support.identification.TerminologyID;
 
 /**
- * TestTerminologyService
+ * TestTerminologyID
  *
  * @author Rong Chen
  * @version 1.0
  */
-public class TestTerminologyService implements TerminologyService
+public class TestTerminologyID
 {
 
-    public static TestTerminologyService getInstance()
+    /* fields */
+    public static final TerminologyID LANGUAGE;
+    public static final TerminologyID CHARSET;
+    public static final TerminologyID SNOMEDCT;
+
+    static
     {
-        return new TestTerminologyService();
-    }
+        LANGUAGE = new TerminologyID("language-test");
 
-    public TerminologyAccess terminology(String name)
-    {
-        return new TestTerminologyAccess();
-    }
+        CHARSET = new TerminologyID("charset-test");
 
-    public CodeSetAccess codeSet(String name)
-    {
-        return new TestCodeSetAccess();
-    }
-
-    public boolean hasTerminology(String name)
-    {
-        return false;
-    }
-
-    public boolean hasCodeSet(String name)
-    {
-        return false;
-    }
-
-
-    public CodeSetAccess codeSetForId(OpenEHRCodeSetIdentifiers name)
-    {
-        return new TestCodeSetAccess();
-    }
-
-
-    public List<String> terminologyIdentifiers()
-    {
-        return null;
-    }
-
-
-    public List<String> codeSetIdentifiers()
-    {
-        return null;
-    }
-
-
-    public Map<String, String> openehrCodeSets()
-    {
-        return null;
+        SNOMEDCT = new TerminologyID("snomedct-test");
     }
 }
 
@@ -90,7 +54,7 @@ public class TestTerminologyService implements TerminologyService
  *  for the specific language governing rights and limitations under the
  *  License.
  *
- *  The Original Code is TestTerminologyService.java
+ *  The Original Code is TestTerminologyID.java
  *
  *  The Initial Developer of the Original Code is Rong Chen.
  *  Portions created by the Initial Developer are Copyright (C) 2003-2004

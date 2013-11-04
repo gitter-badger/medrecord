@@ -18,7 +18,7 @@
  * @author Rong Chen
  * @version 1.0
  */
-package org.openehr.rm.datastructure;
+package com.medvision360.medrecord.spi.tck;
 
 import java.util.List;
 
@@ -37,10 +37,10 @@ import org.openehr.rm.datatypes.text.DvText;
 import org.openehr.rm.support.identification.TerminologyID;
 
 @SuppressWarnings("UnusedDeclaration")
-public class DataStructureTestBase2 extends TestCase
+public class DataStructureTestBase extends TestCase
 {
 
-    public DataStructureTestBase2(String test)
+    public DataStructureTestBase(String test)
     {
         super(test);
     }

@@ -12,7 +12,7 @@
  * revision:    "$LastChangedRevision: 2 $"
  * last_change: "$LastChangedDate: 2005-10-12 22:20:08 +0100 (Wed, 12 Oct 2005) $"
  */
-package org.openehr.rm.support.terminology;
+package com.medvision360.medrecord.spi.tck;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +20,7 @@ import java.util.Set;
 import org.openehr.rm.datatypes.basic.DvState;
 import org.openehr.rm.datatypes.text.CodePhrase;
 import org.openehr.rm.datatypes.text.DvCodedText;
+import org.openehr.rm.support.terminology.CodeSetAccess;
 
 /**
  * TestCodeSetAccess
