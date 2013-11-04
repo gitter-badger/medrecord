@@ -1,0 +1,23 @@
+# this is a template properties file
+#
+# If you need special settings during development, copy this file to
+# configuration.properties and make your changes there.
+# The build will automatically use the correct file during development.
+#
+
+#
+# settings for protecting the resources
+#
+
+# these settings are for configuring the serverlib login stuff
+#idserver.url=http://localhost:8080/idserver2
+#idserver.gapinghole.alwaysallowaccount=test@medvision360.com
+#idserver.gapinghole.alwaysallowtoken=LEMMEIN
+#idserver.gapinghole.alwaysallowmvuid=12345678-1234-1234-1234-1234567890ab
+#lib.server.login.apikey=42
+
+#
+# LOGGING
+#
+lib.server.config.logbackconfigfile=/etc/medvision360/${artifactId}/logback.xml
+

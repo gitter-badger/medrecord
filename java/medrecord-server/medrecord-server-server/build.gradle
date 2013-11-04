@@ -1,0 +1,25 @@
+apply plugin: 'medvision-server'
+
+dependencies {
+  compile project(":medrecord-server-api-jee")
+
+  testCompile "junit:junit:4.11"
+  testCompile "org.restlet.jee:org.restlet.ext.httpclient:${ext.version.restlet}"
+  testCompile project(":medrecord-server-client-jee")
+
+  // the artifact containing the swagger docs
+  swagger project(path: ":medrecord-server-api-jee", configuration: "swaggerArtifacts")
+  swagger "com.medvision360.lib.web:swagger:+:swaggerTool@zip"
+
+    //jsonSchema project(path: ":medrecord-server-api-jee", configuration: "jsonSchemaArtifacts")
+}
+
+prepareTomcat {
+  // TODO: make sure a special logback config is added to the debian package
+  logbackConfig = project.file("logback-test.xml")
+}
+
+tomcatRunWar {
+  httpPort = 8100
+  stopPort = 8101
+}

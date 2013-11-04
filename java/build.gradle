@@ -35,10 +35,10 @@ allprojects {
                     }
                 }
             }
-    
+
             module.dependencies.removeAll(moduleDependencies)
             def jarDependencies = new LinkedHashSet(module.dependencies)
-    
+
             module.dependencies.clear()
             module.dependencies.addAll(moduleDependencies)
             module.dependencies.addAll(jarDependencies)
@@ -49,6 +49,7 @@ allprojects {
 subprojects {
     group = 'com.medvision360.medrecord'
     version = '2.0.0'
+    description = 'MEDvision360 MEDrecord, an openEHR based medical record server'
 
     // Change version based on the build location.
     // When build locally it adds '-SNAPSHOT' when build on Cloudbees it adds
@@ -70,6 +71,13 @@ subprojects {
     }
 
     ext {
+        // some settings used by the Restlet server
+        server = [
+                displayName     : 'MEDrecord Server',
+                applicationClass: 'com.medvision360.medrecord.server.MedRecordServerApplication',
+                projectId       : 'medrecord'
+        ]
+
         // Version numbers of dependencies.
         version = [
                 'commonsCli': '1.2',
@@ -87,7 +95,9 @@ subprojects {
                 'jaxen': '1.1.4',
                 'jackson': '2.2.3',
                 'archetypes': '2.0.0',
-                'spring': '3.2.4.RELEASE'
+                'spring': '3.2.4.RELEASE',
+                'medvisionlib' : 'latest.integration',
+                'restlet' : '2.2-M1',
         ]
     }
 

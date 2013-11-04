@@ -1,0 +1,41 @@
+apply plugin: 'medvision-java'
+apply plugin: 'medvision-apidoc'
+apply plugin: 'medvision-clientdoclet'
+apply plugin: 'medvision-javadoc'
+apply plugin: 'static-analysis'
+
+description += ' API'
+
+configurations {
+    xslt
+}
+
+//
+// artifacts to be uploaded
+//
+
+apply plugin: 'medvision-publish'
+artifacts {
+    // only the artifacts listed below will be uploaded to the public repo
+    publicArchives jar
+}
+
+
+dependencies {
+    compile "com.medvision360.lib:libs-api-jee:${ext.version.medvisionlib}"
+    compile "com.medvision360.lib:libs-common-jee:${ext.version.medvisionlib}"
+    compile "org.restlet.jee:org.restlet:${ext.version.restlet}"
+    xslt "net.sf.saxon:Saxon-HE:9.5.1-1"
+}
+
+generateClientSource {
+    // todo: the client should run the clientdoclet themselves
+    configure(options) {
+        destinationDir = file("../medrecord-server-client-jee/src/main/java")
+    }
+}
+
+tasks.javadoc {
+    // MEDcore codeset2 javadoc issue collector
+    options.footer += "<script type=\"text/javascript\" src=\"https://zorggemak.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e/en_US-fra9ft-1988229788/6204/110/1.4.0-m8/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=c797e8f6\"></script>"
+}

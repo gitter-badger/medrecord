@@ -10,9 +10,19 @@ include(
         'medrecord-rmutil',
         'medrecord-spi',
         'medrecord-spi-tck',
-        'medrecord-tools-dumpadl'
+        'medrecord-tools-dumpadl',
+        'medrecord-server-api-jee',
+        'medrecord-server-client-jee',
+        'medrecord-server-deb',
+        'medrecord-server-server',
 )
 
 project(':medrecord-client-archetyped').projectDir = new File(rootDir, 'medrecord-client/medrecord-client-archetyped')
 project(':medrecord-tools-dumpadl').projectDir = new File(rootDir, 'medrecord-tools/medrecord-tools-dumpadl')
+
+project(':medrecord-server-api-jee').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-api-jee')
+project(':medrecord-server-client-jee').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-client-jee')
+project(':medrecord-server-deb').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-deb')
+project(':medrecord-server-server').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-server')
+
 
