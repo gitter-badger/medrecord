@@ -9,6 +9,7 @@ import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
 import com.medvision360.medrecord.spi.exceptions.SerializeException;
+import com.medvision360.medrecord.spi.exceptions.ValidationException;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.demographic.Person;
 import org.openehr.rm.ehr.EHR;
@@ -85,7 +86,7 @@ public interface Engine extends TransactionalService, NamedService, StatusServic
     EHR getEHRForLocatable(UIDBasedID locatable) throws NotFoundException, IOException, ParseException;
     
     EHR createEHR(EHRStatus EHRStatus) throws NotFoundException, DuplicateException, NotSupportedException,
-            IOException, SerializeException;
+            IOException, SerializeException, ValidationException;
     
     EHRStatus getEHRStatus(EHR EHR) throws NotFoundException, IOException, ParseException;
     
