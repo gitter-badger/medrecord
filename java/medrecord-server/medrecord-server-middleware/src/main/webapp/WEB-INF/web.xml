@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  <description>The ZorgGemak Middleware web layer</description>
+  <display-name>Middleware</display-name>
+
+  <filter>
+    <description>Filter for cross domain requests</description>
+    <filter-name>CORSFilter</filter-name>
+    <filter-class>com.zorggemak.filters.CORSFilter</filter-class>
+  </filter>
+
+  <filter>
+    <description>Add a vary header</description>
+    <filter-name>VaryFilter</filter-name>
+    <filter-class>com.zorggemak.filters.VaryFilter</filter-class>
+  </filter>
+
+  <filter>
+    <description>Translate DELETE and PUT into POST</description>
+    <filter-name>SpringMethodFilter</filter-name>
+    <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>CORSFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>VaryFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>SpringMethodFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <listener>
+    <description>ServletContextListener</description>
+    <listener-class>com.zorggemak.servlet.ServletListener</listener-class>
+  </listener>
+
+  <servlet>
+    <servlet-name>dispatcher</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
+
+  <servlet>
+      <servlet-name>EventSocketServlet</servlet-name>
+      <servlet-class>
+          com.medvision360.wslog.EventSocketServlet
+      </servlet-class>
+      <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
+      <servlet-name>LogSocketServlet</servlet-name>
+      <servlet-class>
+          com.medvision360.wslog.LogSocketServlet
+      </servlet-class>
+      <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+      <servlet-name>EventSocketServlet</servlet-name>
+      <url-pattern>/wslog/events</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+      <servlet-name>LogSocketServlet</servlet-name>
+      <url-pattern>/wslog/logs</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>dispatcher</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>*.png</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>*.jpg</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>*.js</url-pattern>
+  </servlet-mapping>
+
+</web-app>
