@@ -1,10 +1,7 @@
 package com.medvision360.medrecord.api.archetype;
 
-import java.io.IOException;
-
-import com.medvision360.lib.common.exceptions.AnnotatedResourceException;
-import com.medvision360.medrecord.spi.exceptions.RecordException;
-import org.restlet.representation.Representation;
+import com.medvision360.lib.api.MissingParameterException;
+import com.medvision360.lib.api.ServiceUnavailableException;
 import org.restlet.resource.Get;
 
 /**
@@ -20,6 +17,15 @@ public interface ArchetypeResource
      * @apiqueryparam id An OpenEHR ArchetypeID value.
      *   [type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
      */
-    @Get
-    public Representation getArchetype() throws AnnotatedResourceException, IOException, RecordException;
+    @Get("txt")
+    public String getArchetype() throws
+            ArchetypeNotFoundException, MissingParameterException, ServiceUnavailableException;
+
+    // @Get("txt") means it returns plain/text
+    // You almost never have to return an explicit Representation. Restlet is smart enough to convert it.
+    // (TODO: the api documentation tool does not support plain text responses yet...)
+    // Only use exceptions derived from AnnotatedResourceException here, by listing them all explicitly here they
+    // will show up in the API documentation.
+
+
 }

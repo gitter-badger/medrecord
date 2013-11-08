@@ -75,6 +75,15 @@ public final class Dumper
         }
 
         final String ident = i + "  ";
+
+        System.out.println(String.format(
+                "%-60s   type: %-15s %6s %s",
+                i + "-" + termTxt,
+                object.getRmTypeName(),
+                occurrences(object),
+                object.path()
+        ));
+        /*
         System.out.println(String.format(
                 "%-50s %-20s typeName:%-15s %6s %8s %-80s %s",
                 i + name,
@@ -85,7 +94,7 @@ public final class Dumper
                 object.path(),
                 termTxt
         ));
-
+        */
         if (object instanceof CComplexObject)
         {
             CComplexObject cobject = (CComplexObject)object;
@@ -124,6 +133,14 @@ public final class Dumper
         final String ident = i + "  ";
 
         System.out.println(String.format(
+                "%-60s   type: %-15s %6s %s",
+                i + "-" + attribute.getRmAttributeName(),
+                "",
+                occurrences(attribute),
+                attribute.path()
+        ));
+/*
+        System.out.println(String.format(
                 "%-50s %-20s attrName:%-15s        %8s %-80s",
                 i + name,
                 attribute.getClass().getSimpleName(),
@@ -131,7 +148,7 @@ public final class Dumper
                 occurrences(attribute),
                 attribute.path()
         ));
-
+*/
         final List<CObject> objects = attribute.getChildren();
         for (int idx = 0; idx < objects.size(); ++idx)
         {
