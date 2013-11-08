@@ -1,5 +1,7 @@
 package com.zorggemak.controller;
 
+import com.medvision360.medrecord.engine.MedRecordEngine;
+import com.medvision360.medrecord.spi.exceptions.InitializationException;
 import com.zorggemak.commons.MiddlewareErrors;
 import com.zorggemak.util.WebUtils;
 import org.apache.commons.logging.Log;
@@ -14,6 +16,14 @@ import java.util.HashMap;
 
 public abstract class AbstractController {
     private final static Log log = LogFactory.getLog(AbstractController.class);
+    
+    private final static MedRecordEngine engine = new MedRecordEngine();
+
+    public MedRecordEngine engine() throws InitializationException
+    {
+        engine.initialize();
+        return engine;
+    }
 
     @ExceptionHandler(Exception.class)
     public void handleException(Exception e, HttpServletRequest request, HttpServletResponse response) {

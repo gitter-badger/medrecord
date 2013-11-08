@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Iterator;
 
 @SuppressWarnings({"unchecked", "SpellCheckingInspection"})
@@ -42,55 +41,55 @@ public class TestController extends AbstractController {
         }
     }
 
-    @RequestMapping(value = "/getobjectdata", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String getobjectdata(@RequestParam("objid") String objid, HttpServletRequest request) {
-        ArchetypeObject archetype;
-        Iterator iter;
-        String path;
-        String value;
-        StringBuffer buf = new StringBuffer();
-
-        try {
-            if ((archetype = ObjectHelper.getArchetypeObject(objid, true)) != null) {
-                buf.append("<table border=\"1\">");
-                iter = archetype.getPathIterator();
-                while (iter.hasNext()) {
-                    path = (String) iter.next();
-                    value = archetype.getPathValue(path).trim();
-                    buf.append("<tr><td>");
-                    buf.append(archetype.getArchetypeId());
-                    buf.append(" ");
-                    buf.append(path);
-                    buf.append("</td><td>");
-                    if (value != null) {
-                        if (value.startsWith("http:") || value.startsWith("https:")) {
-                            buf.append("<a href=\"");
-                            buf.append(value);
-                            buf.append("\" target=\"_blank\">");
-                            buf.append(value);
-                            buf.append("</a>");
-                        } else {
-                            buf.append(value);
-                        }
-                    } else {
-                        buf.append("");
-                    }
-                    buf.append("</td><td>");
-                    buf.append(path);
-                    buf.append("</td></tr>");
-                }
-                buf.append("</table>");
-                buf.append("\n");
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            buf.append(e.getMessage());
-            WebUtils.middlewareException(request, MiddlewareErrors.SERVER_EXCEPTION, e.getMessage(), e);
-        }
-        return buf.toString();
-    }
+//    @RequestMapping(value = "/getobjectdata", method = RequestMethod.GET)
+//    public
+//    @ResponseBody
+//    String getobjectdata(@RequestParam("objid") String objid, HttpServletRequest request) {
+//        ArchetypeObject archetype;
+//        Iterator iter;
+//        String path;
+//        String value;
+//        StringBuffer buf = new StringBuffer();
+//
+//        try {
+//            if ((archetype = ObjectHelper.getArchetypeObject(objid, true)) != null) {
+//                buf.append("<table border=\"1\">");
+//                iter = archetype.getPathIterator();
+//                while (iter.hasNext()) {
+//                    path = (String) iter.next();
+//                    value = archetype.getPathValue(path).trim();
+//                    buf.append("<tr><td>");
+//                    buf.append(archetype.getArchetypeId());
+//                    buf.append(" ");
+//                    buf.append(path);
+//                    buf.append("</td><td>");
+//                    if (value != null) {
+//                        if (value.startsWith("http:") || value.startsWith("https:")) {
+//                            buf.append("<a href=\"");
+//                            buf.append(value);
+//                            buf.append("\" target=\"_blank\">");
+//                            buf.append(value);
+//                            buf.append("</a>");
+//                        } else {
+//                            buf.append(value);
+//                        }
+//                    } else {
+//                        buf.append("");
+//                    }
+//                    buf.append("</td><td>");
+//                    buf.append(path);
+//                    buf.append("</td></tr>");
+//                }
+//                buf.append("</table>");
+//                buf.append("\n");
+//            }
+//        } catch (Exception e) {
+//            log.error(e.getMessage(), e);
+//            buf.append(e.getMessage());
+//            WebUtils.middlewareException(request, MiddlewareErrors.SERVER_EXCEPTION, e.getMessage(), e);
+//        }
+//        return buf.toString();
+//    }
 
     @RequestMapping(value = "/getversion", method = RequestMethod.GET)
     public

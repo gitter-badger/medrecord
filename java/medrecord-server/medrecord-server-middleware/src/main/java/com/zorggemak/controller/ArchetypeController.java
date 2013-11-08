@@ -1,15 +1,17 @@
 package com.zorggemak.controller;
 
-import com.medvision360.kernel.engine.archetype.ArchetypePathMap;
-import com.medvision360.kernel.engine.archetype.TermDefinitionMap;
-import com.medvision360.kernel.engine.archetype.ArchetypeImplementation;
-import com.medvision360.kernel.engine.archetype.ArchetypeExistsException;
-import com.medvision360.kernel.engine.archetype.ArchetypeNotFoundException;
-import com.medvision360.kernel.engine.KernelException;
-import com.medvision360.kernel.xmlutils.XSUtils;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import com.medvision360.medrecord.spi.ArchetypeParser;
+import com.medvision360.medrecord.spi.WrappedArchetype;
+import com.medvision360.medrecord.spi.exceptions.DuplicateException;
+import com.medvision360.medrecord.spi.exceptions.NotFoundException;
+import com.medvision360.medrecord.spi.exceptions.RecordException;
 import com.zorggemak.commons.MiddlewareErrors;
-import org.openehr.am.serialize.ADLMapPathNodeID;
-import org.openehr.am.serialize.ADLSerializerException;
+import org.apache.commons.io.IOUtils;
+import org.openehr.am.archetype.Archetype;
+import org.openehr.rm.support.identification.ArchetypeID;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,9 +20,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.regex.Pattern;
 
 import static com.zorggemak.util.WebUtils.createJsonString;
 import static com.zorggemak.util.WebUtils.json2HashMap;
@@ -34,18 +36,39 @@ public class ArchetypeController extends AbstractController {
     @RequestMapping(value = "/listarchetypes", method = RequestMethod.GET)
     public
     @ResponseBody
-    String listarchetypes(@RequestParam("regexpr") String regexpr, HttpServletRequest request)
-            throws KernelException {
+    String list(@RequestParam("regexpr") String regexpr, HttpServletRequest request)
+            throws IOException, RecordException
+    {
         HashMap result;
         String[] values;
+        
+        Iterable<String> archetypeIds;
+        Iterable<ArchetypeID> archetypes = engine().getArchetypeStore().list();
+        archetypeIds = Iterables.transform(
+                archetypes,
+                new Function<ArchetypeID, String>()
+                {
+                    @Override
+                    public String apply(ArchetypeID input)
+                    {
+                        return input == null ? "null" : input.getValue();
+                    }
+                });
 
-        if ("ALL".equals(regexpr) || "".equals(regexpr)) {
-            List<String> results = ArchetypeImplementation.listArchetypeIds();
-            values = results.toArray(new String[results.size()]);
-        } else {
-            List<String> results = ArchetypeImplementation.listArchetypeIds(regexpr);
-            values = results.toArray(new String[results.size()]);
+        if (regexpr != null && !"ALL".equals(regexpr) && !"".equals(regexpr)) {
+            final Pattern p = Pattern.compile(regexpr);
+            archetypeIds = Iterables.filter(archetypeIds, new Predicate<String>()
+            {
+                @Override
+                public boolean apply(String input)
+                {
+                    return p.matcher(input).matches();
+                }
+            });
         }
+
+        values = Iterables.toArray(archetypeIds, String.class);
+
         if (values.length != 0) {
             result = new HashMap();
             result.put("result", values);
@@ -59,17 +82,17 @@ public class ArchetypeController extends AbstractController {
     @RequestMapping(value = "/archetypeexist", method = RequestMethod.GET)
     public
     @ResponseBody
-    String archetypeexist(@RequestParam("archid") String archid)
-            throws KernelException {
+    String has(@RequestParam("archid") String archid)
+            throws IOException, RecordException
+    {
+        ArchetypeID archetypeID = new ArchetypeID(archid);
+        
         HashMap result;
 
         result = new HashMap();
         result.put("archid", archid);
-        if (ArchetypeImplementation.archetypeExists(archid)) {
-            result.put("result", "true");
-        } else {
-            result.put("result", "false");
-        }
+        String exists = String.valueOf(engine().getArchetypeStore().has(archetypeID));
+        result.put("result", exists);
         result.put("errorcode", MiddlewareErrors.OK);
         return createJsonString(result);
     }
@@ -77,24 +100,28 @@ public class ArchetypeController extends AbstractController {
     @RequestMapping(value = "/getarchetype", method = RequestMethod.GET)
     public
     @ResponseBody
-    String getarchetype(@RequestParam("archid") String archid,
-                        @RequestParam(value = "pathflag", required = false, defaultValue = "false") Boolean pflag,
-                        HttpServletRequest request)
-            throws KernelException {
+    String get(@RequestParam("archid") String archid,
+            @RequestParam(value = "pathflag", required = false, defaultValue = "false") Boolean pflag,
+            HttpServletRequest request)
+            throws RecordException, IOException
+    {
         HashMap result;
         String value;
+
+        ArchetypeID archetypeID = new ArchetypeID(archid);
 
         result = new HashMap();
         result.put("archid", archid);
         try {
             if (pflag.booleanValue()) {
-                value = ArchetypeImplementation.retrieveArchetypeWithPathDirectives(archid);
+                throw new UnsupportedOperationException("path annotation not supported");
+                //value = ArchetypeImplementation.retrieveArchetypeWithPathDirectives(archid);
             } else {
-                value = ArchetypeImplementation.retrieveArchetype(archid);
+                value = engine().getArchetypeStore().get(archetypeID).getAsString();
             }
             result.put("result", value);
             result.put("errorcode", MiddlewareErrors.OK);
-        } catch (ArchetypeNotFoundException e) {
+        } catch (NotFoundException e) {
             result = middlewareException(request, MiddlewareErrors.ARCHETYPE_NOT_FOUND, "Archetype doesn't exist");
         }
         return createJsonString(result);
@@ -103,52 +130,84 @@ public class ArchetypeController extends AbstractController {
     @RequestMapping(value = "/storearchetype", method = RequestMethod.POST, params = {"archid", "archetype"})
     public
     @ResponseBody
-    String storearchetype(@RequestParam("archid") String archid, @RequestParam("archetype") String archetype,
-                          HttpServletRequest request)
-            throws KernelException {
+    String insert(@RequestParam("archid") String archid, @RequestParam("archetype") String asString,
+            HttpServletRequest request)
+            throws IOException, RecordException
+    {
         HashMap result;
-        String id = null;
+        
+        ArchetypeParser parser = engine().getArchetypeParser("text/plain", "adl");
+        WrappedArchetype wrappedArchetype = parser.parse(IOUtils.toInputStream(asString, "UTF-8"));
+        Archetype archetype = wrappedArchetype.getArchetype();
 
-        try {
-            ArchetypeImplementation.storeArchetype(archid, archetype);
-            result = new HashMap();
-            result.put("result", id);
-            result.put("errorcode", MiddlewareErrors.OK);
-        } catch (ArchetypeExistsException e) {
-            result = middlewareException(request, MiddlewareErrors.ARCHETYPE_EXISTS,
-                    "Archetype with id \"" + id + "\" already exists");
-        } catch (IllegalArgumentException e) {
-            result = middlewareException(request, MiddlewareErrors.ARCHETYPE_ID_NOT_CORRECT,
-                    e.getMessage());
+        if (archid == null)
+        {
+            archid = archetype.getArchetypeId().getValue();
         }
-        return createJsonString(result);
+        else
+        {
+            try
+            {
+                ArchetypeID archetypeID = new ArchetypeID(archid);
+                if (!archetypeID.equals(archetype.getArchetypeId()))
+                {
+                    throw new IllegalArgumentException(String.format(
+                            "archid %s does not match ADL archetype %s", archid, 
+                            archetype.getArchetypeId()));
+                }
+            }
+            catch (IllegalArgumentException e)
+            {
+                result = middlewareException(request, MiddlewareErrors.ARCHETYPE_ID_NOT_CORRECT,
+                        e.getMessage());
+                return createJsonString(result);
+            }
+        }
+
+        try
+        {
+            engine().getArchetypeStore().insert(wrappedArchetype);
+            result = new HashMap();
+            result.put("result", archid);
+            result.put("errorcode", MiddlewareErrors.OK);
+            return createJsonString(result);
+        }
+        catch (DuplicateException e)
+        {
+            result = middlewareException(request, MiddlewareErrors.ARCHETYPE_EXISTS,
+                    "Archetype with id \"" + archid + "\" already exists");
+            return createJsonString(result);
+        }
     }
 
     @RequestMapping(value = "/storearchetype", method = RequestMethod.POST)
     public
     @ResponseBody
-    String storearchetypeWithREST(@RequestBody String body, HttpServletRequest request)
+    String insertJSON(@RequestBody String body, HttpServletRequest request)
             throws Exception {
-        HashMap map;
-
-        map = json2HashMap(body);
-        return storearchetype((String) map.get("archid"), (String) map.get("archetype"), request);
+        HashMap map = json2HashMap(body);
+        return insert((String) map.get("archid"), (String) map.get("archetype"), request);
     }
 
     @RequestMapping(value = "/deletearchetype", method = RequestMethod.POST, params = {"archid"})
     public
     @ResponseBody
-    String deletearchetype(@RequestParam("archid") String archid, HttpServletRequest request)
-            throws KernelException {
+    String delete(@RequestParam("archid") String archid, HttpServletRequest request)
+            throws RecordException, IOException
+    {
         HashMap result;
 
         try {
-            ArchetypeImplementation.removeArchetype(archid);
+            ArchetypeID archetypeID = new ArchetypeID(archid);
+            engine().getArchetypeStore().delete(archetypeID);
+            
             result = new HashMap();
             result.put("archid", archid);
             result.put("result", "OK");
             result.put("errorcode", MiddlewareErrors.OK);
-        } catch (ArchetypeNotFoundException e) {
+        }
+        catch (NotFoundException e)
+        {
             result = middlewareException(request, MiddlewareErrors.ARCHETYPE_NOT_FOUND, e.getMessage());
         }
         return createJsonString(result);
@@ -157,99 +216,10 @@ public class ArchetypeController extends AbstractController {
     @RequestMapping(value = "/deletearchetype", method = RequestMethod.POST)
     public
     @ResponseBody
-    String deletearchetypeWithREST(@RequestBody String body, HttpServletRequest request)
-            throws Exception {
-        HashMap map;
-
-        map = json2HashMap(body);
-        return deletearchetype((String) map.get("archid"), request);
+    String deleteJSON(@RequestBody String body, HttpServletRequest request)
+            throws RecordException, IOException
+    {
+        HashMap map = json2HashMap(body);
+        return delete((String) map.get("archid"), request);
     }
-
-    @RequestMapping(value = "/makeshortpath", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String makeshortpath(@RequestParam("longpath") String lpath)
-            throws ADLSerializerException {
-        HashMap result;
-
-        result = new HashMap();
-        result.put("longpath", lpath);
-        result.put("result", ADLMapPathNodeID.makeShortPath(lpath));
-        result.put("errorcode", MiddlewareErrors.OK);
-        return createJsonString(result);
-    }
-
-    @RequestMapping(value = "/resolveidtolongpath", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String resolveidtolongpath(@RequestParam("archid") String archid)
-            throws Exception {
-        HashMap result;
-
-        ArchetypePathMap apu = ArchetypePathMap.getInstance(archid);
-        String path = apu.archetypeNodeIDPathMap();
-        result = new HashMap();
-        result.put("archid", archid);
-        result.put("result", path);
-        result.put("errorcode", MiddlewareErrors.OK);
-        return createJsonString(result);
-    }
-
-    @RequestMapping(value = "/termdefinitionmap", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String termdefinitionmap(@RequestParam("lang") String lang, @RequestParam("archid") String archid)
-            throws Exception {
-        HashMap result;
-
-        result = new HashMap();
-        result.put("lang", lang);
-        result.put("archid", archid);
-        TermDefinitionMap apu = TermDefinitionMap.getInstance(archid);
-        result.put("result", apu.termDefinitionMap(lang));
-        result.put("errorcode", MiddlewareErrors.OK);
-        return createJsonString(result);
-    }
-
-    @RequestMapping(value = "/termdefinitionlanguages", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String termdefinitionlanguages(@RequestParam("archid") String archid, HttpServletRequest request)
-            throws Exception {
-        HashMap result;
-        String[] values;
-
-        TermDefinitionMap apu = TermDefinitionMap.getInstance(archid);
-
-        Set<String> l = apu.languagesAvailable();
-        if (l.size() == 0) {
-            throw new Exception("No languages are found in this Term definition:" + archid);
-        } else {
-            values = l.toArray(new String[l.size()]);
-        }
-        if (values.length != 0) {
-            result = new HashMap();
-            result.put("archid", archid);
-            result.put("result", values);
-            result.put("errorcode", MiddlewareErrors.OK);
-        } else {
-            result = middlewareException(request, MiddlewareErrors.NOTHING_FOUND, "No languages found");
-        }
-        ;
-        return createJsonString(result);
-    }
-
-    @RequestMapping(value = "/adltoxpath", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    String adltoxpath(@RequestParam("adlpath") String adlpath) {
-        HashMap result;
-
-        result = new HashMap();
-        result.put("adlpath", adlpath);
-        result.put("result", XSUtils.transformArchetypePathToSimpleXPath(adlpath));
-        result.put("errorcode", MiddlewareErrors.OK);
-        return createJsonString(result);
-    }
-
 }
