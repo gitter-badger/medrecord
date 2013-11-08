@@ -1,6 +1,7 @@
 apply plugin: 'medvision-server'
 
 dependencies {
+  compile project(":medrecord-engine")
   compile project(":medrecord-server-api-jee")
 
   testCompile "junit:junit:4.11"

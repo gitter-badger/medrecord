@@ -6,10 +6,15 @@
  */
 package com.medvision360.medrecord.server;
 
+import com.medvision360.medrecord.engine.MedRecordEngine;
+import com.medvision360.medrecord.server.resources.ArchetypeServerResource;
 import com.medvision360.medrecord.server.resources.DemoServerResource;
+import com.medvision360.medrecord.spi.Engine;
+import com.medvision360.medrecord.spi.exceptions.InitializationException;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
 import org.restlet.resource.Directory;
+import org.restlet.routing.Filter;
 import org.restlet.routing.Router;
 import org.restlet.service.TunnelService;
 
@@ -51,6 +56,19 @@ public class MedRecordServerApplication extends RestletApplication
 
         // this is a good place to load configuration and store it in the context so it can be used by the various
         // resources....
+        
+        MedRecordEngine engine = new MedRecordEngine();
+        try
+        {
+            engine.initialize();
+        }
+        catch (InitializationException e)
+        {
+            throw new ConfigurationException(e);
+        }
+        
+        MedRecordService service = new MedRecordService();
+        getServices().add(service);
 
         /*
         IdserverConfig.storeInContext(
@@ -93,6 +111,14 @@ public class MedRecordServerApplication extends RestletApplication
         root.attach(
                 "/demo",
                 DemoServerResource.class
+        );
+        
+        root.attach(
+                "/archetype",
+                new TransactionFilter(
+                        getContext(),
+                        ArchetypeServerResource.class
+                )
         );
 
         return root;
