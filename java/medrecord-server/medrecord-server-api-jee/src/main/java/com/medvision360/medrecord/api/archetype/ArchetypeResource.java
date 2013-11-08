@@ -21,5 +21,5 @@ public interface ArchetypeResource
      *   [type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
      */
     @Get
-    public Representation getArchetype() throws AnnotatedResourceException, IOException, RecordException;
+    public Representation getArchetype();
 }
