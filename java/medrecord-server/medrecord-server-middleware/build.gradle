@@ -1,0 +1,59 @@
+buildscript {
+  repositories {
+    maven {
+      url "http://jcenter.bintray.com/"
+    }
+  }
+  dependencies {
+    classpath 'org.gradle.api.plugins:gradle-tomcat-plugin:1.0'
+  }
+}
+
+apply plugin: 'war'
+apply plugin: 'tomcat'
+
+import org.apache.tools.ant.filters.ReplaceTokens 
+
+dependencies {
+  compile project(":medrecord-engine")
+
+  compile group: 'com.google.code.gson', name: 'gson', version:'2.2.4'
+  compile group: 'com.medvision360.wslog', name: 'wslog', version:'1.0.0'
+  providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version:'3.1.0'
+  providedCompile group: 'javax.servlet', name: 'jstl', version:'1.2'
+  compile group: 'log4j', name: 'log4j', version:'1.2.17'
+  compile "org.springframework:spring-context:${ext.version.spring}"
+  compile "org.springframework:spring-web:${ext.version.spring}"
+  compile "org.springframework:spring-webmvc:${ext.version.spring}"
+  compile group: 'com.mangofactory', name: 'swagger-springmvc', version:'0.6.3'
+  compile group: 'org.slf4j', name: 'slf4j-api', version:'1.7.5'
+  compile group: 'org.slf4j', name: 'slf4j-log4j12', version:'1.7.5'
+  testCompile group: 'junit', name: 'junit', version:'4.11'
+
+  def tomcatVersion = '7.0.34'
+  tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+         "org.apache.tomcat.embed:tomcat-embed-logging-juli:${tomcatVersion}",
+         "javax.servlet:jstl:1.2"
+  tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}") {
+      exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
+  }
+}
+
+processResources {
+  filter(ReplaceTokens, tokens: [
+      "project.version": project.property("version"),
+      "log.level":       project.property("log.level"),
+      "log.appender":    project.property("log.appender"),
+      "jul.log.level":   project.property("jul.log.level")
+  ])
+}
+
+war {
+  archiveName project.property("web.name") + ".war"
+  filter(ReplaceTokens, tokens: [
+      "project.version": project.property("version"),
+      "log.level":       project.property("log.level"),
+      "log.appender":    project.property("log.appender"),
+      "jul.log.level":   project.property("jul.log.level")
+  ])
+}

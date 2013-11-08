@@ -35,9 +35,11 @@ import com.medvision360.medrecord.spi.LocatableSelectorBuilder;
 import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.spi.LocatableSummary;
 import com.medvision360.medrecord.spi.LocatableValidator;
+import com.medvision360.medrecord.spi.StoredEHR;
 import com.medvision360.medrecord.spi.Terminology;
 import com.medvision360.medrecord.spi.TransformingXQueryStore;
 import com.medvision360.medrecord.spi.TypeSelector;
+import com.medvision360.medrecord.spi.UIDFactory;
 import com.medvision360.medrecord.spi.ValidatingXQueryStore;
 import com.medvision360.medrecord.spi.XQueryStore;
 import com.medvision360.medrecord.spi.base.BaseLocatableEditor;
@@ -50,14 +52,19 @@ import com.medvision360.medrecord.spi.exceptions.ParseException;
 import com.medvision360.medrecord.spi.exceptions.SerializeException;
 import com.medvision360.medrecord.spi.exceptions.StatusException;
 import com.medvision360.medrecord.spi.exceptions.TransactionException;
+import com.medvision360.medrecord.spi.exceptions.ValidationException;
 import org.basex.core.Context;
 import org.openehr.build.SystemValue;
 import org.openehr.rm.common.archetyped.Locatable;
+import org.openehr.rm.common.generic.PartySelf;
 import org.openehr.rm.datatypes.text.CodePhrase;
 import org.openehr.rm.demographic.Person;
 import org.openehr.rm.ehr.EHR;
 import org.openehr.rm.ehr.EHRStatus;
 import org.openehr.rm.support.identification.HierObjectID;
+import org.openehr.rm.support.identification.ObjectID;
+import org.openehr.rm.support.identification.ObjectRef;
+import org.openehr.rm.support.identification.PartyRef;
 import org.openehr.rm.support.identification.UIDBasedID;
 import org.openehr.rm.support.measurement.MeasurementService;
 import org.openehr.rm.support.measurement.SimpleMeasurementService;
@@ -68,6 +75,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MedRecordEngine implements Engine, AuditService
 {
+    private boolean m_initialized = false;
     private boolean m_storeValidation = true;
     private CodePhrase m_encoding;
     private CodePhrase m_language;
@@ -77,6 +85,8 @@ public class MedRecordEngine implements Engine, AuditService
     private Map<SystemValue, Object> m_systemValues = new HashMap<>();
 
     private List<Context> m_baseXContexts = new LinkedList<>();
+    
+    private UIDFactory m_uidFactory;
 
     private ArchetypeStore m_archetypeStore;
     private List<ArchetypeParser> m_archetypeParsers = new LinkedList<>();
@@ -155,8 +165,13 @@ public class MedRecordEngine implements Engine, AuditService
         return baseXContext;
     }
 
-    public void initialize() throws InitializationException
+    public synchronized void initialize() throws InitializationException
     {
+        if (m_initialized)
+        {
+            return;
+        }
+        
         if (m_name == null)
         {
             m_name = "MedRecordServer";
@@ -192,6 +207,8 @@ public class MedRecordEngine implements Engine, AuditService
         initializeArchetypeSupport();
         initializeEHRSupport();
         initializeLocatableSupport();
+        
+        m_initialized = true;
     }
 
     private void initializeArchetypeSupport()
@@ -283,6 +300,7 @@ public class MedRecordEngine implements Engine, AuditService
         }
         
         UIDGenerator uidGenerator = new UIDGenerator();
+        m_uidFactory = uidGenerator;
         CompositeTransformer transformer = new CompositeTransformer();
         transformer.addDelegate(uidGenerator);
         TransformingXQueryStore transformingStore = new TransformingXQueryStore(m_name + "STORE", compositeStore, 
@@ -401,44 +419,160 @@ public class MedRecordEngine implements Engine, AuditService
     @Override
     public EHR getEHRBySubject(Person subject) throws NotFoundException, IOException, ParseException
     {
-        throw new UnsupportedOperationException("todo implement MedRecordServer.getEHRBySubject()");
+        checkNotNull(subject, "subject cannot be null");
+        return getEHRBySubject(subject.getUid());
     }
 
     @Override
-    public EHR getEHRBySubject(UIDBasedID subject) throws NotFoundException, IOException, ParseException
+    public EHR getEHRBySubject(UIDBasedID subjectUid) throws NotFoundException, IOException, ParseException
     {
-        throw new UnsupportedOperationException("todo implement MedRecordServer.getEHRBySubject()");
+        checkNotNull(subjectUid, "subjectUid cannot be null");
+        EHRStatus ehrStatus = getEhrStatusBySubject(subjectUid);
+        EHR EHR = getEHRByEHRStatus(ehrStatus);
+        return EHR;
+    }
+
+    private EHRStatus getEhrStatusBySubject(UIDBasedID subjectUid) throws IOException, NotFoundException, ParseException
+    {
+        checkNotNull(subjectUid, "subjectUid cannot be null");
+        // todo xQuery  /  efficient index
+        Iterable<HierObjectID> list = m_locatableStore.list();
+        for (HierObjectID hierObjectID : list)
+        {
+            Locatable locatable;
+            try
+            {
+                locatable = m_locatableStore.get(hierObjectID);
+            }
+            catch (NotFoundException e)
+            {
+                continue;
+            }
+            if (!(locatable instanceof EHRStatus))
+            {
+                continue;
+            }
+            EHRStatus ehrStatus = (EHRStatus) locatable;
+            PartySelf partySelf = ehrStatus.getSubject();
+            PartyRef partyRef = partySelf.getExternalRef();
+            if (partyRef == null)
+            {
+                continue;
+            }
+            ObjectID partyRefId = partyRef.getId();
+            if (partyRefId.equals(subjectUid))
+            {
+                return ehrStatus;
+            }
+        }
+        throw new NotFoundException(String.format("No EHR_STATUS found for subject %s", subjectUid));
+    }
+
+    private EHR getEHRByEHRStatus(EHRStatus ehrStatus) throws IOException, ParseException, NotFoundException
+    {
+        checkNotNull(ehrStatus, "ehrStatus cannot be null");
+        UIDBasedID uid = ehrStatus.getUid();
+        return getEHRByEHRStatus(uid);
+    }
+
+    private EHR getEHRByEHRStatus(UIDBasedID ehrStatusUid) throws IOException, ParseException, NotFoundException
+    {
+        checkNotNull(ehrStatusUid, "ehrStatusUid cannot be null");
+        // todo xQuery  /  efficient index
+        Iterable<HierObjectID> list = m_ehrStore.list();
+        for (HierObjectID hierObjectID : list)
+        {
+            EHR EHR;
+            try
+            {
+                EHR = m_ehrStore.get(hierObjectID);
+            }
+            catch (NotFoundException e)
+            {
+                continue;
+            }
+            ObjectRef ehrStatusRef = EHR.getEhrStatus();
+            if (ehrStatusRef == null)
+            {
+                continue;
+            }
+            ObjectID ehrStatusRefId = ehrStatusRef.getId();
+            if (ehrStatusUid.equals(ehrStatusRefId))
+            {
+                return EHR;
+            }
+        }
+        throw new NotFoundException(String.format("No EHR found for EHR_STATUS %s", ehrStatusUid));
     }
 
     @Override
     public EHR getEHRForLocatable(Locatable locatable) throws NotFoundException, IOException, ParseException
     {
-        throw new UnsupportedOperationException("todo implement MedRecordServer.getEHRForLocatable()");
+        checkNotNull(locatable, "locatable cannot be null");
+        UIDBasedID uid = locatable.getUid();
+        return getEHRForLocatable(uid);
     }
 
     @Override
-    public EHR getEHRForLocatable(UIDBasedID locatable) throws NotFoundException, IOException, ParseException
+    public EHR getEHRForLocatable(UIDBasedID locatableUid) throws NotFoundException, IOException, ParseException
     {
-        throw new UnsupportedOperationException("todo implement MedRecordServer.getEHRForLocatable()");
+        checkNotNull(locatableUid, "locatableUid cannot be null");
+        // todo xQuery / efficient index
+        Iterable<HierObjectID> ehrList = m_ehrStore.list();
+        for (HierObjectID ehrID : ehrList)
+        {
+            EHR EHR;
+            try
+            {
+                EHR = m_ehrStore.get(ehrID);
+            }
+            catch (NotFoundException e)
+            {
+                continue;
+            }
+            Iterable<HierObjectID> locatableList = m_locatableStore.list(EHR);
+            for (HierObjectID locatableID : locatableList)
+            {
+                if (locatableUid.equals(locatableID))
+                {
+                    return EHR;
+                }
+            }
+        }
+        throw new NotFoundException(String.format("No EHR found for locatable %s", locatableUid));
     }
 
     @Override
-    public EHR createEHR(EHRStatus EHRStatus)
-            throws NotFoundException, DuplicateException, NotSupportedException, IOException, SerializeException
+    public EHR createEHR(EHRStatus ehrStatus)
+            throws NotFoundException, DuplicateException, NotSupportedException, IOException, SerializeException,
+            ValidationException
     {
-        throw new UnsupportedOperationException("todo implement MedRecordServer.createEHR()");
+        checkNotNull(ehrStatus, "ehrStatus cannot be null");
+        EHRStatus savedEHRStatus = (EHRStatus) m_locatableStore.insert(ehrStatus);
+        UIDBasedID uid = savedEHRStatus.getUid();
+        
+        StoredEHR EHR = new StoredEHR(m_ehrStore, m_locatableStore, m_uidFactory, new ObjectRef(uid, "EHR", 
+            "EHR_STATUS"));
+        EHR savedEHR = m_ehrStore.insert(EHR);
+        return savedEHR;
     }
 
     @Override
     public EHRStatus getEHRStatus(EHR EHR) throws NotFoundException, IOException, ParseException
     {
-        throw new UnsupportedOperationException("todo implement MedRecordServer.getEHRStatus()");
+        checkNotNull(EHR, "EHR cannot be null");
+        ObjectRef ehrStatusRef = EHR.getEhrStatus();
+        checkNotNull(ehrStatusRef, "EHR.ehrStatus cannot be null");
+        ObjectID ehrStatusRefId = ehrStatusRef.getId();
+        HierObjectID ehrStatusUid = new HierObjectID(ehrStatusRefId.getValue());
+        return getEHRStatus(ehrStatusUid);
     }
 
     @Override
-    public EHRStatus getEHRStatus(HierObjectID ehrId) throws NotFoundException, IOException, ParseException
+    public EHRStatus getEHRStatus(HierObjectID ehrStatusUid) throws NotFoundException, IOException, ParseException
     {
-        throw new UnsupportedOperationException("todo implement MedRecordServer.getEHRStatus()");
+        checkNotNull(ehrStatusUid, "ehrStatusUid cannot be null");
+        return (EHRStatus) m_locatableStore.get(ehrStatusUid);
     }
 
     @Override
@@ -470,13 +604,28 @@ public class MedRecordEngine implements Engine, AuditService
     @Override
     public void verifyStatus() throws StatusException
     {
-        throw new UnsupportedOperationException("todo implement MedRecordServer.verifyStatus()");
+        m_archetypeStore.verifyStatus();
+        m_ehrStore.verifyStatus();
+        m_locatableStore.verifyStatus();
     }
 
     @Override
     public String reportStatus() throws StatusException
     {
-        throw new UnsupportedOperationException("todo implement MedRecordServer.reportStatus()");
+        StringBuilder result = new StringBuilder();
+        result.append("archetype store: ");
+        result.append(m_archetypeStore.reportStatus());
+        result.append("\n");
+
+        result.append("ehr store: ");
+        result.append(m_ehrStore.reportStatus());
+        result.append("\n");
+        
+        result.append("locatable store: ");
+        result.append(m_locatableStore.reportStatus());
+        result.append("\n");
+        
+        return result.toString();
     }
 
     @Override
@@ -488,22 +637,60 @@ public class MedRecordEngine implements Engine, AuditService
     @Override
     public boolean supportsTransactions()
     {
-        return false;
+        return m_archetypeStore.supportsTransactions() &&
+                m_ehrStore.supportsTransactions() &&
+                m_locatableStore.supportsTransactions();
     }
 
     @Override
     public void begin() throws TransactionException
     {
+        if (m_archetypeStore.supportsTransactions())
+        {
+            m_archetypeStore.begin();
+        }
+        if (m_ehrStore.supportsTransactions())
+        {
+            m_ehrStore.begin();
+        }
+        if (m_locatableStore.supportsTransactions())
+        {
+            m_locatableStore.begin();
+        }
     }
 
     @Override
     public void commit() throws TransactionException
     {
+        if (m_archetypeStore.supportsTransactions())
+        {
+            m_archetypeStore.commit();
+        }
+        if (m_ehrStore.supportsTransactions())
+        {
+            m_ehrStore.commit();
+        }
+        if (m_locatableStore.supportsTransactions())
+        {
+            m_locatableStore.commit();
+        }
     }
 
     @Override
     public void rollback() throws TransactionException
     {
+        if (m_archetypeStore.supportsTransactions())
+        {
+            m_archetypeStore.rollback();
+        }
+        if (m_ehrStore.supportsTransactions())
+        {
+            m_ehrStore.rollback();
+        }
+        if (m_locatableStore.supportsTransactions())
+        {
+            m_locatableStore.rollback();
+        }
     }
     
     ///

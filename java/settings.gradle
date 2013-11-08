@@ -14,6 +14,7 @@ include(
         'medrecord-server-client-jee',
         'medrecord-server-deb',
         'medrecord-server-server',
+        'medrecord-server-middleware'
 )
 
 project(':medrecord-client-archetypes').projectDir = new File(rootDir, 'medrecord-client/medrecord-client-archetypes')
@@ -23,5 +24,4 @@ project(':medrecord-server-api-jee').projectDir = new File(rootDir, 'medrecord-s
 project(':medrecord-server-client-jee').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-client-jee')
 project(':medrecord-server-deb').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-deb')
 project(':medrecord-server-server').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-server')
-
-
+project(':medrecord-server-middleware').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-middleware')
