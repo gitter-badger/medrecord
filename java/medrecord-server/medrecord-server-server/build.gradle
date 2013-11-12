@@ -24,3 +24,40 @@ tomcatRunWar {
   httpPort = 8100
   stopPort = 8101
 }
+
+import org.gradle.plugins.ide.idea.model.*
+apply plugin: 'idea'
+
+idea.module.iml {
+    whenMerged { module ->
+        
+        // add module dependencies for medvision common libraries
+        def toModuleDependencies = [
+                'libs-api-jee',
+                'libs-client-jee',
+                'libs-common-jee',
+                'libs-server'
+        ]
+        
+        toModuleDependencies.each { dependencyName ->
+            module.dependencies += new ModuleDependency(dependencyName, 'COMPILE')
+        }
+
+        // split dependencies into module dependencies and jar dependencies
+        def moduleDependencies = []
+        module.dependencies.each { dependency ->
+            if (dependency.class.simpleName == 'ModuleDependency') {
+                if (dependency.scope.equalsIgnoreCase("COMPILE")) {
+                    moduleDependencies += dependency
+                }
+            }
+        }
+
+        module.dependencies.removeAll(moduleDependencies)
+        def jarDependencies = new LinkedHashSet(module.dependencies)
+
+        module.dependencies.clear()
+        module.dependencies.addAll(moduleDependencies)
+        module.dependencies.addAll(jarDependencies)
+    }
+}
