@@ -1,0 +1,69 @@
+// use
+//   gradle -c settings-all.gradle idea
+// to generate an idea project that includes other modules
+
+/// start contents of settings.gradle
+
+include(
+        'medrecord-basex',
+        'medrecord-client-archetypes',
+        'medrecord-engine',
+        'medrecord-itest',
+        'medrecord-memstore',
+        'medrecord-pv',
+        'medrecord-riio',
+        'medrecord-rmutil',
+        'medrecord-spi',
+        'medrecord-spi-tck',
+        'medrecord-tools-dumpadl',
+        'medrecord-server-api-jee',
+        'medrecord-server-client-jee',
+        'medrecord-server-deb',
+        'medrecord-server-server',
+        'medrecord-server-middleware',
+)
+
+project(':medrecord-client-archetypes').projectDir = new File(rootDir, 'medrecord-client/medrecord-client-archetypes')
+project(':medrecord-tools-dumpadl').projectDir = new File(rootDir, 'medrecord-tools/medrecord-tools-dumpadl')
+
+project(':medrecord-server-api-jee').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-api-jee')
+project(':medrecord-server-client-jee').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-client-jee')
+project(':medrecord-server-deb').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-deb')
+project(':medrecord-server-server').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-server')
+project(':medrecord-server-middleware').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-middleware')
+
+
+/// end contents of settings.gradle
+
+include 'buildlib'
+project(':buildlib').projectDir = new File(rootDir, '../../Common/libs/gradle/buildlib')
+
+include(
+        'annotations',
+        'processor'
+)
+project(':annotations').projectDir = new File(rootDir, '../../Common/java/restlet/doc/annotations')
+project(':processor').projectDir = new File(rootDir, '../../Common/java/restlet/doc/processor')
+
+include(
+        'apidoclet',
+        'clientdoclet',
+        'docletlib',
+        'jsonschemadoclet',
+)
+project(':apidoclet').projectDir = new File(rootDir, '../../Common/libs/doclet/apidoclet')
+project(':clientdoclet').projectDir = new File(rootDir, '../../Common/libs/doclet/clientdoclet')
+project(':docletlib').projectDir = new File(rootDir, '../../Common/libs/doclet/docletlib')
+project(':jsonschemadoclet').projectDir = new File(rootDir, '../../Common/libs/doclet/jsonschemadoclet')
+
+include(
+        'libs-api-jee',
+        'libs-client-jee',
+        'libs-common-jee',
+        'libs-server'
+)
+
+project(':libs-api-jee').projectDir = new File(rootDir, '../../Common/libs/java/libs-api/jee')
+project(':libs-client-jee').projectDir = new File(rootDir, '../../Common/libs/java/libs-client/jee')
+project(':libs-common-jee').projectDir = new File(rootDir, '../../Common/libs/java/libs-common/jee')
+project(':libs-server').projectDir = new File(rootDir, '../../Common/libs/java/libs-server')
