@@ -3,6 +3,7 @@ apply plugin: 'medvision-server'
 dependencies {
   compile project(":medrecord-engine")
   compile project(":medrecord-server-api-jee")
+  compile project(":medrecord-server-middleware")
 
   testCompile "junit:junit:4.11"
   testCompile "org.restlet.jee:org.restlet.ext.httpclient:${ext.version.restlet}"
@@ -23,6 +24,48 @@ prepareTomcat {
 tomcatRunWar {
   httpPort = 8100
   stopPort = 8101
+}
+
+// merge the old middleware into this server, and add in custom config
+// https://github.com/wadahiro/gradle-samples/blob/master/war-samples/merge-war-sample/build.gradle
+import org.apache.tools.ant.filters.ReplaceTokens
+
+// apply medvision-server plugin standard filter to local webapp resources
+task filterLocalWarResources(type: Copy) {
+  def displayName = project.ext.server.displayName
+  def applicationClass = project.ext.server.applicationClass
+  def projectId = project.ext.server.projectId
+
+  from project.webAppDirName
+  into new File(project.buildDir, "filtered")
+  filter(
+    ReplaceTokens,
+    tokens:[
+      displayName: displayName,
+      servletName: project.group + '.' + project.name,
+      applicationClass: applicationClass,
+      agent: displayName + '/' + project.version,
+      configfile: '/etc/medvision360/' + projectId + '/configuration.properties'
+    ]
+  )
+}
+
+war.dependsOn(':medrecord-server-middleware:war')
+war.dependsOn filterLocalWarResources
+war << {
+  // add middleware but don't override anything
+  ant.zip(destfile: war.archivePath, update: true, keepcompression: true, duplicate: 'preserve') {
+    zipfileset (src: project(':medrecord-server-middleware').war.archivePath)
+  }
+    
+  // add our own local webapp stuff, do override
+  // http://stackoverflow.com/questions/2210041/updating-files-inside-an-existing-war-file
+  ant.touch {
+    fileset(dir: "$project.buildDir/filtered")
+  }
+  ant.zip(destfile: war.archivePath, update: true, keepcompression: true, duplicate: 'add') {
+    fileset(dir: "$project.buildDir/filtered")
+  }
 }
 
 import org.gradle.plugins.ide.idea.model.*

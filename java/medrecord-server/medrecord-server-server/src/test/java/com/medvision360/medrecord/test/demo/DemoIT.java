@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 public class DemoIT
 {
     final ClientResourceConfig m_resourceConfig = new ClientResourceConfig(
-        System.getProperty("integrationtest.service.url")
+        System.getProperty("integrationtest.service.url") + "/v2"
     );
 
     @BeforeClass
