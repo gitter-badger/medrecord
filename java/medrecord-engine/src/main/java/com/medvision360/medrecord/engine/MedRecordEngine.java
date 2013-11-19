@@ -211,7 +211,7 @@ public class MedRecordEngine implements Engine, AuditService
         m_initialized = true;
     }
 
-    private void initializeArchetypeSupport()
+    private void initializeArchetypeSupport() throws InitializationException
     {
         RIAdlConverter adlConverter = new RIAdlConverter();
         m_archetypeParsers.add(adlConverter);
@@ -221,18 +221,38 @@ public class MedRecordEngine implements Engine, AuditService
         m_archetypeParsers.add(wrappedConverter);
         m_archetypeSerializers.add(wrappedConverter);
 
-        m_archetypeStore = new BaseXArchetypeStore(newContext(), wrappedConverter, wrappedConverter,
+        ArchetypeStore archetypeStore = new BaseXArchetypeStore(newContext(), wrappedConverter, wrappedConverter,
                 m_name + "Archetypes", "archetype");
+        try
+        {
+            archetypeStore.initialize();
+        }
+        catch (IOException e)
+        {
+            throw new InitializationException(e);
+        }
+        
+        m_archetypeStore = archetypeStore;
     }
 
-    private void initializeEHRSupport()
+    private void initializeEHRSupport() throws InitializationException
     {
         XmlEHRConverter xmlConverter = new XmlEHRConverter();
         m_ehrParsers.add(xmlConverter);
         m_ehrSerializers.add(xmlConverter);
         
-        HierObjectID ehrSystemID = new HierObjectID(m_name + "EHR");
-        m_ehrStore = new BaseXEHRStore(newContext(), xmlConverter, xmlConverter, ehrSystemID, "ehr");
+        HierObjectID ehrSystemID = new HierObjectID(m_name + "EHRStore");
+        EHRStore ehrStore = new BaseXEHRStore(newContext(), xmlConverter, xmlConverter, ehrSystemID, "ehr");
+        try
+        {
+            ehrStore.initialize();
+        }
+        catch (IOException e)
+        {
+            throw new InitializationException(e);
+        }
+        
+        m_ehrStore = ehrStore;
     }
 
     private void initializeLocatableSupport() throws InitializationException
@@ -260,16 +280,6 @@ public class MedRecordEngine implements Engine, AuditService
         compositeValidator.addDelegate(archetypeBasedValidator);
         m_locatableValidator = compositeValidator;
 
-        LocatableSelector ehrSelector = LocatableSelectorBuilder
-                .start()
-                .requireRMName("EHR")
-                .matchRMEntity("^(?:COMPOSITION|EHRSTATUS)$")
-                .build();
-        baseXContext = new Context();
-        m_baseXContexts.add(baseXContext);
-        BaseXLocatableStore ehrStore = new BaseXLocatableStore(newContext(), xmlConverter, xmlConverter,
-                ehrSelector, m_name + "EHR", "ehr");
-
         LocatableSelector demographicSelector = LocatableSelectorBuilder
                 .start()
                 .requireRMName("DEMOGRAPHIC")
@@ -281,22 +291,33 @@ public class MedRecordEngine implements Engine, AuditService
         BaseXLocatableStore demographicStore = new BaseXLocatableStore(newContext(), xmlConverter, xmlConverter,
                 demographicSelector, m_name + "DEMOGRAPHIC", "demographic");
         
+        LocatableSelector ehrSelector = LocatableSelectorBuilder
+                .start()
+                .requireRMName("EHR")
+                .matchRMEntity("^(?:COMPOSITION|EHRSTATUS|EHR_STATUS)$")
+                .build();
+        baseXContext = new Context();
+        m_baseXContexts.add(baseXContext);
+        BaseXLocatableStore ehrStore = new BaseXLocatableStore(newContext(), xmlConverter, xmlConverter,
+                ehrSelector, m_name + "EHR", "ehr");
+
         CompositeStore compositeStore = new CompositeStore(m_name + "STORE");
         if (m_storeValidation)
         {
             LocatableSelector validatingSelector = m_locatableValidator;
-            ValidatingXQueryStore validatingEhrStore = new ValidatingXQueryStore(
-                    ehrStore.getName(), validatingSelector, ehrStore, m_locatableValidator);
-            compositeStore.addDelegate(validatingEhrStore);
-            
+
             ValidatingXQueryStore validatingDemographicStore = new ValidatingXQueryStore(
                     demographicStore.getName(), validatingSelector, demographicStore, m_locatableValidator);
             compositeStore.addDelegate(validatingDemographicStore);
+
+            ValidatingXQueryStore validatingEhrStore = new ValidatingXQueryStore(
+                    ehrStore.getName(), validatingSelector, ehrStore, m_locatableValidator);
+            compositeStore.addDelegate(validatingEhrStore);
         }
         else
         {
-            compositeStore.addDelegate(ehrStore);
             compositeStore.addDelegate(demographicStore);
+            compositeStore.addDelegate(ehrStore);
         }
         
         UIDGenerator uidGenerator = new UIDGenerator();
