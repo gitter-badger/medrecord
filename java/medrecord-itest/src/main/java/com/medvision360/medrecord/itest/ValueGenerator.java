@@ -546,7 +546,13 @@ public class ValueGenerator
 
     public String generateNodeId()
     {
-        return String.format("at999%04d", generateId());
+        // XSD does not like code bigger than 9999
+        int id = 1000+generateId();
+        while (id > 9999)
+        {
+            id -= 9000;
+        }
+        return String.format("at%d", id);
     }
 
     public String generateString()
