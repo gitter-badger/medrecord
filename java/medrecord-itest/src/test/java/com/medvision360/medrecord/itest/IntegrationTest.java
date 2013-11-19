@@ -27,12 +27,10 @@ import com.medvision360.medrecord.spi.TransformingLocatableStore;
 import com.medvision360.medrecord.spi.ValidationReport;
 import com.medvision360.medrecord.spi.ValidationResult;
 import com.medvision360.medrecord.spi.WrappedArchetype;
-import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
 import com.medvision360.medrecord.spi.exceptions.SerializeException;
-import com.medvision360.medrecord.spi.exceptions.ValidationException;
 import com.medvision360.medrecord.spi.tck.RMTestBase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,12 +38,10 @@ import org.openehr.am.archetype.Archetype;
 import org.openehr.build.SystemValue;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
-import org.openehr.rm.common.generic.PartySelf;
 import org.openehr.rm.ehr.EHR;
 import org.openehr.rm.ehr.EHRStatus;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
-import org.openehr.rm.support.identification.PartyRef;
 import org.openehr.rm.support.measurement.MeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -452,7 +448,16 @@ public class IntegrationTest extends RMTestBase
         for (HierObjectID ehrID : ehrIDs)
         {
             EHR EHR = m_engine.getEHRStore().get(ehrID);
-            Iterable<HierObjectID> locatableIDs = m_engine.getLocatableStore().list(EHR);
+            Iterable<HierObjectID> locatableIDs;
+            try
+            {
+                locatableIDs = m_engine.getLocatableStore().list(EHR);
+            }
+            catch(NotFoundException e)
+            {
+                // ignored
+                continue;
+            }
             Set<String> rmTypes = new HashSet<>();
             for (HierObjectID locatableID : locatableIDs)
             {

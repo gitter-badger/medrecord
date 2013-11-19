@@ -188,9 +188,22 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
     {
         checkNotNull(EHR, "EHR cannot be null");
         List<Iterable<HierObjectID>> all = new LinkedList<>();
+        boolean foundSome = false;
         for (LocatableStore delegate : m_delegates)
         {
-            all.add(delegate.list(EHR));
+            try
+            {
+                all.add(delegate.list(EHR));
+                foundSome = true;
+            }
+            catch(NotFoundException e)
+            {
+                // that's ok, maybe it's known elsewhere
+            }
+        }
+        if (!foundSome)
+        {
+            throw new NotFoundException(String.format("EHR %s not found", EHR.getEhrID()));
         }
         Iterable<HierObjectID> result = Iterables.concat(all);
         return result;
