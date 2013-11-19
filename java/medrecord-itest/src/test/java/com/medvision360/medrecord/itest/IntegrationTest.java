@@ -24,22 +24,28 @@ import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.spi.LocatableStore;
 import com.medvision360.medrecord.spi.LocatableValidator;
 import com.medvision360.medrecord.spi.TransformingLocatableStore;
-import com.medvision360.medrecord.spi.TransformingXQueryStore;
 import com.medvision360.medrecord.spi.ValidationReport;
 import com.medvision360.medrecord.spi.ValidationResult;
 import com.medvision360.medrecord.spi.WrappedArchetype;
+import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
 import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
 import com.medvision360.medrecord.spi.exceptions.SerializeException;
+import com.medvision360.medrecord.spi.exceptions.ValidationException;
 import com.medvision360.medrecord.spi.tck.RMTestBase;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openehr.am.archetype.Archetype;
 import org.openehr.build.SystemValue;
+import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
+import org.openehr.rm.common.generic.PartySelf;
+import org.openehr.rm.ehr.EHR;
+import org.openehr.rm.ehr.EHRStatus;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
+import org.openehr.rm.support.identification.PartyRef;
 import org.openehr.rm.support.measurement.MeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -211,12 +217,41 @@ public class IntegrationTest extends RMTestBase
 
     public void testEverything() throws Exception
     {
-        long ct;
+        loadAll();
+
+        generateAll();
+
+        serializeAll();
+
+        validateAll();
+        
+        useEngineApi();
+
+        report();
+        
+        assertEquals("No failures", 0, creationFailed);
+    }
+
+    private void loadAll() throws Exception
+    {
         m_archetypeStore.clear();
         m_archetypeLoader.loadAll("openehr");
         m_archetypeLoader.loadAll("medfit");
         m_archetypeLoader.loadAll("chiron");
         m_archetypeLoader.loadAll("mobiguide");
+    }
+
+    private void generateAll() throws Exception
+    {
+        subject = subject();
+        Archetyped arch = new Archetyped(new ArchetypeID("openEHR-EHR-EHRSTATUS.medvision_ehrstatus.v1"), "1.0.2");
+        EHRStatus status = new EHRStatus(makeUID(), "at0001", text("EHR Status"),
+                arch, null, null, null, subject, true, true, null);
+
+        EHR createdEHR = m_engine.createEHR(status);
+        EHRStatus retrievedStatus = m_engine.getEHRStatus(createdEHR);
+        EHRStatus retrievedByIdStatus = m_engine.getEHRStatus(new HierObjectID(retrievedStatus.getUid().getValue()));
+        assertEqualish(retrievedStatus, retrievedByIdStatus);
 
         Iterable<ArchetypeID> allArchetypeIDs = m_archetypeStore.list();
         TreeSet<String> sortedIDs = new TreeSet<>();
@@ -241,54 +276,60 @@ public class IntegrationTest extends RMTestBase
             
             WrappedArchetype wrappedArchetype = m_archetypeStore.get(archetypeID);
             Archetype archetype = wrappedArchetype.getArchetype();
-
-            // generate
-            if (log.isDebugEnabled())
-            {
-                log.debug(String.format("Generating instance of %s", archetypeName));
-            }
-            Locatable instance;
-            try
-            {
-                ct = System.nanoTime();
-                instance = m_locatableGenerator.generate(archetype);
-                generatedNs += System.nanoTime() - ct;
-
-                generated++;
-            }
-            catch (Exception e)
-            {
-                String message = e.getMessage();
-                log.error(String.format("FAILED generating instance of %s: %s", archetypeName, message));
-                creationFailed++;
-                continue;
-            }
-            String className = instance.getClass().getSimpleName();
-            if (log.isDebugEnabled())
-            {
-                log.debug(String.format("Got %s for archetype %s", className, archetypeName));
-            }
-
-            // insert
-
-            ct = System.nanoTime();
-            m_locatableStore.insert(instance);
-            insertedNs += System.nanoTime() - ct;
-
-            inserted++;
-            if (log.isDebugEnabled())
-            {
-                log.debug(String.format("Inserted a %s", archetypeName));
-            }
+            Locatable generated = generate(archetype);
+            insert(createdEHR, generated);
         }
+    }
 
-        serializeAll();
-
-        validateAll();
-
-        report();
+    private Locatable generate(Archetype archetype) throws Exception
+    {
+        long ct;
         
-        assertEquals("No failures", 0, creationFailed);
+        String archetypeName = archetype.getArchetypeId().getValue();
+        
+        // generate
+        if (log.isDebugEnabled())
+        {
+            log.debug(String.format("Generating instance of %s", archetypeName));
+        }
+        Locatable instance;
+        try
+        {
+            ct = System.nanoTime();
+            instance = m_locatableGenerator.generate(archetype);
+            generatedNs += System.nanoTime() - ct;
+
+            generated++;
+        }
+        catch (Exception e)
+        {
+            String message = e.getMessage();
+            log.error(String.format("FAILED generating instance of %s: %s", archetypeName, message));
+            creationFailed++;
+            return null;
+        }
+        String className = instance.getClass().getSimpleName();
+        if (log.isDebugEnabled())
+        {
+            log.debug(String.format("Got %s for archetype %s", className, archetypeName));
+        }
+        
+        return instance;
+    }
+    
+    private Locatable insert(EHR EHR, Locatable instance) throws Exception
+    {
+        long ct = System.nanoTime();
+        Locatable insertedInstance = m_locatableStore.insert(EHR, instance);
+        insertedNs += System.nanoTime() - ct;
+
+        inserted++;
+        if (log.isDebugEnabled())
+        {
+            log.debug(String.format("Inserted a %s", instance.getArchetypeDetails().getArchetypeId().getValue()));
+        }
+        
+        return insertedInstance;
     }
 
     private void serializeAll() throws IOException
@@ -402,6 +443,34 @@ public class IntegrationTest extends RMTestBase
         else
         {
             valid++;
+        }
+    }
+    
+    private void useEngineApi() throws Exception
+    {
+        Iterable<HierObjectID> ehrIDs = m_engine.getEHRStore().list();
+        for (HierObjectID ehrID : ehrIDs)
+        {
+            EHR EHR = m_engine.getEHRStore().get(ehrID);
+            Iterable<HierObjectID> locatableIDs = m_engine.getLocatableStore().list(EHR);
+            Set<String> rmTypes = new HashSet<>();
+            for (HierObjectID locatableID : locatableIDs)
+            {
+                Locatable locatable = m_engine.getLocatableStore().get(locatableID);
+                assertNotNull(locatable);
+                rmTypes.add(locatable.getArchetypeDetails().getArchetypeId().rmEntity());
+            }
+            for (String rmType : rmTypes)
+            {
+                locatableIDs = m_engine.getLocatableStore().list(EHR, rmType);
+                for (HierObjectID locatableID : locatableIDs)
+                {
+                    Locatable locatable = m_engine.getLocatableStore().get(locatableID);
+                    assertNotNull(locatable);
+                    String retrievedRmType = locatable.getArchetypeDetails().getArchetypeId().rmEntity();
+                    assertEquals(rmType, retrievedRmType);
+                }
+            }
         }
     }
 
