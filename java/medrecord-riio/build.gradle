@@ -15,7 +15,9 @@ dependencies {
 //    compile "com.fasterxml.jackson.core:jackson-core:${ext.version.jackson}"
 //    compile "com.fasterxml.jackson.core:jackson-databind:${ext.version.jackson}"
 //    compile "org.apache.commons:commons-lang3:${ext.version.commonsLang3}"
+    compile "commons-io:commons-io:${ext.version.commonsIo}"
     compile "jaxen:jaxen:${ext.version.jaxen}" // used by jdom
+    //compile "net.sf.saxon:Saxon-HE:${ext.version.saxon}"
 
     testCompile project(':medrecord-spi-tck')
     testCompile project(':medrecord-memstore')

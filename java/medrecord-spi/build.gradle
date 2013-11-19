@@ -30,7 +30,7 @@ idea.module.iml {
                 'openehr-rm-core',
                 'openehr-rm-domain',
                 'rm-builder',
-                'rm-skeleton',
+                //'rm-skeleton',
                 'xml-binding',
                 'xml-serializer'
         ]
@@ -75,7 +75,7 @@ dependencies {
     compile "openehr:openehr-rm-core:${ext.version.openEhr}"
     compile "openehr:openehr-rm-domain:${ext.version.openEhr}"
     compile "openehr:rm-builder:${ext.version.openEhr}"
-    compile "openehr:rm-skeleton:${ext.version.openEhr}"
+    //compile "openehr:rm-skeleton:${ext.version.openEhr}"
     compile "openehr:xml-binding:${ext.version.openEhr}"
     compile "openehr:xml-serializer:${ext.version.openEhr}"
 }

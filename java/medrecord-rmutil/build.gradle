@@ -22,7 +22,7 @@ idea.module.iml {
                 'openehr-rm-core',
                 'openehr-rm-domain',
                 'rm-builder',
-                'rm-skeleton',
+                //'rm-skeleton',
                 'xml-binding',
                 'xml-serializer'
         ]
