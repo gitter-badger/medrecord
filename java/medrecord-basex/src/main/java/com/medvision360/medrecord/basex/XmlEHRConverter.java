@@ -43,10 +43,15 @@ public class XmlEHRConverter extends AbstractXmlConverter implements EHRParser, 
         String ehrStatusType = xpath(d, "//ehrStatus/type", Filters.element());
         ObjectRef ehrStatus = new ObjectRef(ehrStatusId, ehrStatusNamespace, ehrStatusType);
         
-        HierObjectID directoryId = new HierObjectID(xpath(d, "//directory/id/value", Filters.element()));
-        String directoryNamespace = xpath(d, "//directory/namespace", Filters.element());
-        String directoryType = xpath(d, "//directory/type", Filters.element());
-        ObjectRef directory = new ObjectRef(directoryId, directoryNamespace, directoryType);
+		ObjectRef directory = null;
+		String directoryIdValue = xpath(d, "//directory/id/value", Filters.element());
+		if (directoryIdValue != null)
+		{
+			HierObjectID directoryId = new HierObjectID(directoryIdValue);
+			String directoryNamespace = xpath(d, "//directory/namespace", Filters.element());
+			String directoryType = xpath(d, "//directory/type", Filters.element());
+			directory = new ObjectRef(directoryId, directoryNamespace, directoryType);
+		}
         List<ObjectRef> compositions = new ArrayList<>();
         
         boolean deleted = Boolean.parseBoolean(xpath(d, "//deleted", Filters.element())); 
@@ -73,10 +78,14 @@ public class XmlEHRConverter extends AbstractXmlConverter implements EHRParser, 
         set(root, "/ehrStatus/id/value", EHR.getEhrStatus().getId().getValue());
         set(root, "/ehrStatus/namespace", EHR.getEhrStatus().getNamespace());
         set(root, "/ehrStatus/type", EHR.getEhrStatus().getType());
-
-        set(root, "/directory/id/value", EHR.getDirectory().getId().getValue());
-        set(root, "/directory/namespace", EHR.getDirectory().getNamespace());
-        set(root, "/directory/type", EHR.getDirectory().getType());
+        
+        ObjectRef directory = EHR.getDirectory();
+        if (directory != null)
+        {
+            set(root, "/directory/id/value", directory.getId().getValue());
+            set(root, "/directory/namespace", directory.getNamespace());
+            set(root, "/directory/type", directory.getType());
+        }
         
         if (EHR instanceof SoftDeletable)
         {
