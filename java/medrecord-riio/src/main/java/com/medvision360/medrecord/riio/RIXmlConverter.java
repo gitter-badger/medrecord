@@ -31,28 +31,30 @@ import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.measurement.MeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
 import org.openehr.schemas.v1.ADDRESS;
-import org.openehr.schemas.v1.ADDRESSDocument;
 import org.openehr.schemas.v1.AGENT;
-import org.openehr.schemas.v1.AGENTDocument;
+import org.openehr.schemas.v1.AddressDocument;
+import org.openehr.schemas.v1.AgentDocument;
 import org.openehr.schemas.v1.CAPABILITY;
-import org.openehr.schemas.v1.CAPABILITYDocument;
 import org.openehr.schemas.v1.COMPOSITION;
 import org.openehr.schemas.v1.CONTACT;
-import org.openehr.schemas.v1.CONTACTDocument;
+import org.openehr.schemas.v1.CapabilityDocument;
 import org.openehr.schemas.v1.CompositionDocument;
+import org.openehr.schemas.v1.ContactDocument;
+import org.openehr.schemas.v1.EHRSTATUS;
+import org.openehr.schemas.v1.EhrStatusDocument;
 import org.openehr.schemas.v1.GROUP;
-import org.openehr.schemas.v1.GROUPDocument;
+import org.openehr.schemas.v1.GroupDocument;
 import org.openehr.schemas.v1.ItemsDocument;
 import org.openehr.schemas.v1.ORGANISATION;
-import org.openehr.schemas.v1.ORGANISATIONDocument;
+import org.openehr.schemas.v1.OrganisationDocument;
 import org.openehr.schemas.v1.PARTYIDENTITY;
-import org.openehr.schemas.v1.PARTYIDENTITYDocument;
 import org.openehr.schemas.v1.PARTYRELATIONSHIP;
-import org.openehr.schemas.v1.PARTYRELATIONSHIPDocument;
 import org.openehr.schemas.v1.PERSON;
-import org.openehr.schemas.v1.PERSONDocument;
+import org.openehr.schemas.v1.PersonDocument;
+import org.openehr.schemas.v1.PartyIdentityDocument;
+import org.openehr.schemas.v1.PartyRelationshipDocument;
 import org.openehr.schemas.v1.ROLE;
-import org.openehr.schemas.v1.ROLEDocument;
+import org.openehr.schemas.v1.RoleDocument;
 import org.openehr.schemas.v1.VersionDocument;
 import org.openehr.schemas.v1.VersionedObjectDocument;
 import org.w3c.dom.CharacterData;
@@ -65,9 +67,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class RIXmlConverter implements LocatableParser, LocatableSerializer
 {
-    // currently failing with
-    //   Caused by: org.apache.xmlbeans.XmlException: error: The document is not a composition@http://schemas.openehr.org/v1: multiple document elements
-
     private SimpleNamespaceContext m_namespaceContext = new SimpleNamespaceContext();
 
     {
@@ -80,23 +79,24 @@ public class RIXmlConverter implements LocatableParser, LocatableSerializer
     {
         @SuppressWarnings("SpellCheckingInspection")
         String[] serializerMapping = new String[] {
-                "address", ADDRESSDocument.Factory.class.getName(),
-                "agent", AGENTDocument.Factory.class.getName(),
+                "address", AddressDocument.Factory.class.getName(),
+                "agent", AgentDocument.Factory.class.getName(),
                 //"archetype",         ArchetypeDocument.Factory.class.getName(),
-                "capability", CAPABILITYDocument.Factory.class.getName(),
-                "contact", CONTACTDocument.Factory.class.getName(),
+                "capability", CapabilityDocument.Factory.class.getName(),
+                "contact", ContactDocument.Factory.class.getName(),
                 "composition", CompositionDocument.Factory.class.getName(),
                 //"extract",           ExtractDocument.Factory.class.getName(),
                 //"extractrequest",    ExtractRequestDocument.Factory.class.getName(),
-                "group", GROUPDocument.Factory.class.getName(),
+                "group", GroupDocument.Factory.class.getName(),
                 "items", ItemsDocument.Factory.class.getName(),
-                "organisation", ORGANISATIONDocument.Factory.class.getName(),
-                "partyidentity", PARTYIDENTITYDocument.Factory.class.getName(),
-                "partyrelationship", PARTYRELATIONSHIPDocument.Factory.class.getName(),
-                "person", PERSONDocument.Factory.class.getName(),
-                "role", ROLEDocument.Factory.class.getName(),
+                "organisation", OrganisationDocument.Factory.class.getName(),
+                "partyidentity", PartyIdentityDocument.Factory.class.getName(),
+                "partyrelationship", PartyRelationshipDocument.Factory.class.getName(),
+                "person", PersonDocument.Factory.class.getName(),
+                "role", RoleDocument.Factory.class.getName(),
                 "version", VersionDocument.Factory.class.getName(),
                 "versionedobject", VersionedObjectDocument.Factory.class.getName(),
+                "ehrstatus", EhrStatusDocument.Factory.class.getName(),
         };
         for (int i = 0; i < serializerMapping.length; i++)
         {
@@ -124,6 +124,7 @@ public class RIXmlConverter implements LocatableParser, LocatableSerializer
                 "role", ROLE.Factory.class.getName(),
                 "version", VersionDocument.Factory.class.getName(),
                 "versionedobject", VersionedObjectDocument.Factory.class.getName(),
+                "ehrstatus", EHRSTATUS.Factory.class.getName(),
         };
         for (int i = 0; i < parserMapping.length; i++)
         {
@@ -383,10 +384,7 @@ public class RIXmlConverter implements LocatableParser, LocatableSerializer
         xmlOptions.setSavePrettyPrint();
         xmlOptions.setCharacterEncoding(encoding);
         xmlOptions.setSaveOuter();
-        xmlOptions.setSaveNamespacesFirst();
-
-        m_namespaceContext.addNamespace("openehr", "http://schemas.openehr.org/v1");
-        m_namespaceContext.addNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        //xmlOptions.setSaveNamespacesFirst();
 
         xmlObject.save(os, xmlOptions);
     }
