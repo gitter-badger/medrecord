@@ -558,6 +558,10 @@ public class RMAdapter extends RMUtil
                 {
                     valueMap.put("id", m_valueGenerator.generateUID());
                 }
+				if (!valueMap.containsKey("namespace"))
+				{
+					valueMap.put("namespace", "DEMOGRAPHIC");
+				}
                 if (!valueMap.containsKey("type"))
                 {
                     valueMap.put("type", "" + m_valueGenerator.generateString());
@@ -704,7 +708,8 @@ public class RMAdapter extends RMUtil
                 }
                 if (!valueMap.containsKey("activityId"))
                 {
-                    valueMap.put("activityId", m_valueGenerator.generateName("activity").getValue());
+                    //valueMap.put("activityId", m_valueGenerator.generateName("activity").getValue());
+					valueMap.put("activityId", m_valueGenerator.generateNodeId());
                 }
                 break;
 
