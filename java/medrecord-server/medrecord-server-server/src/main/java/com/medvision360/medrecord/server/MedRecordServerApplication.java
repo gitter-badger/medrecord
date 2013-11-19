@@ -6,6 +6,7 @@
  */
 package com.medvision360.medrecord.server;
 
+import com.medvision360.lib.server.service.JsonStatusService;
 import com.medvision360.medrecord.engine.MedRecordEngine;
 import com.medvision360.medrecord.server.resources.ArchetypeServerResource;
 import com.medvision360.medrecord.server.resources.DemoServerResource;
@@ -29,6 +30,9 @@ public class MedRecordServerApplication extends RestletApplication
 {
     public MedRecordServerApplication()
     {
+        // add a custom status service which understands the exception conventions used in medrecord
+        setStatusService(new CustomStatusService());
+        
         // need to enable preferences and extensions tunnel to be able
         // to use document.en.json
 
@@ -56,16 +60,6 @@ public class MedRecordServerApplication extends RestletApplication
 
         // this is a good place to load configuration and store it in the context so it can be used by the various
         // resources....
-        
-        MedRecordEngine engine = new MedRecordEngine();
-        try
-        {
-            engine.initialize();
-        }
-        catch (InitializationException e)
-        {
-            throw new ConfigurationException(e);
-        }
         
         MedRecordService service = new MedRecordService();
         getServices().add(service);

@@ -37,9 +37,9 @@ public class ArchetypeResource extends ClientResourceBase
     }
 
     /**
-       Demo resource.
+       Archetype resource.
 
-Some extra text which shows up in swagger...
+Retrieve an archetype as an ADL string (plain text).
 
 
 
@@ -58,9 +58,10 @@ Some extra text which shows up in swagger...
     public java.lang.String getArchetype(
         final String id
     ) throws
-        com.medvision360.medrecord.api.archetype.ArchetypeNotFoundException,
-        com.medvision360.lib.api.MissingParameterException,
-        com.medvision360.lib.api.ServiceUnavailableException
+        com.medvision360.medrecord.spi.exceptions.NotFoundException,
+        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
+        com.medvision360.medrecord.spi.exceptions.RecordException,
+        java.io.IOException
     {
       return getArchetype(
         id,
@@ -69,9 +70,9 @@ Some extra text which shows up in swagger...
     }
 
     /**
-       Demo resource.
+       Archetype resource.
 
-Some extra text which shows up in swagger...
+Retrieve an archetype as an ADL string (plain text).
 
 
 
@@ -87,9 +88,10 @@ Some extra text which shows up in swagger...
         final String id,
         final ArchetypeResourceGetArchetypeParams queryParams_
     ) throws
-        com.medvision360.medrecord.api.archetype.ArchetypeNotFoundException,
-        com.medvision360.lib.api.MissingParameterException,
-        com.medvision360.lib.api.ServiceUnavailableException
+        com.medvision360.medrecord.spi.exceptions.NotFoundException,
+        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
+        com.medvision360.medrecord.spi.exceptions.RecordException,
+        java.io.IOException
     {
         try
         {
@@ -111,12 +113,101 @@ Some extra text which shows up in swagger...
             {
                 switch(errorDocument_.getCode())
                 {
-                    case "ARCHETYPE_NOT_FOUND":
-                        throw new com.medvision360.medrecord.api.archetype.ArchetypeNotFoundException(errorDocument_.getArguments());
-                    case "MISSING_PARAMETER":
-                        throw new com.medvision360.lib.api.MissingParameterException(errorDocument_.getArguments());
-                    case "SERVICE_UNAVAILABLE":
-                        throw new com.medvision360.lib.api.ServiceUnavailableException(errorDocument_.getArguments());
+                    case "NOT_FOUND_EXCEPTION":
+                        throw new com.medvision360.medrecord.spi.exceptions.NotFoundException(errorDocument_.getArguments());
+                    case "MISSING_PARAMETER_EXCEPTION":
+                        throw new com.medvision360.medrecord.spi.exceptions.MissingParameterException(errorDocument_.getArguments());
+                    case "RECORD_EXCEPTION":
+                        throw new com.medvision360.medrecord.spi.exceptions.RecordException(errorDocument_.getArguments());
+                }
+            }
+            throw e_;
+        }
+    }
+
+    /**
+       Archetype resource.
+
+Retrieve an archetype encapsulated in JSON or XML.
+
+
+
+       <p>
+       Use the {@link #getArchetypeResult(String,ArchetypeResourceGetArchetypeResultParams)}
+       method to pass additional query arguments.</p>
+
+       @param id An OpenEHR ArchetypeID value
+
+       @apiqueryparam id An OpenEHR ArchetypeID value.
+[type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
+
+
+
+     */
+    public com.medvision360.medrecord.api.archetype.ArchetypeResult getArchetypeResult(
+        final String id
+    ) throws
+        com.medvision360.medrecord.spi.exceptions.NotFoundException,
+        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
+        com.medvision360.medrecord.spi.exceptions.RecordException,
+        java.io.IOException
+    {
+      return getArchetypeResult(
+        id,
+        null
+      );
+    }
+
+    /**
+       Archetype resource.
+
+Retrieve an archetype encapsulated in JSON or XML.
+
+
+
+       @param queryParams_ The query parameters to be added to the request.
+       @param id An OpenEHR ArchetypeID value
+
+       @apiqueryparam id An OpenEHR ArchetypeID value.
+[type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
+
+
+     */
+    public com.medvision360.medrecord.api.archetype.ArchetypeResult getArchetypeResult(
+        final String id,
+        final ArchetypeResourceGetArchetypeResultParams queryParams_
+    ) throws
+        com.medvision360.medrecord.spi.exceptions.NotFoundException,
+        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
+        com.medvision360.medrecord.spi.exceptions.RecordException,
+        java.io.IOException
+    {
+        try
+        {
+            final ClientResource resource_ = getClientResource();
+            if (queryParams_ != null)
+            {
+                queryParams_.applyTo(resource_);
+            }
+
+            resource_.addQueryParameter("id", id);
+            final com.medvision360.medrecord.api.archetype.ArchetypeResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.archetype.ArchetypeResource.class);
+            return wrapped_.getArchetypeResult(
+            );
+        }
+        catch(final ResourceException e_)
+        {
+            final ErrorDocument errorDocument_ = getErrorDocument();
+            if (errorDocument_ != null)
+            {
+                switch(errorDocument_.getCode())
+                {
+                    case "NOT_FOUND_EXCEPTION":
+                        throw new com.medvision360.medrecord.spi.exceptions.NotFoundException(errorDocument_.getArguments());
+                    case "MISSING_PARAMETER_EXCEPTION":
+                        throw new com.medvision360.medrecord.spi.exceptions.MissingParameterException(errorDocument_.getArguments());
+                    case "RECORD_EXCEPTION":
+                        throw new com.medvision360.medrecord.spi.exceptions.RecordException(errorDocument_.getArguments());
                 }
             }
             throw e_;

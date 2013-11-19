@@ -70,11 +70,15 @@ import org.openehr.rm.support.measurement.MeasurementService;
 import org.openehr.rm.support.measurement.SimpleMeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
 import org.openehr.terminology.SimpleTerminologyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MedRecordEngine implements Engine, AuditService
 {
+    private static final Logger log = LoggerFactory.getLogger(MedRecordEngine.class);
+
     private boolean m_initialized = false;
     private boolean m_storeValidation = true;
     private CodePhrase m_encoding;
@@ -109,6 +113,25 @@ public class MedRecordEngine implements Engine, AuditService
     ///
     /// Initialization
     ///
+    
+    private static MedRecordEngine m_instance = null;
+    public static synchronized MedRecordEngine getInstance()
+    {
+        if (m_instance == null)
+        {
+            m_instance = new MedRecordEngine();
+        }
+        return m_instance;
+    }
+
+    public MedRecordEngine()
+    {
+        if (log.isTraceEnabled())
+        {
+            Exception e = new Exception(String.format("constructor stack: %s", this));
+            log.trace("--> MedRecordEngine()", e);
+        }
+    }
 
     @SuppressWarnings("UnusedDeclaration")
     public void setStoreValidation(boolean storeValidation)
@@ -167,6 +190,11 @@ public class MedRecordEngine implements Engine, AuditService
 
     public synchronized void initialize() throws InitializationException
     {
+        if (log.isTraceEnabled())
+        {
+            Exception e = new Exception(String.format("initialize stack: %s", this));
+            log.trace("--> initialize()", e);
+        }
         if (m_initialized)
         {
             return;
@@ -209,9 +237,10 @@ public class MedRecordEngine implements Engine, AuditService
         initializeLocatableSupport();
         
         m_initialized = true;
+        log.trace("<-- initialize()");
     }
 
-    private void initializeArchetypeSupport() throws InitializationException
+    private synchronized void initializeArchetypeSupport() throws InitializationException
     {
         RIAdlConverter adlConverter = new RIAdlConverter();
         m_archetypeParsers.add(adlConverter);
@@ -235,7 +264,7 @@ public class MedRecordEngine implements Engine, AuditService
         m_archetypeStore = archetypeStore;
     }
 
-    private void initializeEHRSupport() throws InitializationException
+    private synchronized void initializeEHRSupport() throws InitializationException
     {
         XmlEHRConverter xmlConverter = new XmlEHRConverter();
         m_ehrParsers.add(xmlConverter);
@@ -255,7 +284,7 @@ public class MedRecordEngine implements Engine, AuditService
         m_ehrStore = ehrStore;
     }
 
-    private void initializeLocatableSupport() throws InitializationException
+    private synchronized void initializeLocatableSupport() throws InitializationException
     {
         Context baseXContext;
         

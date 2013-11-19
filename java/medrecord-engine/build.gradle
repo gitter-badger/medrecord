@@ -12,5 +12,8 @@ dependencies {
     compile project(':medrecord-spi-tck')
     compile project(':medrecord-memstore')
     
-    compile "org.springframework:spring-core:${ext.version.spring}"
+    compile("org.springframework:spring-core:${ext.version.spring}") {
+        exclude group:'commons-logging', module:'commons-logging'
+    }
+    compile "org.slf4j:jcl-over-slf4j:${ext.version.slf4j}"
 }

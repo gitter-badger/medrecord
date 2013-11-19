@@ -12,9 +12,9 @@ import com.medvision360.medrecord.spi.WrappedArchetype;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;
 import com.medvision360.medrecord.spi.exceptions.ParseException;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openehr.am.archetype.Archetype;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -22,8 +22,7 @@ import se.acode.openehr.parser.ADLParser;
 
 public class ArchetypeLoader
 {
-    private final static Log log = LogFactory.getLog(ArchetypeLoader.class);
-
+    private static final Logger log = LoggerFactory.getLogger(ArchetypeLoader.class);
     private ResourcePatternResolver m_resolver;
     private ArchetypeStore m_store;
     private String m_basePath;

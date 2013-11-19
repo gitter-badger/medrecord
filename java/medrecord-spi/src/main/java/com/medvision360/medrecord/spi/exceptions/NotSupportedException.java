@@ -7,7 +7,18 @@
  */
 package com.medvision360.medrecord.spi.exceptions;
 
+import java.util.Collection;
+
+import com.medvision360.lib.common.exceptions.ApiException;
+import com.medvision360.lib.common.exceptions.Cause;
+
 @SuppressWarnings("UnusedDeclaration")
+@ApiException(
+        status  = 400,
+        cause   = Cause.CLIENT,
+        code    = "NOT_SUPPORTED_EXCEPTION",
+        message = "Resource not supported: {0}"
+)
 public class NotSupportedException extends RecordException
 {
     private static final long serialVersionUID = 0x130L;
@@ -35,5 +46,10 @@ public class NotSupportedException extends RecordException
             boolean writableStackTrace)
     {
         super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public NotSupportedException(Collection<String> arguments)
+    {
+        super(arguments);
     }
 }

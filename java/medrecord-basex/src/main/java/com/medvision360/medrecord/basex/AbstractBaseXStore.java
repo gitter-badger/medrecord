@@ -88,7 +88,7 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
         checkArgument(name.matches(NAME_REGEX), "name has to match regex %s", NAME_REGEX);
         setPath(name, path);
 
-        startConcurrentOptimizer();
+        //startConcurrentOptimizer();
     }
 
     public AbstractBaseXStore(Context ctx, String name, String path)

@@ -101,6 +101,11 @@
     <listener-class>com.zorggemak.servlet.ServletListener</listener-class>
   </listener>
 
+  <listener>
+    <description>LoggingConfigurer</description>
+    <listener-class>com.medvision360.medrecord.server.LoggingConfigurationListener</listener-class>
+  </listener>
+
   <servlet>
     <servlet-name>dispatcher</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>

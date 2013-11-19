@@ -2,8 +2,8 @@ package com.zorggemak.servlet;
 
 import com.zorggemak.data.DataManager;
 import com.zorggemak.util.Configuration;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -13,7 +13,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class ServletListener implements ServletContextListener {
-    private final static Log log = LogFactory.getLog(ServletListener.class);
+    private static final Logger log = LoggerFactory.getLogger(ServletListener.class);
     private static final long DATA_LOOP = 60 * 1000;
 
     private static Timer timer = null;

@@ -9,6 +9,7 @@ import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Filter;
+import org.restlet.service.StatusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +36,10 @@ public class TransactionFilter extends Filter
         }
         catch (InitializationException | TransactionException e)
         {
-            response.setStatus(Status.SERVER_ERROR_INTERNAL);
-            // todo write error to client
-            log.error("Error beginning transaction: %s", e.getMessage());
+            StatusService statusService = getApplication().getStatusService();
+            Status status = statusService.getStatus(e, request, response);
+            response.setStatus(status);
+            log.error(String.format("Error beginning transaction: %s", e.getMessage()), e);
             return STOP;
         }
         
@@ -70,9 +72,10 @@ public class TransactionFilter extends Filter
         catch (InitializationException e)
         {
             setCommitFlag(false);
-            response.setStatus(Status.SERVER_ERROR_INTERNAL);
-            // todo write error to client
-            log.error("Error finalizing transaction: %s", e.getMessage());
+            StatusService statusService = getApplication().getStatusService();
+            Status status = statusService.getStatus(e, request, response);
+            response.setStatus(status);
+            log.error(String.format("Error finalizing transaction: %s", e.getMessage()), e);
             response.commit();
             return;
         }
@@ -91,9 +94,10 @@ public class TransactionFilter extends Filter
         }
         catch (TransactionException e)
         {
-            response.setStatus(Status.SERVER_ERROR_INTERNAL);
-            // todo write error to client
-            log.error("Error finalizing transaction: %s", e.getMessage());
+            StatusService statusService = getApplication().getStatusService();
+            Status status = statusService.getStatus(e, request, response);
+            response.setStatus(status);
+            log.error(String.format("Error finalizing transaction: %s", e.getMessage()), e);
         }
         finally
         {

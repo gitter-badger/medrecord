@@ -55,7 +55,8 @@ description = 'MEDvision360 MEDrecord Reference Model Utilities'
 
 dependencies {
     compile "com.google.guava:guava:${ext.version.guava}"
-    compile "commons-logging:commons-logging:${ext.version.commonsLogging}"
+    //compile "commons-logging:commons-logging:${ext.version.commonsLogging}"
+    compile "org.slf4j:jcl-over-slf4j:${ext.version.slf4j}"
     compile "org.apache.commons:commons-lang3:${ext.version.commonsLang3}"
     compile "openehr:openehr-aom:${ext.version.openEhr}"
     compile "openehr:openehr-rm-core:${ext.version.openEhr}"

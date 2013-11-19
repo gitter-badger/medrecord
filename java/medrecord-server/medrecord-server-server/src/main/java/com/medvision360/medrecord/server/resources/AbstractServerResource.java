@@ -5,6 +5,7 @@ import com.medvision360.lib.server.ServerResourceBase;
 import com.medvision360.medrecord.engine.MedRecordEngine;
 import com.medvision360.medrecord.server.MedRecordService;
 import com.medvision360.medrecord.spi.exceptions.InitializationException;
+import com.medvision360.medrecord.spi.exceptions.MissingParameterException;
 import org.restlet.service.Service;
 
 public abstract class AbstractServerResource
@@ -15,18 +16,20 @@ public abstract class AbstractServerResource
         return getApplication().getServices().get(serviceClass);
     }
     
-    protected MedRecordEngine engine() throws ServiceUnavailableException
+    protected MedRecordEngine engine() throws InitializationException
     {
         MedRecordService service = getService(MedRecordService.class);
-        MedRecordEngine engine;
-        try
-        {
-            engine = service.engine();
-        }
-        catch (InitializationException e)
-        {
-            throw new ServiceUnavailableException(e);
-        }
+        MedRecordEngine engine = service.engine();
         return engine;
+    }
+
+    protected String getRequiredQueryValue(String name) throws MissingParameterException
+    {
+        String id = getQueryValue(name);
+        if (id == null)
+        {
+            throw new MissingParameterException(name);
+        }
+        return id;
     }
 }

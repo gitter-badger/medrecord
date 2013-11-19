@@ -7,13 +7,26 @@
  */
 package com.medvision360.medrecord.spi.exceptions;
 
+import java.util.Collection;
+
+import com.medvision360.lib.common.exceptions.AnnotatedResourceException;
+import com.medvision360.lib.common.exceptions.ApiException;
+import com.medvision360.lib.common.exceptions.Cause;
+
 @SuppressWarnings("UnusedDeclaration")
-public class RecordException extends Exception
+@ApiException(
+        status  = 500,
+        cause   = Cause.SERVER,
+        code    = "RECORD_EXCEPTION",
+        message = "Generic error in server: {0}"
+)
+public class RecordException extends AnnotatedResourceException
 {
     private static final long serialVersionUID = 0x130L;
 
     public RecordException()
     {
+        super("details unknown");
     }
 
     public RecordException(String message)
@@ -34,5 +47,10 @@ public class RecordException extends Exception
     public RecordException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
     {
         super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+    public RecordException(Collection<String> arguments)
+    {
+        super(arguments);
     }
 }

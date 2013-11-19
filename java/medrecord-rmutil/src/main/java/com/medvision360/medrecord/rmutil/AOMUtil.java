@@ -3,8 +3,6 @@ package com.medvision360.medrecord.rmutil;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openehr.am.archetype.Archetype;
 import org.openehr.am.archetype.constraintmodel.ArchetypeConstraint;
 import org.openehr.am.archetype.constraintmodel.CAttribute;
@@ -16,10 +14,12 @@ import org.openehr.am.archetype.ontology.OntologyBindingItem;
 import org.openehr.am.archetype.ontology.TermBindingItem;
 import org.openehr.build.SystemValue;
 import org.openehr.rm.datatypes.text.CodePhrase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AOMUtil extends RMUtil
 {
-    private final static Log log = LogFactory.getLog(AOMUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(RMUtil.class);
 
     public AOMUtil(Map<SystemValue, Object> systemValues)
     {

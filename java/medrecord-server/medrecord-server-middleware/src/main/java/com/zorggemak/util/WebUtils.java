@@ -8,8 +8,8 @@ import com.zorggemak.commons.NoSystemIdAuditException;
 import com.zorggemak.commons.NoUserIdAuditException;
 import com.zorggemak.data.DataManager;
 import com.zorggemak.data.RequestError;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -30,7 +30,7 @@ import java.util.Map;
 
 @SuppressWarnings({"SpellCheckingInspection", "unchecked"})
 public class WebUtils {
-    private final static Log log = LogFactory.getLog(WebUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(WebUtils.class);
 
     public static String createJsonString(HashMap map) {
         StringBuilder buf;

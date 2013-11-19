@@ -1,31 +1,44 @@
 package com.medvision360.medrecord.api.archetype;
 
-import com.medvision360.lib.api.MissingParameterException;
-import com.medvision360.lib.api.ServiceUnavailableException;
+import java.io.IOException;
+
+import com.medvision360.medrecord.spi.exceptions.MissingParameterException;
+import com.medvision360.medrecord.spi.exceptions.NotFoundException;
+import com.medvision360.medrecord.spi.exceptions.RecordException;
 import org.restlet.resource.Get;
 
 /**
  * @apipath /archetype
  */
+@SuppressWarnings("DuplicateThrows")
 public interface ArchetypeResource
 {
     /**
-     * Demo resource.
+     * Archetype resource.
      *
-     * Some extra text which shows up in swagger...
+     * Retrieve an archetype as an ADL string (plain text).
      *
      * @apiqueryparam id An OpenEHR ArchetypeID value.
      *   [type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
      */
     @Get("txt")
-    public String getArchetype() throws
-            ArchetypeNotFoundException, MissingParameterException, ServiceUnavailableException;
-
-    // @Get("txt") means it returns plain/text
-    // You almost never have to return an explicit Representation. Restlet is smart enough to convert it.
-    // (TODO: the api documentation tool does not support plain text responses yet...)
-    // Only use exceptions derived from AnnotatedResourceException here, by listing them all explicitly here they
-    // will show up in the API documentation.
-
+    public String getArchetype()
+            throws NotFoundException, MissingParameterException, RecordException, IOException;
+    
+    /**
+     * Archetype resource.
+     *
+     * Retrieve an archetype encapsulated in JSON or XML.
+     *
+     * @apiqueryparam id An OpenEHR ArchetypeID value.
+     *   [type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
+     */
+    // todo this breaks the swagger UI with
+    //   Unable to read api 'com_medvision360_medrecord_api_archetype' from path
+    //     http://localhost:8100/medrecord/v2/apidocs/com_medvision360_medrecord_api_archetype
+    //     (server returned OK)
+    //@Get("json|xml")
+    //public ArchetypeResult getArchetypeResult()
+    //        throws NotFoundException, MissingParameterException, RecordException, IOException;
 
 }

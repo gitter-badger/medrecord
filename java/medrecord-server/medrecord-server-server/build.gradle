@@ -1,9 +1,23 @@
 apply plugin: 'medvision-server'
 
+configurations {
+  all*.exclude group:'commons-logging', module:'commons-logging'
+}
+
 dependencies {
-  compile project(":medrecord-engine")
+  compile(project(":medrecord-engine")) {
+    exclude group:'commons-logging', module:'commons-logging'
+  }
   compile project(":medrecord-server-api-jee")
-  compile project(":medrecord-server-middleware")
+  compile(project(":medrecord-server-middleware")) {
+    exclude group:'commons-logging', module:'commons-logging'
+  }
+
+  compile "ch.qos.logback:logback-classic:${ext.version.logback}"
+  compile group: 'org.slf4j', name: 'slf4j-api', version:"${ext.version.slf4j}"
+  compile group: 'org.slf4j', name: 'log4j-over-slf4j', version:"${ext.version.slf4j}"
+  compile group: 'org.slf4j', name: 'jul-to-slf4j', version:"${ext.version.slf4j}"
+  compile group: 'org.slf4j', name: 'jcl-over-slf4j', version:"${ext.version.slf4j}"
 
   testCompile "junit:junit:4.11"
   testCompile "org.restlet.jee:org.restlet.ext.httpclient:${ext.version.restlet}"
@@ -20,6 +34,17 @@ prepareTomcat {
   // TODO: make sure a special logback config is added to the debian package
   logbackConfig = project.file("logback-test.xml")
 }
+
+//// TODO: above does not seem to work, so fiddle and fiddle and fiddle
+//task injectLogBackConfig(type: Copy) {
+//  from project.projectDir
+//  into new File(project.buildDir, "buildlib/server/config/filtered")
+//  include 'logback-test.xml'
+//}
+//
+//war << {
+//  tasks.injectLogBackConfig.execute()
+//}
 
 tomcatRunWar {
   httpPort = 8100

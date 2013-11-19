@@ -32,7 +32,10 @@ idea.module.iml {
                 'rm-builder',
                 //'rm-skeleton',
                 'xml-binding',
-                'xml-serializer'
+                'xml-serializer',
+                
+                'libs-api-jee',
+                'libs-common-jee'                
         ]
         
         toModuleDependencies.each { dependencyName ->
@@ -63,7 +66,10 @@ description = 'MEDvision360 MEDrecord Service Provider Interface'
 
 dependencies {
     compile project(':medrecord-rmutil')
-    compile "commons-logging:commons-logging:${ext.version.commonsLogging}"
+    compile "com.medvision360.lib:libs-api-jee:${ext.version.medvisionlib}"
+    compile "com.medvision360.lib:libs-common-jee:${ext.version.medvisionlib}"
+    //compile "commons-logging:commons-logging:${ext.version.commonsLogging}"
+    compile "org.slf4j:jcl-over-slf4j:${ext.version.slf4j}"
     compile "com.google.guava:guava:${ext.version.guava}"
     compile "openehr:adl-parser:${ext.version.openEhr}"
     compile "openehr:adl-serializer:${ext.version.openEhr}"

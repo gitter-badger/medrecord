@@ -7,41 +7,41 @@ import com.medvision360.lib.common.exceptions.Cause;
 
 @SuppressWarnings("UnusedDeclaration")
 @ApiException(
-        status  = 500,
-        cause   = Cause.SERVER,
-        code    = "INITIALIZATION_EXCEPTION",
-        message = "Problem starting up server: {0}"
+  status  = 400,
+  cause   = Cause.CLIENT,
+  code    = "MISSING_PARAMETER_EXCEPTION",
+  message = "The required parameter is missing: {0}"
 )
-public class InitializationException extends RecordException
+public class MissingParameterException extends RecordException
 {
     private static final long serialVersionUID = 0x130L;
     
-    public InitializationException()
+    public MissingParameterException()
     {
     }
 
-    public InitializationException(String message)
+    public MissingParameterException(String message)
     {
         super(message);
     }
 
-    public InitializationException(String message, Throwable cause)
+    public MissingParameterException(String message, Throwable cause)
     {
         super(message, cause);
     }
 
-    public InitializationException(Throwable cause)
+    public MissingParameterException(Throwable cause)
     {
         super(cause);
     }
 
-    public InitializationException(String message, Throwable cause, boolean enableSuppression,
+    public MissingParameterException(String message, Throwable cause, boolean enableSuppression,
             boolean writableStackTrace)
     {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public InitializationException(Collection<String> arguments)
+    public MissingParameterException(Collection<String> arguments)
     {
         super(arguments);
     }

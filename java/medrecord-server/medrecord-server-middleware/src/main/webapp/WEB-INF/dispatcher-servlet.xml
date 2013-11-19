@@ -45,7 +45,4 @@
   <bean name="indexController"
         class="org.springframework.web.servlet.mvc.ParameterizableViewController"
         p:viewName="index"/>
-
-  <context:property-placeholder location="classpath:middleware/swagger.properties" /> 
-  <bean id="documentationConfig" class="com.mangofactory.swagger.configuration.DocumentationConfig"/>
 </beans>

@@ -4,8 +4,8 @@ import com.zorggemak.commons.MiddlewareErrors;
 import com.zorggemak.data.DataManager;
 import com.zorggemak.data.RequestError;
 import com.zorggemak.util.WebUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +20,7 @@ import static com.zorggemak.util.WebUtils.toStackTrace;
 @Controller
 @RequestMapping("/v1/system")
 public class SystemController extends AbstractController {
-    private final static Log log = LogFactory.getLog(SystemController.class);
+    private static final Logger log = LoggerFactory.getLogger(SystemController.class);
     private static final long MAX_TIME_PASSED = 15 * 60 * 1000;
 
     @RequestMapping(value = "/getlasterror/{reqid}", method = RequestMethod.GET)
