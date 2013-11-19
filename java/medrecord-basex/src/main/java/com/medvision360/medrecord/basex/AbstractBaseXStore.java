@@ -344,7 +344,7 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
                     "%s/%s/%s",
                     v.substring(0, 2),
                     v.substring(2, 4),
-                    v.substring(4)
+                    v
             );
         }
     }
