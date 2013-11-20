@@ -114,3 +114,8 @@ task vendor(type: Exec) {
     workingDir 'medrecord-vendor'
     commandLine 'mvn', 'install', '-B', '-Dmaven.test.skip=true'
 }
+
+// so you can do 'gradle clean install tomcatRunWar' from the project root
+task tomcatRunWar {
+    dependsOn ':medrecord-server-server:tomcatRunWar'
+}
