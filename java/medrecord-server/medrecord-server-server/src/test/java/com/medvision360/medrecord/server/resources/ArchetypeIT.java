@@ -96,6 +96,7 @@ public class ArchetypeIT extends AbstractIntegrationTest
         assertEquals(archetypeName, result.getArchetypeId());
         assertNotNull(result.getAdl());
         assertTrue(result.getAdl().contains("blood_pressure"));
+        assertTrue(result.getAdl().trim().startsWith("archetype"));
         
         // LIST
         list = m_archetypeListResource.listArchetypes();

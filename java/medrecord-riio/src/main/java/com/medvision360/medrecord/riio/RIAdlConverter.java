@@ -62,8 +62,17 @@ public class RIAdlConverter implements ArchetypeParser, ArchetypeSerializer
         {
             throw new ParseException(e);
         }
+        asString = stripBOMAndStartingWhiteSpace(asString);
         
         return new WrappedArchetype(asString, archetype);
+    }
+
+    private String stripBOMAndStartingWhiteSpace(String asString)
+    {
+        // ADL files often have a unicode BOM at the start of the file (which is bad/not recommended for UTF-8)
+        //   we definitely want that gone as we are (de)encapsulating the ADL into XML and/or sending it over the
+        //   wire.
+        return asString.replaceFirst("^\uFEFF\\s*", "");
     }
 
     @Override
@@ -82,6 +91,7 @@ public class RIAdlConverter implements ArchetypeParser, ArchetypeSerializer
             ADLSerializer adlSerializer = new ADLSerializer();
             asString = adlSerializer.output(archetype.getArchetype());
         }
+        asString = stripBOMAndStartingWhiteSpace(asString);
         IOUtils.write(asString, os, encoding);
         return new WrappedArchetype(asString, archetype.getArchetype());
     }

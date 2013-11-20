@@ -172,15 +172,12 @@ public class BaseXArchetypeStore extends AbstractBaseXStore implements Archetype
             throws IOException, SerializeException
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        m_serializer.serialize(wrappedArchetype, os);
+        WrappedArchetype serialized = m_serializer.serialize(wrappedArchetype, os);
         byte[] buffer = os.toByteArray();
-        String asString = new String(buffer);
         ByteArrayInputStream is = new ByteArrayInputStream(buffer);
         replace(path, is); // calls initialize()
-        WrappedArchetype result = new WrappedArchetype(asString, wrappedArchetype.getArchetype(),
-                wrappedArchetype.isLocked());
-        m_cache.put(wrappedArchetype.getArchetype().getArchetypeId(), result);
-        return result;
+        m_cache.put(wrappedArchetype.getArchetype().getArchetypeId(), serialized);
+        return serialized;
     }
 
     protected Iterable<ArchetypeID> listArchetypes(String path) throws IOException

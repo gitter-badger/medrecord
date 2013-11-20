@@ -56,7 +56,7 @@ public class XmlWrappedArchetypeConverter extends AbstractXmlConverter implement
 
         InputStream asInputStream = IOUtils.toInputStream(asString);
         WrappedArchetype result = m_delegate.parse(asInputStream, encoding);
-        return new WrappedArchetype(result.getAsString(), result.getArchetype(), locked);
+        return new WrappedArchetype(asString, result.getArchetype(), locked);
     }
 
     @Override
