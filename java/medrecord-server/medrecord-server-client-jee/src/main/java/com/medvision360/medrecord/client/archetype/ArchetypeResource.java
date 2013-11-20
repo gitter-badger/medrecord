@@ -39,7 +39,7 @@ public class ArchetypeResource extends ClientResourceBase
     /**
        Archetype resource.
 
-Retrieve an archetype as an ADL string (plain text).
+Retrieve an archetype encapsulated in JSON or XML.
 
 
 
@@ -55,7 +55,7 @@ Retrieve an archetype as an ADL string (plain text).
 
 
      */
-    public java.lang.String getArchetype(
+    public com.medvision360.medrecord.api.archetype.ArchetypeResult getArchetype(
         final String id
     ) throws
         com.medvision360.medrecord.spi.exceptions.NotFoundException,
@@ -72,7 +72,7 @@ Retrieve an archetype as an ADL string (plain text).
     /**
        Archetype resource.
 
-Retrieve an archetype as an ADL string (plain text).
+Retrieve an archetype encapsulated in JSON or XML.
 
 
 
@@ -84,7 +84,7 @@ Retrieve an archetype as an ADL string (plain text).
 
 
      */
-    public java.lang.String getArchetype(
+    public com.medvision360.medrecord.api.archetype.ArchetypeResult getArchetype(
         final String id,
         final ArchetypeResourceGetArchetypeParams queryParams_
     ) throws
@@ -128,32 +128,28 @@ Retrieve an archetype as an ADL string (plain text).
     /**
        Archetype resource.
 
-Retrieve an archetype encapsulated in JSON or XML.
+Retrieve an archetype as an ADL string (plain text).
 
 
 
        <p>
-       Use the {@link #getArchetypeResult(String,ArchetypeResourceGetArchetypeResultParams)}
+       Use the {@link #getArchetypeAsText(ArchetypeResourceGetArchetypeAsTextParams)}
        method to pass additional query arguments.</p>
 
-       @param id An OpenEHR ArchetypeID value
 
-       @apiqueryparam id An OpenEHR ArchetypeID value.
-[type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
+       @apiacceptvariant getArchetype
 
 
 
      */
-    public com.medvision360.medrecord.api.archetype.ArchetypeResult getArchetypeResult(
-        final String id
+    public java.lang.String getArchetypeAsText(
     ) throws
         com.medvision360.medrecord.spi.exceptions.NotFoundException,
         com.medvision360.medrecord.spi.exceptions.MissingParameterException,
         com.medvision360.medrecord.spi.exceptions.RecordException,
         java.io.IOException
     {
-      return getArchetypeResult(
-        id,
+      return getArchetypeAsText(
         null
       );
     }
@@ -161,21 +157,18 @@ Retrieve an archetype encapsulated in JSON or XML.
     /**
        Archetype resource.
 
-Retrieve an archetype encapsulated in JSON or XML.
+Retrieve an archetype as an ADL string (plain text).
 
 
 
        @param queryParams_ The query parameters to be added to the request.
-       @param id An OpenEHR ArchetypeID value
 
-       @apiqueryparam id An OpenEHR ArchetypeID value.
-[type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
+       @apiacceptvariant getArchetype
 
 
      */
-    public com.medvision360.medrecord.api.archetype.ArchetypeResult getArchetypeResult(
-        final String id,
-        final ArchetypeResourceGetArchetypeResultParams queryParams_
+    public java.lang.String getArchetypeAsText(
+        final ArchetypeResourceGetArchetypeAsTextParams queryParams_
     ) throws
         com.medvision360.medrecord.spi.exceptions.NotFoundException,
         com.medvision360.medrecord.spi.exceptions.MissingParameterException,
@@ -190,9 +183,8 @@ Retrieve an archetype encapsulated in JSON or XML.
                 queryParams_.applyTo(resource_);
             }
 
-            resource_.addQueryParameter("id", id);
             final com.medvision360.medrecord.api.archetype.ArchetypeResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.archetype.ArchetypeResource.class);
-            return wrapped_.getArchetypeResult(
+            return wrapped_.getArchetypeAsText(
             );
         }
         catch(final ResourceException e_)

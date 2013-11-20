@@ -19,15 +19,7 @@ public class ArchetypeServerResource
         implements ArchetypeResource
 {
     @Override
-    public String getArchetype() throws RecordException, IOException
-    {
-        WrappedArchetype wrappedArchetype = getWrappedArchetype();
-        return wrappedArchetype.getAsString();
-    }
-
-    //@Override
-    @Get("json|xml")
-    public ArchetypeResult getArchetypeResult() throws RecordException, IOException
+    public ArchetypeResult getArchetype() throws RecordException, IOException
     {
         WrappedArchetype wrappedArchetype = getWrappedArchetype();
         String adl = wrappedArchetype.getAsString();
@@ -36,6 +28,13 @@ public class ArchetypeServerResource
         result.setArchetypeId(id);
         result.setArchetype(adl);
         return result;
+    }
+
+    @Override
+    public String getArchetypeAsText() throws RecordException, IOException
+    {
+        WrappedArchetype wrappedArchetype = getWrappedArchetype();
+        return wrappedArchetype.getAsString();
     }
 
     private WrappedArchetype getWrappedArchetype() throws RecordException, IOException

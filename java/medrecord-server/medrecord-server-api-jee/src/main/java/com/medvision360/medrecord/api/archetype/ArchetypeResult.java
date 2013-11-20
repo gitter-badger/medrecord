@@ -29,18 +29,11 @@ public class ArchetypeResult
     /**
      * The openEHR Archetype as an ADL string.
      * 
-     * @apiexample
-     *     archetype (adl_version=1.4)
-     *              openEHR-EHR-OBSERVATION.blood_pressure.v1
-     *     
-     *     concept
-     *        [at0000]	-- Blood Pressure
-     *     language
-     *        original_language = <[ISO_639-1::en]>
-     *        translations = <
-     *            ["de"] = <
-     *                language = <[ISO_639-1::de]>
-     *     ...
+     * @apiexample archetype (adl_version=1.4) openEHR-EHR-OBSERVATION.blood_pressure.v1\n
+     *   concept\n
+     *     [at0000]\n
+     *   language\n
+     *     original_language = ....
      */
     public String getAdl()
     {

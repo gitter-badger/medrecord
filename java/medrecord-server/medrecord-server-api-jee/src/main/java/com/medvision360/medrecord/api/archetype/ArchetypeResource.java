@@ -16,29 +16,25 @@ public interface ArchetypeResource
     /**
      * Archetype resource.
      *
-     * Retrieve an archetype as an ADL string (plain text).
-     *
-     * @apiqueryparam id An OpenEHR ArchetypeID value.
-     *   [type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
-     */
-    @Get("txt")
-    public String getArchetype()
-            throws NotFoundException, MissingParameterException, RecordException, IOException;
-    
-    /**
-     * Archetype resource.
-     *
      * Retrieve an archetype encapsulated in JSON or XML.
      *
      * @apiqueryparam id An OpenEHR ArchetypeID value.
      *   [type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
      */
-    // todo this breaks the swagger UI with
-    //   Unable to read api 'com_medvision360_medrecord_api_archetype' from path
-    //     http://localhost:8100/medrecord/v2/apidocs/com_medvision360_medrecord_api_archetype
-    //     (server returned OK)
+    // note the use of | breaks the swagger UI generation magic doclet
     //@Get("json|xml")
-    //public ArchetypeResult getArchetypeResult()
-    //        throws NotFoundException, MissingParameterException, RecordException, IOException;
+    @Get("json")
+    public ArchetypeResult getArchetype()
+            throws NotFoundException, MissingParameterException, RecordException, IOException;
 
+    /**
+     * Archetype resource.
+     *
+     * Retrieve an archetype as an ADL string (plain text).
+     *
+     * @apiacceptvariant getArchetype
+     */
+    @Get("txt")
+    public String getArchetypeAsText()
+            throws NotFoundException, MissingParameterException, RecordException, IOException;
 }
