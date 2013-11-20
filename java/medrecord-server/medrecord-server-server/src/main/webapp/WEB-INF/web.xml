@@ -24,11 +24,10 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
 
-  <!-- disabled for now
-
   <servlet>
      <servlet-name>EventSocketServlet</servlet-name>
-     <servlet-class>
+     <!--suppress WebProperties -->
+    <servlet-class>
         com.medvision360.wslog.EventSocketServlet
      </servlet-class>
      <load-on-startup>1</load-on-startup>
@@ -36,7 +35,8 @@
 
   <servlet>
      <servlet-name>LogSocketServlet</servlet-name>
-     <servlet-class>
+     <!--suppress WebProperties -->
+    <servlet-class>
         com.medvision360.wslog.LogSocketServlet
      </servlet-class>
      <load-on-startup>1</load-on-startup>
@@ -52,8 +52,6 @@
      <url-pattern>/wslog/logs</url-pattern>
   </servlet-mapping>
 
-  -->
-
   <servlet-mapping>
     <servlet-name>@servletName@</servlet-name>
     <url-pattern>/v2/*</url-pattern>
@@ -62,7 +60,6 @@
   <!-- end medvision-server standard web-app stuff -->
   
   <!-- middleware web-app stuff -->
-  
   <filter>
     <description>Filter for cross domain requests</description>
     <filter-name>CORSFilter</filter-name>

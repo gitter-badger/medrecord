@@ -6,43 +6,75 @@ import com.medvision360.medrecord.api.archetype.ArchetypeResource;
 import com.medvision360.medrecord.api.archetype.ArchetypeResult;
 import com.medvision360.medrecord.engine.MedRecordEngine;
 import com.medvision360.medrecord.spi.WrappedArchetype;
-import com.medvision360.medrecord.spi.exceptions.InitializationException;
+import com.medvision360.medrecord.spi.exceptions.IORecordException;
+import com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException;
 import com.medvision360.medrecord.spi.exceptions.MissingParameterException;
-import com.medvision360.medrecord.spi.exceptions.NotFoundException;
-import com.medvision360.medrecord.spi.exceptions.ParseException;
 import com.medvision360.medrecord.spi.exceptions.RecordException;
 import org.openehr.rm.support.identification.ArchetypeID;
-import org.restlet.resource.Get;
 
 public class ArchetypeServerResource
         extends AbstractServerResource
         implements ArchetypeResource
 {
     @Override
-    public ArchetypeResult getArchetype() throws RecordException, IOException
+    public ArchetypeResult getArchetype() throws RecordException
     {
         WrappedArchetype wrappedArchetype = getWrappedArchetype();
         String adl = wrappedArchetype.getAsString();
         String id = wrappedArchetype.getArchetype().getArchetypeId().getValue();
         ArchetypeResult result = new ArchetypeResult();
         result.setArchetypeId(id);
-        result.setArchetype(adl);
+        result.setAdl(adl);
         return result;
     }
 
     @Override
-    public String getArchetypeAsText() throws RecordException, IOException
+    public String getArchetypeAsText() throws RecordException
     {
         WrappedArchetype wrappedArchetype = getWrappedArchetype();
         return wrappedArchetype.getAsString();
     }
 
-    private WrappedArchetype getWrappedArchetype() throws RecordException, IOException
+    private WrappedArchetype getWrappedArchetype() throws RecordException
     {
-        String id = getRequiredQueryValue("id");
-        ArchetypeID archetypeID = new ArchetypeID(id);
+        try
+        {
+            ArchetypeID archetypeID = getArchetypeIDAttribute();
+    
+            MedRecordEngine engine = engine();
+            return engine.getArchetypeStore().get(archetypeID);
+        }
+        catch (IOException e)
+        {
+            throw new IORecordException(e.getMessage(), e);
+        }
+    }
 
-        MedRecordEngine engine = engine();
-        return engine.getArchetypeStore().get(archetypeID);
+    private ArchetypeID getArchetypeIDAttribute() throws MissingParameterException, InvalidArchetypeIDException
+    {
+        String id = getRequiredAttributeValue("id");
+        try
+        {
+            return new ArchetypeID(id);
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new InvalidArchetypeIDException(id);
+        }
+    }
+
+    @Override
+    public void deleteArchetype()
+            throws RecordException
+    {
+        try
+        {
+            ArchetypeID archetypeID = getArchetypeIDAttribute();
+            engine().getArchetypeStore().delete(archetypeID);
+        }
+        catch (IOException e)
+        {
+            throw new IORecordException(e.getMessage(), e);
+        }
     }
 }

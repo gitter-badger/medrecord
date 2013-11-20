@@ -1,34 +1,37 @@
 package com.medvision360.medrecord.api.archetype;
 
-import java.io.IOException;
-
+import com.medvision360.medrecord.spi.exceptions.IORecordException;
+import com.medvision360.medrecord.spi.exceptions.InUseException;
+import com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException;
 import com.medvision360.medrecord.spi.exceptions.MissingParameterException;
 import com.medvision360.medrecord.spi.exceptions.NotFoundException;
+import com.medvision360.medrecord.spi.exceptions.ParseException;
 import com.medvision360.medrecord.spi.exceptions.RecordException;
+import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 
 /**
- * @apipath /archetype
+ * @apipath /archetype/{id}
+ * @apipathparam id An OpenEHR ArchetypeID value.
+ *   [type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
  */
 @SuppressWarnings("DuplicateThrows")
 public interface ArchetypeResource
 {
     /**
-     * Archetype resource.
+     * Retrieve archetype resource.
      *
-     * Retrieve an archetype encapsulated in JSON or XML.
-     *
-     * @apiqueryparam id An OpenEHR ArchetypeID value.
-     *   [type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
+     * Retrieve an archetype encapsulated in JSON.
      */
     // note the use of | breaks the swagger UI generation magic doclet
     //@Get("json|xml")
     @Get("json")
     public ArchetypeResult getArchetype()
-            throws NotFoundException, MissingParameterException, RecordException, IOException;
+            throws NotFoundException, MissingParameterException, ParseException, InvalidArchetypeIDException,
+            RecordException, IORecordException;
 
     /**
-     * Archetype resource.
+     * Retrieve archetype resource.
      *
      * Retrieve an archetype as an ADL string (plain text).
      *
@@ -36,5 +39,16 @@ public interface ArchetypeResource
      */
     @Get("txt")
     public String getArchetypeAsText()
-            throws NotFoundException, MissingParameterException, RecordException, IOException;
+            throws NotFoundException, MissingParameterException, ParseException, InvalidArchetypeIDException,
+            RecordException, IORecordException;
+
+    /**
+     * Delete archetype resource.
+     * 
+     * Delete a stored archetype.
+     */
+    @Delete
+    public void deleteArchetype()
+            throws NotFoundException, MissingParameterException, InUseException, InvalidArchetypeIDException,
+            RecordException, IORecordException;
 }

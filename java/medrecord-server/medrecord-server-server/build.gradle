@@ -22,6 +22,8 @@ dependencies {
   testCompile "junit:junit:4.11"
   testCompile "org.restlet.jee:org.restlet.ext.httpclient:${ext.version.restlet}"
   testCompile project(":medrecord-server-client-jee")
+  testCompile project(':medrecord-itest')
+    
 
   // the artifact containing the swagger docs
   swagger project(path: ":medrecord-server-api-jee", configuration: "swaggerArtifacts")
@@ -34,17 +36,6 @@ prepareTomcat {
   // TODO: make sure a special logback config is added to the debian package
   logbackConfig = project.file("logback-test.xml")
 }
-
-//// TODO: above does not seem to work, so fiddle and fiddle and fiddle
-//task injectLogBackConfig(type: Copy) {
-//  from project.projectDir
-//  into new File(project.buildDir, "buildlib/server/config/filtered")
-//  include 'logback-test.xml'
-//}
-//
-//war << {
-//  tasks.injectLogBackConfig.execute()
-//}
 
 tomcatRunWar {
   httpPort = 8100

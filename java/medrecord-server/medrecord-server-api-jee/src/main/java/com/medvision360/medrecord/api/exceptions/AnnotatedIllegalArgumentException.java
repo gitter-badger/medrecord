@@ -1,4 +1,4 @@
-package com.medvision360.medrecord.server;
+package com.medvision360.medrecord.api.exceptions;
 
 import java.util.Collection;
 

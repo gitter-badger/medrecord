@@ -76,6 +76,17 @@ public class ArchetypeLoader
         }
     }
 
+    public void load(String collection, String archetypeId) throws IOException, ParseException
+    {
+        if (!archetypeId.endsWith(".adl"))
+        {
+            archetypeId = archetypeId + ".adl";
+        }
+        String location = String.format("classpath:%s/%s/%s", m_basePath, collection, archetypeId);
+        Resource resource = m_resolver.getResource(location);
+        load(resource);
+    }
+
     private void load(Resource resource) throws IOException, ParseException
     {
         InputStream is = resource.getInputStream();

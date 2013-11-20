@@ -1,6 +1,5 @@
 package com.medvision360.medrecord.server.resources;
 
-import com.medvision360.lib.api.ServiceUnavailableException;
 import com.medvision360.lib.server.ServerResourceBase;
 import com.medvision360.medrecord.engine.MedRecordEngine;
 import com.medvision360.medrecord.server.MedRecordService;
@@ -23,9 +22,21 @@ public abstract class AbstractServerResource
         return engine;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     protected String getRequiredQueryValue(String name) throws MissingParameterException
     {
         String id = getQueryValue(name);
+        if (id == null)
+        {
+            throw new MissingParameterException(name);
+        }
+        return id;
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    protected String getRequiredAttributeValue(String name) throws MissingParameterException
+    {
+        String id = getAttribute(name);
         if (id == null)
         {
             throw new MissingParameterException(name);

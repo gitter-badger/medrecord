@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.medvision360.lib.common.exceptions.AnnotatedResourceException;
 import com.medvision360.lib.server.service.JsonStatusService;
+import com.medvision360.medrecord.api.exceptions.AnnotatedIllegalArgumentException;
 import com.medvision360.medrecord.spi.exceptions.RecordException;
 import com.medvision360.medrecord.spi.exceptions.RuntimeRecordException;
 import org.restlet.Request;

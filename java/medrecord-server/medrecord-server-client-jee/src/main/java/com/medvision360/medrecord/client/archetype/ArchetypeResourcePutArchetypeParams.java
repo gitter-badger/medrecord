@@ -14,9 +14,9 @@ import com.medvision360.lib.client.MethodParameterBase;
  * Class for adding query parameters to the request.
  *
  * <p>This class holds the query parameters used when making requests using the
- * {@link ArchetypeResource#getArchetype(ArchetypeResourceGetArchetypeParams) getArchetype()} method of the <code>ArchetypeResource</code>
+ * {@link ArchetypeResource#putArchetype(java.lang.String, ArchetypeResourcePutArchetypeParams) putArchetype()} method of the <code>ArchetypeResource</code>
  * class.
  */
-public class ArchetypeResourceGetArchetypeParams extends MethodParameterBase
+public class ArchetypeResourcePutArchetypeParams extends MethodParameterBase
 {
 }

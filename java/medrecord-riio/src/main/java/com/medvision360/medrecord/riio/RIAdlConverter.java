@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.openehr.am.archetype.Archetype;
 import org.openehr.am.serialize.ADLSerializer;
 import se.acode.openehr.parser.ADLParser;
+import se.acode.openehr.parser.TokenMgrError;
 
 public class RIAdlConverter implements ArchetypeParser, ArchetypeSerializer
 {
@@ -57,7 +58,7 @@ public class RIAdlConverter implements ArchetypeParser, ArchetypeSerializer
         {
             archetype = adlParser.parse();
         }
-        catch (Exception e)
+        catch (Exception|TokenMgrError e)
         {
             throw new ParseException(e);
         }

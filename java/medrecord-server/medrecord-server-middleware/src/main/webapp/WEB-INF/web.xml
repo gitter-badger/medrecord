@@ -50,7 +50,8 @@
 
   <servlet>
       <servlet-name>EventSocketServlet</servlet-name>
-      <servlet-class>
+      <!--suppress WebProperties -->
+    <servlet-class>
           com.medvision360.wslog.EventSocketServlet
       </servlet-class>
       <load-on-startup>1</load-on-startup>
@@ -58,7 +59,8 @@
 
   <servlet>
       <servlet-name>LogSocketServlet</servlet-name>
-      <servlet-class>
+      <!--suppress WebProperties -->
+    <servlet-class>
           com.medvision360.wslog.LogSocketServlet
       </servlet-class>
       <load-on-startup>1</load-on-startup>

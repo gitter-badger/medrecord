@@ -2,11 +2,10 @@
  * This file is part of MEDvision360 Profile Server..
  *
  * @copyright Copyright 2013 by MEDvision360. All rights reserved.
- * @author Ralph van Etten <ralph@medvision360.com>
  */
 /**
- * Demo api.
+ * Unit test api.
  *
- * @apipath /demo
+ * @apipath /test
  */
-package com.medvision360.medrecord.api.demo;
+package com.medvision360.medrecord.api.test;

@@ -1,10 +1,11 @@
 package com.medvision360.medrecord.api.archetype;
 
+@SuppressWarnings("UnusedDeclaration")
 public class ArchetypeResult
 {
     private String m_archetypeId;
     
-    private String m_archetype;
+    private String m_adl;
 
     public void setArchetypeId(String archetypeId)
     {
@@ -21,9 +22,9 @@ public class ArchetypeResult
         return m_archetypeId;
     }
 
-    public void setArchetype(String archetype)
+    public void setAdl(String archetype)
     {
-        m_archetype = archetype;
+        m_adl = archetype;
     }
 
     /**
@@ -37,6 +38,6 @@ public class ArchetypeResult
      */
     public String getAdl()
     {
-        return m_archetype;
+        return m_adl;
     }
 }

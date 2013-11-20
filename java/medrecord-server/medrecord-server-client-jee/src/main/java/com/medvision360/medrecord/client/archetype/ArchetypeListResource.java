@@ -16,12 +16,10 @@ import com.medvision360.lib.common.exceptions.AnnotatedResourceException;
 import com.medvision360.lib.common.exceptions.ApiException;
 
 /**
-    @apipath /archetype/{id}
- @apipathparam id An OpenEHR ArchetypeID value.
-   [type=string,required,single,default=openEHR-EHR-OBSERVATION.blood_pressure.v1]
+    @apipath /archetype
 
  */
-public class ArchetypeResource extends ClientResourceBase
+public class ArchetypeListResource extends ClientResourceBase
 {
     /**
      * Constructor.
@@ -30,49 +28,64 @@ public class ArchetypeResource extends ClientResourceBase
      *
      * @param config_ Configuration object containing the location of the server
      *   this resource sends requests to.
-     * @param id An OpenEHR ArchetypeID value
      */
-    public ArchetypeResource(
-        final ClientResourceConfig config_,
-        final String id
+    public ArchetypeListResource(
+        final ClientResourceConfig config_
     )
     {
-        super(config_, "/archetype/" + id);
+        super(config_, "/archetype");
     }
 
     /**
-       Retrieve archetype resource.
+       Create archetype resource.
 
-Retrieve an archetype encapsulated in JSON.
+Store an archetype from an ADL string (plain text). Will result in DUPLICATE_EXCEPTION if the archetype
+already exists. If you want to update an archetype that's unused, you can delete it first and then re-upload
+it. Updating archetypes once they are in use is not possible.
+
+Note that for non-web-based tools, simply using the plain text API is probably much easier, i.e. something like
+<code>curl -X POST -T foo.adl -H "Content-Type: text/plain" $URL/medrecord/v2/archetype</code>
+works fine.
+
+Store an archetype encapsulated in JSON.
 
 
 
        <p>
-       Use the {@link #getArchetype(ArchetypeResourceGetArchetypeParams)}
+       Use the {@link #postArchetype(com.medvision360.medrecord.api.archetype.ArchetypeRequest,ArchetypeListResourcePostArchetypeParams)}
        method to pass additional query arguments.</p>
 
 
        
 
      */
-    public com.medvision360.medrecord.api.archetype.ArchetypeResult getArchetype(
+    public void postArchetype(
+        final com.medvision360.medrecord.api.archetype.ArchetypeRequest archetype
     ) throws
-        com.medvision360.medrecord.spi.exceptions.NotFoundException,
+        com.medvision360.medrecord.spi.exceptions.DuplicateException,
+        com.medvision360.medrecord.api.exceptions.ClientParseException,
         com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.ParseException,
-        com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException,
         com.medvision360.medrecord.spi.exceptions.RecordException,
         com.medvision360.medrecord.spi.exceptions.IORecordException
     {
-      return getArchetype(
+      postArchetype(
+        archetype,
         null
       );
     }
 
     /**
-       Retrieve archetype resource.
+       Create archetype resource.
 
-Retrieve an archetype encapsulated in JSON.
+Store an archetype from an ADL string (plain text). Will result in DUPLICATE_EXCEPTION if the archetype
+already exists. If you want to update an archetype that's unused, you can delete it first and then re-upload
+it. Updating archetypes once they are in use is not possible.
+
+Note that for non-web-based tools, simply using the plain text API is probably much easier, i.e. something like
+<code>curl -X POST -T foo.adl -H "Content-Type: text/plain" $URL/medrecord/v2/archetype</code>
+works fine.
+
+Store an archetype encapsulated in JSON.
 
 
 
@@ -80,13 +93,13 @@ Retrieve an archetype encapsulated in JSON.
 
        
      */
-    public com.medvision360.medrecord.api.archetype.ArchetypeResult getArchetype(
-        final ArchetypeResourceGetArchetypeParams queryParams_
+    public void postArchetype(
+        final com.medvision360.medrecord.api.archetype.ArchetypeRequest archetype,
+        final ArchetypeListResourcePostArchetypeParams queryParams_
     ) throws
-        com.medvision360.medrecord.spi.exceptions.NotFoundException,
+        com.medvision360.medrecord.spi.exceptions.DuplicateException,
+        com.medvision360.medrecord.api.exceptions.ClientParseException,
         com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.ParseException,
-        com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException,
         com.medvision360.medrecord.spi.exceptions.RecordException,
         com.medvision360.medrecord.spi.exceptions.IORecordException
     {
@@ -98,8 +111,9 @@ Retrieve an archetype encapsulated in JSON.
                 queryParams_.applyTo(resource_);
             }
 
-            final com.medvision360.medrecord.api.archetype.ArchetypeResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.archetype.ArchetypeResource.class);
-            return wrapped_.getArchetype(
+            final com.medvision360.medrecord.api.archetype.ArchetypeListResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.archetype.ArchetypeListResource.class);
+            wrapped_.postArchetype(
+                archetype
             );
         }
         catch(final ResourceException e_)
@@ -109,14 +123,12 @@ Retrieve an archetype encapsulated in JSON.
             {
                 switch(errorDocument_.getCode())
                 {
-                    case "NOT_FOUND_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.NotFoundException(errorDocument_.getArguments());
+                    case "DUPLICATE_EXCEPTION":
+                        throw new com.medvision360.medrecord.spi.exceptions.DuplicateException(errorDocument_.getArguments());
+                    case "CLIENT_PARSE_EXCEPTION":
+                        throw new com.medvision360.medrecord.api.exceptions.ClientParseException(errorDocument_.getArguments());
                     case "MISSING_PARAMETER_EXCEPTION":
                         throw new com.medvision360.medrecord.spi.exceptions.MissingParameterException(errorDocument_.getArguments());
-                    case "PARSE_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.ParseException(errorDocument_.getArguments());
-                    case "INVALID_ARCHETYPE_ID_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
                         throw new com.medvision360.medrecord.spi.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":
@@ -128,56 +140,53 @@ Retrieve an archetype encapsulated in JSON.
     }
 
     /**
-       Retrieve archetype resource.
-
-Retrieve an archetype as an ADL string (plain text).
+       Create archetype resource.
 
 
 
        <p>
-       Use the {@link #getArchetypeAsText(ArchetypeResourceGetArchetypeAsTextParams)}
+       Use the {@link #postArchetypeAsText(java.lang.String,ArchetypeListResourcePostArchetypeAsTextParams)}
        method to pass additional query arguments.</p>
 
 
-       @apiacceptvariant getArchetype
+       @apiacceptvariant postArchetype
 
 
 
      */
-    public java.lang.String getArchetypeAsText(
+    public void postArchetypeAsText(
+        final java.lang.String adl
     ) throws
-        com.medvision360.medrecord.spi.exceptions.NotFoundException,
+        com.medvision360.medrecord.spi.exceptions.DuplicateException,
+        com.medvision360.medrecord.api.exceptions.ClientParseException,
         com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.ParseException,
-        com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException,
         com.medvision360.medrecord.spi.exceptions.RecordException,
         com.medvision360.medrecord.spi.exceptions.IORecordException
     {
-      return getArchetypeAsText(
+      postArchetypeAsText(
+        adl,
         null
       );
     }
 
     /**
-       Retrieve archetype resource.
-
-Retrieve an archetype as an ADL string (plain text).
+       Create archetype resource.
 
 
 
        @param queryParams_ The query parameters to be added to the request.
 
-       @apiacceptvariant getArchetype
+       @apiacceptvariant postArchetype
 
 
      */
-    public java.lang.String getArchetypeAsText(
-        final ArchetypeResourceGetArchetypeAsTextParams queryParams_
+    public void postArchetypeAsText(
+        final java.lang.String adl,
+        final ArchetypeListResourcePostArchetypeAsTextParams queryParams_
     ) throws
-        com.medvision360.medrecord.spi.exceptions.NotFoundException,
+        com.medvision360.medrecord.spi.exceptions.DuplicateException,
+        com.medvision360.medrecord.api.exceptions.ClientParseException,
         com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.ParseException,
-        com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException,
         com.medvision360.medrecord.spi.exceptions.RecordException,
         com.medvision360.medrecord.spi.exceptions.IORecordException
     {
@@ -189,8 +198,9 @@ Retrieve an archetype as an ADL string (plain text).
                 queryParams_.applyTo(resource_);
             }
 
-            final com.medvision360.medrecord.api.archetype.ArchetypeResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.archetype.ArchetypeResource.class);
-            return wrapped_.getArchetypeAsText(
+            final com.medvision360.medrecord.api.archetype.ArchetypeListResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.archetype.ArchetypeListResource.class);
+            wrapped_.postArchetypeAsText(
+                adl
             );
         }
         catch(final ResourceException e_)
@@ -200,14 +210,12 @@ Retrieve an archetype as an ADL string (plain text).
             {
                 switch(errorDocument_.getCode())
                 {
-                    case "NOT_FOUND_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.NotFoundException(errorDocument_.getArguments());
+                    case "DUPLICATE_EXCEPTION":
+                        throw new com.medvision360.medrecord.spi.exceptions.DuplicateException(errorDocument_.getArguments());
+                    case "CLIENT_PARSE_EXCEPTION":
+                        throw new com.medvision360.medrecord.api.exceptions.ClientParseException(errorDocument_.getArguments());
                     case "MISSING_PARAMETER_EXCEPTION":
                         throw new com.medvision360.medrecord.spi.exceptions.MissingParameterException(errorDocument_.getArguments());
-                    case "PARSE_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.ParseException(errorDocument_.getArguments());
-                    case "INVALID_ARCHETYPE_ID_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
                         throw new com.medvision360.medrecord.spi.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":
@@ -219,52 +227,54 @@ Retrieve an archetype as an ADL string (plain text).
     }
 
     /**
-       Delete archetype resource.
+       List archetype resources.
 
-Delete a stored archetype.
+Retrieve a list of archetype IDs known to the server encapsulated in JSON.
 
 
 
        <p>
-       Use the {@link #deleteArchetype(ArchetypeResourceDeleteArchetypeParams)}
+       Use the {@link #listArchetypes(ArchetypeListResourceListArchetypesParams)}
        method to pass additional query arguments.</p>
 
 
-       
+       @apipathparam q A regular expression to limit the returned archetypes by their name.
+[type=string,single,default=openEHR-EHR.*]
+
+
 
      */
-    public void deleteArchetype(
+    public com.medvision360.medrecord.api.archetype.ArchetypeList listArchetypes(
     ) throws
-        com.medvision360.medrecord.spi.exceptions.NotFoundException,
-        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.InUseException,
-        com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException,
+        com.medvision360.medrecord.api.exceptions.PatternException,
+        com.medvision360.medrecord.spi.exceptions.ParseException,
         com.medvision360.medrecord.spi.exceptions.RecordException,
         com.medvision360.medrecord.spi.exceptions.IORecordException
     {
-      deleteArchetype(
+      return listArchetypes(
         null
       );
     }
 
     /**
-       Delete archetype resource.
+       List archetype resources.
 
-Delete a stored archetype.
+Retrieve a list of archetype IDs known to the server encapsulated in JSON.
 
 
 
        @param queryParams_ The query parameters to be added to the request.
 
-       
+       @apipathparam q A regular expression to limit the returned archetypes by their name.
+[type=string,single,default=openEHR-EHR.*]
+
+
      */
-    public void deleteArchetype(
-        final ArchetypeResourceDeleteArchetypeParams queryParams_
+    public com.medvision360.medrecord.api.archetype.ArchetypeList listArchetypes(
+        final ArchetypeListResourceListArchetypesParams queryParams_
     ) throws
-        com.medvision360.medrecord.spi.exceptions.NotFoundException,
-        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.InUseException,
-        com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException,
+        com.medvision360.medrecord.api.exceptions.PatternException,
+        com.medvision360.medrecord.spi.exceptions.ParseException,
         com.medvision360.medrecord.spi.exceptions.RecordException,
         com.medvision360.medrecord.spi.exceptions.IORecordException
     {
@@ -276,8 +286,8 @@ Delete a stored archetype.
                 queryParams_.applyTo(resource_);
             }
 
-            final com.medvision360.medrecord.api.archetype.ArchetypeResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.archetype.ArchetypeResource.class);
-            wrapped_.deleteArchetype(
+            final com.medvision360.medrecord.api.archetype.ArchetypeListResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.archetype.ArchetypeListResource.class);
+            return wrapped_.listArchetypes(
             );
         }
         catch(final ResourceException e_)
@@ -287,14 +297,10 @@ Delete a stored archetype.
             {
                 switch(errorDocument_.getCode())
                 {
-                    case "NOT_FOUND_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.NotFoundException(errorDocument_.getArguments());
-                    case "MISSING_PARAMETER_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.MissingParameterException(errorDocument_.getArguments());
-                    case "IN_USE_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.InUseException(errorDocument_.getArguments());
-                    case "INVALID_ARCHETYPE_ID_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException(errorDocument_.getArguments());
+                    case "PATTERN_EXCEPTION":
+                        throw new com.medvision360.medrecord.api.exceptions.PatternException(errorDocument_.getArguments());
+                    case "PARSE_EXCEPTION":
+                        throw new com.medvision360.medrecord.spi.exceptions.ParseException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
                         throw new com.medvision360.medrecord.spi.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":
