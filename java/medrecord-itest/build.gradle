@@ -20,4 +20,16 @@ dependencies {
     compile "com.medvision360.archetypes:openehr-archetypes-chiron:${ext.version.archetypes}"
     compile "com.medvision360.archetypes:openehr-archetypes-medfit:${ext.version.archetypes}"
     compile "com.medvision360.archetypes:openehr-archetypes-mobiguide:${ext.version.archetypes}"
+
+    testCompile "ch.qos.logback:logback-classic:${ext.version.logback}"
+}
+
+// run medrecord-itest as part of 'gradle integrationTest', not 'gradle test'
+task integrationTest(type: Test) {
+    include '**/*Test.*'
+    dependsOn compileTestJava
+    dependsOn processTestResources
+}
+
+task test(overwrite: true) {
 }
