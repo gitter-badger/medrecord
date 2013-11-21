@@ -19,4 +19,35 @@ import com.medvision360.lib.client.MethodParameterBase;
  */
 public class ArchetypeListResourceListArchetypesParams extends MethodParameterBase
 {
+    /**
+     * Gets the value of the <code>q</code> query parameter.
+     *
+     * <p>The default value for the query parameter is <code>null</code>
+     * meaning the parameter will not be included in the request.</p>
+     *
+     * <p><b>Description:</b> <i>A regular expression to limit the returned archetypes by their name</i></p>
+     *
+     * @return The value of the <code>q</code> query parameter
+     *   or <code>null</code> when the query parameter is not set.
+     */
+    public String getQ()
+    {
+        return getQueryArgument("q");
+    }
+
+    /**
+     * Sets the <code>q</code> query parameter.
+     *
+     * <p><b>Description:</b> <i>A regular expression to limit the returned archetypes by their name</i></p>
+     *
+     *
+     * @param value The new value for the <code>q</code> query
+     *   parameter. Use <code>null</code> (which also is the default value)
+     *   to make sure the parameter is not added to the request.
+     */
+    public void setQ(final String value)
+    {
+        setQueryArgument("q", value);
+    }
+
 }

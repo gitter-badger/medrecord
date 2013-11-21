@@ -1,7 +1,5 @@
 package com.medvision360.medrecord.api.archetype;
 
-import java.io.IOException;
-
 import com.medvision360.medrecord.api.exceptions.ClientParseException;
 import com.medvision360.medrecord.api.exceptions.PatternException;
 import com.medvision360.medrecord.spi.exceptions.DuplicateException;

@@ -137,7 +137,7 @@ public class ArchetypeIT extends AbstractIntegrationTest
         ensureArchetype(histopathologyArchetype);
 
         ArchetypeListResourceListArchetypesParams params = new ArchetypeListResourceListArchetypesParams();
-        params.setQueryArgument("q", "lab_test-blood.*?v[12]");
+        params.setQ("lab_test-blood.*?v[12]");
         ArchetypeList list = m_archetypeListResource.listArchetypes(params);
         assertNotNull(list.getArchetypes());
         assertTrue(list.getArchetypes().contains(bloodGlucoseArchetype));
@@ -146,7 +146,7 @@ public class ArchetypeIT extends AbstractIntegrationTest
         
         // try full match with ^ $
         params = new ArchetypeListResourceListArchetypesParams();
-        params.setQueryArgument("q", "^openEHR-EHR-OBSERVATION\\.lab_test-blood.*\\.v1$");
+        params.setQ("^openEHR-EHR-OBSERVATION\\.lab_test-blood.*\\.v1$");
         list = m_archetypeListResource.listArchetypes(params);
         assertNotNull(list.getArchetypes());
         assertTrue(list.getArchetypes().contains(bloodGlucoseArchetype));
@@ -156,7 +156,7 @@ public class ArchetypeIT extends AbstractIntegrationTest
     public void listArchetypesWithInvalidRegexThrowsPatternException() throws Exception
     {
         ArchetypeListResourceListArchetypesParams params = new ArchetypeListResourceListArchetypesParams();
-        params.setQueryArgument("q", "openEHR-invalid-regex.[.v1");
+        params.setQ("openEHR-invalid-regex.[.v1");
 
         try
         {

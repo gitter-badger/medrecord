@@ -238,7 +238,7 @@ Retrieve a list of archetype IDs known to the server encapsulated in JSON.
        method to pass additional query arguments.</p>
 
 
-       @apipathparam q A regular expression to limit the returned archetypes by their name.
+       @apiqueryparam q A regular expression to limit the returned archetypes by their name.
 [type=string,single,default=openEHR-EHR.*]
 
 
@@ -265,7 +265,7 @@ Retrieve a list of archetype IDs known to the server encapsulated in JSON.
 
        @param queryParams_ The query parameters to be added to the request.
 
-       @apipathparam q A regular expression to limit the returned archetypes by their name.
+       @apiqueryparam q A regular expression to limit the returned archetypes by their name.
 [type=string,single,default=openEHR-EHR.*]
 
 
