@@ -5,13 +5,13 @@
  * @author Leo Simons <leo@medvision360.com>
  * @author Ralph van Etten <ralph@medvision360.com>
  */
-package com.medvision360.medrecord.spi.exceptions;
+package com.medvision360.medrecord.api.exceptions;
 
 import java.util.Collection;
 
 import com.medvision360.lib.common.exceptions.ApiException;
 import com.medvision360.lib.common.exceptions.Cause;
-import com.medvision360.medrecord.spi.ValidationReport;
+import com.medvision360.medrecord.api.ValidationReport;
 
 @SuppressWarnings("UnusedDeclaration")
 @ApiException(

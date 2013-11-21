@@ -31,7 +31,7 @@ import com.medvision360.medrecord.rmutil.ExactPathComparator;
 import com.medvision360.medrecord.rmutil.Node;
 import com.medvision360.medrecord.rmutil.RMUtil;
 import com.medvision360.medrecord.spi.LocatableParser;
-import com.medvision360.medrecord.spi.exceptions.ParseException;
+import com.medvision360.medrecord.api.exceptions.ParseException;
 import org.openehr.rm.common.archetyped.Locatable;
 
 @SuppressWarnings("rawtypes")

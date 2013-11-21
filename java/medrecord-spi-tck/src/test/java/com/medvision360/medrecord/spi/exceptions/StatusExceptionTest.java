@@ -1,5 +1,6 @@
 package com.medvision360.medrecord.spi.exceptions;
 
+import com.medvision360.medrecord.api.exceptions.StatusException;
 import com.medvision360.medrecord.spi.tck.ExceptionTestBase;
 
 public class StatusExceptionTest extends ExceptionTestBase<StatusException>

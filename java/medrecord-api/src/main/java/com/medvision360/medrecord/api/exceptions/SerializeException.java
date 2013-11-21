@@ -1,4 +1,4 @@
-package com.medvision360.medrecord.spi.exceptions;
+package com.medvision360.medrecord.api.exceptions;
 
 import java.util.Collection;
 
@@ -9,38 +9,38 @@ import com.medvision360.lib.common.exceptions.Cause;
 @ApiException(
         status  = 500,
         cause   = Cause.SERVER,
-        code    = "DISPOSAL_EXCEPTION",
-        message = "Problem shutting down server: {0}"
+        code    = "SERIALIZE_EXCEPTION",
+        message = "Problem serializing resource: {0}"
 )
-public class DisposalException extends RecordException
+public class SerializeException extends RecordException
 {
     private static final long serialVersionUID = 0x130L;
     
-    public DisposalException()
+    public SerializeException()
     {
     }
 
-    public DisposalException(String message)
+    public SerializeException(String message)
     {
         super(message);
     }
 
-    public DisposalException(String message, Throwable cause)
+    public SerializeException(String message, Throwable cause)
     {
         super(message, cause);
     }
 
-    public DisposalException(Throwable cause)
+    public SerializeException(Throwable cause)
     {
         super(cause);
     }
 
-    public DisposalException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
+    public SerializeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
     {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public DisposalException(Collection<String> arguments)
+    public SerializeException(Collection<String> arguments)
     {
         super(arguments);
     }

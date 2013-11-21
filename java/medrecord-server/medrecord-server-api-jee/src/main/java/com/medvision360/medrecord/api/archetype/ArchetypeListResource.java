@@ -2,11 +2,11 @@ package com.medvision360.medrecord.api.archetype;
 
 import com.medvision360.medrecord.api.exceptions.ClientParseException;
 import com.medvision360.medrecord.api.exceptions.PatternException;
-import com.medvision360.medrecord.spi.exceptions.DuplicateException;
-import com.medvision360.medrecord.spi.exceptions.IORecordException;
-import com.medvision360.medrecord.spi.exceptions.MissingParameterException;
-import com.medvision360.medrecord.spi.exceptions.ParseException;
-import com.medvision360.medrecord.spi.exceptions.RecordException;
+import com.medvision360.medrecord.api.exceptions.DuplicateException;
+import com.medvision360.medrecord.api.exceptions.IORecordException;
+import com.medvision360.medrecord.api.exceptions.MissingParameterException;
+import com.medvision360.medrecord.api.exceptions.ParseException;
+import com.medvision360.medrecord.api.exceptions.RecordException;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 

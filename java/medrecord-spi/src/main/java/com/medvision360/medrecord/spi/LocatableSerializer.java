@@ -10,7 +10,7 @@ package com.medvision360.medrecord.spi;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.medvision360.medrecord.spi.exceptions.SerializeException;
+import com.medvision360.medrecord.api.exceptions.SerializeException;
 import org.openehr.rm.common.archetyped.Locatable;
 
 public interface LocatableSerializer extends LocatableSelector, TypeSelector // todo javadoc / api spec / exceptions

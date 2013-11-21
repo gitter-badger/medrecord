@@ -13,8 +13,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import com.medvision360.medrecord.spi.LocatableParser;
 import com.medvision360.medrecord.spi.LocatableSerializer;
-import com.medvision360.medrecord.spi.exceptions.ParseException;
-import com.medvision360.medrecord.spi.exceptions.SerializeException;
+import com.medvision360.medrecord.api.exceptions.ParseException;
+import com.medvision360.medrecord.api.exceptions.SerializeException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.jaxen.JaxenException;

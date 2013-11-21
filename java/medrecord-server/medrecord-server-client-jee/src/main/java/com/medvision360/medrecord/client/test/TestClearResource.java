@@ -57,7 +57,7 @@ and any other stored data. This is a <strong>very</strong> destructive method in
      */
     public void clear(
     ) throws
-        com.medvision360.medrecord.spi.exceptions.RecordException
+        com.medvision360.medrecord.api.exceptions.RecordException
     {
       clear(
         null
@@ -80,7 +80,7 @@ and any other stored data. This is a <strong>very</strong> destructive method in
     public void clear(
         final TestClearResourceClearParams queryParams_
     ) throws
-        com.medvision360.medrecord.spi.exceptions.RecordException
+        com.medvision360.medrecord.api.exceptions.RecordException
     {
         try
         {
@@ -102,7 +102,7 @@ and any other stored data. This is a <strong>very</strong> destructive method in
                 switch(errorDocument_.getCode())
                 {
                     case "RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.RecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.RecordException(errorDocument_.getArguments());
                 }
             }
             throw e_;

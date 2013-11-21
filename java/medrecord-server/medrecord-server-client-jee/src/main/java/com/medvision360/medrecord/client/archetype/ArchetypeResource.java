@@ -57,12 +57,12 @@ Retrieve an archetype encapsulated in JSON.
      */
     public com.medvision360.medrecord.api.archetype.ArchetypeResult getArchetype(
     ) throws
-        com.medvision360.medrecord.spi.exceptions.NotFoundException,
-        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.ParseException,
-        com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException,
-        com.medvision360.medrecord.spi.exceptions.RecordException,
-        com.medvision360.medrecord.spi.exceptions.IORecordException
+        com.medvision360.medrecord.api.exceptions.NotFoundException,
+        com.medvision360.medrecord.api.exceptions.MissingParameterException,
+        com.medvision360.medrecord.api.exceptions.ParseException,
+        com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException,
+        com.medvision360.medrecord.api.exceptions.RecordException,
+        com.medvision360.medrecord.api.exceptions.IORecordException
     {
       return getArchetype(
         null
@@ -83,12 +83,12 @@ Retrieve an archetype encapsulated in JSON.
     public com.medvision360.medrecord.api.archetype.ArchetypeResult getArchetype(
         final ArchetypeResourceGetArchetypeParams queryParams_
     ) throws
-        com.medvision360.medrecord.spi.exceptions.NotFoundException,
-        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.ParseException,
-        com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException,
-        com.medvision360.medrecord.spi.exceptions.RecordException,
-        com.medvision360.medrecord.spi.exceptions.IORecordException
+        com.medvision360.medrecord.api.exceptions.NotFoundException,
+        com.medvision360.medrecord.api.exceptions.MissingParameterException,
+        com.medvision360.medrecord.api.exceptions.ParseException,
+        com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException,
+        com.medvision360.medrecord.api.exceptions.RecordException,
+        com.medvision360.medrecord.api.exceptions.IORecordException
     {
         try
         {
@@ -110,17 +110,17 @@ Retrieve an archetype encapsulated in JSON.
                 switch(errorDocument_.getCode())
                 {
                     case "NOT_FOUND_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.NotFoundException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.NotFoundException(errorDocument_.getArguments());
                     case "MISSING_PARAMETER_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.MissingParameterException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.MissingParameterException(errorDocument_.getArguments());
                     case "PARSE_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.ParseException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.ParseException(errorDocument_.getArguments());
                     case "INVALID_ARCHETYPE_ID_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.RecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.IORecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.IORecordException(errorDocument_.getArguments());
                 }
             }
             throw e_;
@@ -146,12 +146,12 @@ Retrieve an archetype as an ADL string (plain text).
      */
     public java.lang.String getArchetypeAsText(
     ) throws
-        com.medvision360.medrecord.spi.exceptions.NotFoundException,
-        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.ParseException,
-        com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException,
-        com.medvision360.medrecord.spi.exceptions.RecordException,
-        com.medvision360.medrecord.spi.exceptions.IORecordException
+        com.medvision360.medrecord.api.exceptions.NotFoundException,
+        com.medvision360.medrecord.api.exceptions.MissingParameterException,
+        com.medvision360.medrecord.api.exceptions.ParseException,
+        com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException,
+        com.medvision360.medrecord.api.exceptions.RecordException,
+        com.medvision360.medrecord.api.exceptions.IORecordException
     {
       return getArchetypeAsText(
         null
@@ -174,12 +174,12 @@ Retrieve an archetype as an ADL string (plain text).
     public java.lang.String getArchetypeAsText(
         final ArchetypeResourceGetArchetypeAsTextParams queryParams_
     ) throws
-        com.medvision360.medrecord.spi.exceptions.NotFoundException,
-        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.ParseException,
-        com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException,
-        com.medvision360.medrecord.spi.exceptions.RecordException,
-        com.medvision360.medrecord.spi.exceptions.IORecordException
+        com.medvision360.medrecord.api.exceptions.NotFoundException,
+        com.medvision360.medrecord.api.exceptions.MissingParameterException,
+        com.medvision360.medrecord.api.exceptions.ParseException,
+        com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException,
+        com.medvision360.medrecord.api.exceptions.RecordException,
+        com.medvision360.medrecord.api.exceptions.IORecordException
     {
         try
         {
@@ -201,17 +201,17 @@ Retrieve an archetype as an ADL string (plain text).
                 switch(errorDocument_.getCode())
                 {
                     case "NOT_FOUND_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.NotFoundException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.NotFoundException(errorDocument_.getArguments());
                     case "MISSING_PARAMETER_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.MissingParameterException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.MissingParameterException(errorDocument_.getArguments());
                     case "PARSE_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.ParseException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.ParseException(errorDocument_.getArguments());
                     case "INVALID_ARCHETYPE_ID_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.RecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.IORecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.IORecordException(errorDocument_.getArguments());
                 }
             }
             throw e_;
@@ -235,12 +235,12 @@ Delete a stored archetype.
      */
     public void deleteArchetype(
     ) throws
-        com.medvision360.medrecord.spi.exceptions.NotFoundException,
-        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.InUseException,
-        com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException,
-        com.medvision360.medrecord.spi.exceptions.RecordException,
-        com.medvision360.medrecord.spi.exceptions.IORecordException
+        com.medvision360.medrecord.api.exceptions.NotFoundException,
+        com.medvision360.medrecord.api.exceptions.MissingParameterException,
+        com.medvision360.medrecord.api.exceptions.InUseException,
+        com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException,
+        com.medvision360.medrecord.api.exceptions.RecordException,
+        com.medvision360.medrecord.api.exceptions.IORecordException
     {
       deleteArchetype(
         null
@@ -261,12 +261,12 @@ Delete a stored archetype.
     public void deleteArchetype(
         final ArchetypeResourceDeleteArchetypeParams queryParams_
     ) throws
-        com.medvision360.medrecord.spi.exceptions.NotFoundException,
-        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.InUseException,
-        com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException,
-        com.medvision360.medrecord.spi.exceptions.RecordException,
-        com.medvision360.medrecord.spi.exceptions.IORecordException
+        com.medvision360.medrecord.api.exceptions.NotFoundException,
+        com.medvision360.medrecord.api.exceptions.MissingParameterException,
+        com.medvision360.medrecord.api.exceptions.InUseException,
+        com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException,
+        com.medvision360.medrecord.api.exceptions.RecordException,
+        com.medvision360.medrecord.api.exceptions.IORecordException
     {
         try
         {
@@ -288,17 +288,17 @@ Delete a stored archetype.
                 switch(errorDocument_.getCode())
                 {
                     case "NOT_FOUND_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.NotFoundException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.NotFoundException(errorDocument_.getArguments());
                     case "MISSING_PARAMETER_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.MissingParameterException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.MissingParameterException(errorDocument_.getArguments());
                     case "IN_USE_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.InUseException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.InUseException(errorDocument_.getArguments());
                     case "INVALID_ARCHETYPE_ID_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.RecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.IORecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.IORecordException(errorDocument_.getArguments());
                 }
             }
             throw e_;

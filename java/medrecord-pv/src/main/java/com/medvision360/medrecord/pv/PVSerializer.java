@@ -17,7 +17,7 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.medvision360.medrecord.spi.exceptions.SerializeException;
+import com.medvision360.medrecord.api.exceptions.SerializeException;
 import org.openehr.rm.common.archetyped.Locatable;
 
 // based on DADLBinding from reference implementation

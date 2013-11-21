@@ -22,7 +22,7 @@ import java.util.regex.Matcher;
 
 import com.medvision360.medrecord.rmutil.RMUtil;
 import com.medvision360.medrecord.spi.LocatableSerializer;
-import com.medvision360.medrecord.spi.exceptions.SerializeException;
+import com.medvision360.medrecord.api.exceptions.SerializeException;
 import org.openehr.rm.Attribute;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;

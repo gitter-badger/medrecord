@@ -3,8 +3,8 @@ package com.medvision360.medrecord.spi;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.medvision360.medrecord.spi.exceptions.IOValidationException;
-import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
+import com.medvision360.medrecord.api.exceptions.IOValidationException;
+import com.medvision360.medrecord.api.exceptions.NotSupportedException;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.ehr.EHR;
 

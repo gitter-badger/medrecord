@@ -1,4 +1,4 @@
-package com.medvision360.medrecord.spi.exceptions;
+package com.medvision360.medrecord.api.exceptions;
 
 import java.util.Collection;
 
@@ -9,38 +9,38 @@ import com.medvision360.lib.common.exceptions.Cause;
 @ApiException(
         status  = 500,
         cause   = Cause.SERVER,
-        code    = "TRANSFORM_EXCEPTION",
-        message = "Problem transforming resource: {0}"
+        code    = "PARSE_EXCEPTION",
+        message = "Problem parsing the resource: {0}"
 )
-public class TransformException extends RecordException
+public class ParseException extends RecordException
 {
     private static final long serialVersionUID = 0x130L;
     
-    public TransformException()
+    public ParseException()
     {
     }
 
-    public TransformException(String message)
+    public ParseException(String message)
     {
         super(message);
     }
 
-    public TransformException(String message, Throwable cause)
+    public ParseException(String message, Throwable cause)
     {
         super(message, cause);
     }
 
-    public TransformException(Throwable cause)
+    public ParseException(Throwable cause)
     {
         super(cause);
     }
 
-    public TransformException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
+    public ParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
     {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public TransformException(Collection<String> arguments)
+    public ParseException(Collection<String> arguments)
     {
         super(arguments);
     }

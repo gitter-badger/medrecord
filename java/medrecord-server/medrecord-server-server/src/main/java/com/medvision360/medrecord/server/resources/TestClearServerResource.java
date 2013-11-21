@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import com.medvision360.medrecord.api.exceptions.AnnotatedIllegalArgumentException;
 import com.medvision360.medrecord.api.test.TestClearResource;
-import com.medvision360.medrecord.spi.exceptions.IORecordException;
-import com.medvision360.medrecord.spi.exceptions.RecordException;
+import com.medvision360.medrecord.api.exceptions.IORecordException;
+import com.medvision360.medrecord.api.exceptions.RecordException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,12 +1,12 @@
 package com.medvision360.medrecord.api.archetype;
 
-import com.medvision360.medrecord.spi.exceptions.IORecordException;
-import com.medvision360.medrecord.spi.exceptions.InUseException;
-import com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException;
-import com.medvision360.medrecord.spi.exceptions.MissingParameterException;
-import com.medvision360.medrecord.spi.exceptions.NotFoundException;
-import com.medvision360.medrecord.spi.exceptions.ParseException;
-import com.medvision360.medrecord.spi.exceptions.RecordException;
+import com.medvision360.medrecord.api.exceptions.IORecordException;
+import com.medvision360.medrecord.api.exceptions.InUseException;
+import com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException;
+import com.medvision360.medrecord.api.exceptions.MissingParameterException;
+import com.medvision360.medrecord.api.exceptions.NotFoundException;
+import com.medvision360.medrecord.api.exceptions.ParseException;
+import com.medvision360.medrecord.api.exceptions.RecordException;
 import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 

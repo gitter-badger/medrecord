@@ -2,8 +2,8 @@ package com.medvision360.medrecord.spi.tck;
 
 import com.medvision360.medrecord.spi.ArchetypeStore;
 import com.medvision360.medrecord.spi.WrappedArchetype;
-import com.medvision360.medrecord.spi.exceptions.InUseException;
-import com.medvision360.medrecord.spi.exceptions.NotFoundException;
+import com.medvision360.medrecord.api.exceptions.InUseException;
+import com.medvision360.medrecord.api.exceptions.NotFoundException;
 import org.openehr.am.archetype.Archetype;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.support.identification.ArchetypeID;

@@ -5,10 +5,11 @@
  * @author Leo Simons <leo@medvision360.com>
  * @author Ralph van Etten <ralph@medvision360.com>
  */
-package com.medvision360.medrecord.spi.exceptions;
+package com.medvision360.medrecord.api.exceptions;
 
 import java.util.Collection;
 
+import com.medvision360.lib.common.exceptions.AnnotatedResourceException;
 import com.medvision360.lib.common.exceptions.ApiException;
 import com.medvision360.lib.common.exceptions.Cause;
 
@@ -16,39 +17,39 @@ import com.medvision360.lib.common.exceptions.Cause;
 @ApiException(
         status  = 500,
         cause   = Cause.SERVER,
-        code    = "TRANSACTION_EXCEPTION",
-        message = "Problem in transaction: {0}"
+        code    = "RECORD_EXCEPTION",
+        message = "Generic error in server: {0}"
 )
-public class TransactionException extends RecordException
+public class RecordException extends AnnotatedResourceException
 {
     private static final long serialVersionUID = 0x130L;
 
-    public TransactionException()
+    public RecordException()
     {
+        super("details unknown");
     }
 
-    public TransactionException(String message)
+    public RecordException(String message)
     {
         super(message);
     }
 
-    public TransactionException(String message, Throwable cause)
+    public RecordException(String message, Throwable cause)
     {
         super(message, cause);
     }
 
-    public TransactionException(Throwable cause)
+    public RecordException(Throwable cause)
     {
         super(cause);
     }
 
-    public TransactionException(String message, Throwable cause, boolean enableSuppression,
-            boolean writableStackTrace)
+    public RecordException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
     {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public TransactionException(Collection<String> arguments)
+    public RecordException(Collection<String> arguments)
     {
         super(arguments);
     }

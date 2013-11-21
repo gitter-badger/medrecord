@@ -6,9 +6,9 @@ import java.lang.reflect.Method;
 
 import com.medvision360.medrecord.spi.LocatableSelector;
 import com.medvision360.medrecord.spi.LocatableSelectorBuilder;
-import com.medvision360.medrecord.spi.exceptions.DuplicateException;
-import com.medvision360.medrecord.spi.exceptions.NotFoundException;
-import com.medvision360.medrecord.spi.exceptions.TransactionException;
+import com.medvision360.medrecord.api.exceptions.DuplicateException;
+import com.medvision360.medrecord.api.exceptions.NotFoundException;
+import com.medvision360.medrecord.api.exceptions.TransactionException;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.support.identification.HierObjectID;

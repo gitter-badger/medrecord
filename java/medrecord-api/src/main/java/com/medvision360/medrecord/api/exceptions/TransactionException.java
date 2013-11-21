@@ -5,7 +5,7 @@
  * @author Leo Simons <leo@medvision360.com>
  * @author Ralph van Etten <ralph@medvision360.com>
  */
-package com.medvision360.medrecord.spi.exceptions;
+package com.medvision360.medrecord.api.exceptions;
 
 import java.util.Collection;
 
@@ -16,38 +16,39 @@ import com.medvision360.lib.common.exceptions.Cause;
 @ApiException(
         status  = 500,
         cause   = Cause.SERVER,
-        code    = "STATUS_EXCEPTION",
-        message = "Problem determining server status: {0}"
+        code    = "TRANSACTION_EXCEPTION",
+        message = "Problem in transaction: {0}"
 )
-public class StatusException extends RecordException
+public class TransactionException extends RecordException
 {
     private static final long serialVersionUID = 0x130L;
 
-    public StatusException()
+    public TransactionException()
     {
     }
 
-    public StatusException(String message)
+    public TransactionException(String message)
     {
         super(message);
     }
 
-    public StatusException(String message, Throwable cause)
+    public TransactionException(String message, Throwable cause)
     {
         super(message, cause);
     }
 
-    public StatusException(Throwable cause)
+    public TransactionException(Throwable cause)
     {
         super(cause);
     }
 
-    public StatusException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
+    public TransactionException(String message, Throwable cause, boolean enableSuppression,
+            boolean writableStackTrace)
     {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public StatusException(Collection<String> arguments)
+    public TransactionException(Collection<String> arguments)
     {
         super(arguments);
     }

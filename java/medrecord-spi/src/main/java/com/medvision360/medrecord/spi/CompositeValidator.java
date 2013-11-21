@@ -10,8 +10,9 @@ package com.medvision360.medrecord.spi;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
-import com.medvision360.medrecord.spi.exceptions.ValidationException;
+import com.medvision360.medrecord.api.ValidationReport;
+import com.medvision360.medrecord.api.exceptions.NotSupportedException;
+import com.medvision360.medrecord.api.exceptions.ValidationException;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 

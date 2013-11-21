@@ -1,8 +1,8 @@
 package com.medvision360.medrecord.spi.tck;
 
 import com.medvision360.medrecord.spi.EHRStore;
-import com.medvision360.medrecord.spi.exceptions.DuplicateException;
-import com.medvision360.medrecord.spi.exceptions.NotFoundException;
+import com.medvision360.medrecord.api.exceptions.DuplicateException;
+import com.medvision360.medrecord.api.exceptions.NotFoundException;
 import org.openehr.rm.ehr.EHR;
 import org.openehr.rm.support.identification.HierObjectID;
 

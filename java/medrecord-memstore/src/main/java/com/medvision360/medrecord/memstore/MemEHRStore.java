@@ -8,12 +8,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.medvision360.medrecord.spi.LocatableStore;
 import com.medvision360.medrecord.spi.StoredEHR;
 import com.medvision360.medrecord.spi.base.AbstractEHRStore;
-import com.medvision360.medrecord.spi.exceptions.DuplicateException;
-import com.medvision360.medrecord.spi.exceptions.NotFoundException;
-import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
-import com.medvision360.medrecord.spi.exceptions.ParseException;
-import com.medvision360.medrecord.spi.exceptions.SerializeException;
-import com.medvision360.medrecord.spi.exceptions.StatusException;
+import com.medvision360.medrecord.api.exceptions.DuplicateException;
+import com.medvision360.medrecord.api.exceptions.NotFoundException;
+import com.medvision360.medrecord.api.exceptions.NotSupportedException;
+import com.medvision360.medrecord.api.exceptions.ParseException;
+import com.medvision360.medrecord.api.exceptions.SerializeException;
+import com.medvision360.medrecord.api.exceptions.StatusException;
 import org.openehr.rm.ehr.EHR;
 import org.openehr.rm.support.identification.HierObjectID;
 

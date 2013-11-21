@@ -3,7 +3,7 @@ package com.medvision360.medrecord.spi.base;
 import java.io.IOException;
 
 import com.medvision360.medrecord.spi.EHRStore;
-import com.medvision360.medrecord.spi.exceptions.TransactionException;
+import com.medvision360.medrecord.api.exceptions.TransactionException;
 import org.openehr.rm.support.identification.HierObjectID;
 
 public abstract class AbstractEHRStore implements EHRStore

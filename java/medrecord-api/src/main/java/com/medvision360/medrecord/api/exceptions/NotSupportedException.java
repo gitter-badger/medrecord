@@ -5,7 +5,7 @@
  * @author Leo Simons <leo@medvision360.com>
  * @author Ralph van Etten <ralph@medvision360.com>
  */
-package com.medvision360.medrecord.spi.exceptions;
+package com.medvision360.medrecord.api.exceptions;
 
 import java.util.Collection;
 

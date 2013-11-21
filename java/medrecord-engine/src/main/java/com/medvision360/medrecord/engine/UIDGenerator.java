@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 
 import com.medvision360.medrecord.spi.LocatableTransformer;
 import com.medvision360.medrecord.spi.UIDFactory;
-import com.medvision360.medrecord.spi.exceptions.TransformException;
+import com.medvision360.medrecord.api.exceptions.TransformException;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.composition.Composition;
 import org.openehr.rm.composition.content.entry.Instruction;

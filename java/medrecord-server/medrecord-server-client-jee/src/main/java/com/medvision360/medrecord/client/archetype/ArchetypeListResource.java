@@ -62,11 +62,11 @@ Store an archetype encapsulated in JSON.
     public void postArchetype(
         final com.medvision360.medrecord.api.archetype.ArchetypeRequest archetype
     ) throws
-        com.medvision360.medrecord.spi.exceptions.DuplicateException,
+        com.medvision360.medrecord.api.exceptions.DuplicateException,
         com.medvision360.medrecord.api.exceptions.ClientParseException,
-        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.RecordException,
-        com.medvision360.medrecord.spi.exceptions.IORecordException
+        com.medvision360.medrecord.api.exceptions.MissingParameterException,
+        com.medvision360.medrecord.api.exceptions.RecordException,
+        com.medvision360.medrecord.api.exceptions.IORecordException
     {
       postArchetype(
         archetype,
@@ -97,11 +97,11 @@ Store an archetype encapsulated in JSON.
         final com.medvision360.medrecord.api.archetype.ArchetypeRequest archetype,
         final ArchetypeListResourcePostArchetypeParams queryParams_
     ) throws
-        com.medvision360.medrecord.spi.exceptions.DuplicateException,
+        com.medvision360.medrecord.api.exceptions.DuplicateException,
         com.medvision360.medrecord.api.exceptions.ClientParseException,
-        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.RecordException,
-        com.medvision360.medrecord.spi.exceptions.IORecordException
+        com.medvision360.medrecord.api.exceptions.MissingParameterException,
+        com.medvision360.medrecord.api.exceptions.RecordException,
+        com.medvision360.medrecord.api.exceptions.IORecordException
     {
         try
         {
@@ -124,15 +124,15 @@ Store an archetype encapsulated in JSON.
                 switch(errorDocument_.getCode())
                 {
                     case "DUPLICATE_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.DuplicateException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.DuplicateException(errorDocument_.getArguments());
                     case "CLIENT_PARSE_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.ClientParseException(errorDocument_.getArguments());
                     case "MISSING_PARAMETER_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.MissingParameterException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.MissingParameterException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.RecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.IORecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.IORecordException(errorDocument_.getArguments());
                 }
             }
             throw e_;
@@ -157,11 +157,11 @@ Store an archetype encapsulated in JSON.
     public void postArchetypeAsText(
         final java.lang.String adl
     ) throws
-        com.medvision360.medrecord.spi.exceptions.DuplicateException,
+        com.medvision360.medrecord.api.exceptions.DuplicateException,
         com.medvision360.medrecord.api.exceptions.ClientParseException,
-        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.RecordException,
-        com.medvision360.medrecord.spi.exceptions.IORecordException
+        com.medvision360.medrecord.api.exceptions.MissingParameterException,
+        com.medvision360.medrecord.api.exceptions.RecordException,
+        com.medvision360.medrecord.api.exceptions.IORecordException
     {
       postArchetypeAsText(
         adl,
@@ -184,11 +184,11 @@ Store an archetype encapsulated in JSON.
         final java.lang.String adl,
         final ArchetypeListResourcePostArchetypeAsTextParams queryParams_
     ) throws
-        com.medvision360.medrecord.spi.exceptions.DuplicateException,
+        com.medvision360.medrecord.api.exceptions.DuplicateException,
         com.medvision360.medrecord.api.exceptions.ClientParseException,
-        com.medvision360.medrecord.spi.exceptions.MissingParameterException,
-        com.medvision360.medrecord.spi.exceptions.RecordException,
-        com.medvision360.medrecord.spi.exceptions.IORecordException
+        com.medvision360.medrecord.api.exceptions.MissingParameterException,
+        com.medvision360.medrecord.api.exceptions.RecordException,
+        com.medvision360.medrecord.api.exceptions.IORecordException
     {
         try
         {
@@ -211,15 +211,15 @@ Store an archetype encapsulated in JSON.
                 switch(errorDocument_.getCode())
                 {
                     case "DUPLICATE_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.DuplicateException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.DuplicateException(errorDocument_.getArguments());
                     case "CLIENT_PARSE_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.ClientParseException(errorDocument_.getArguments());
                     case "MISSING_PARAMETER_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.MissingParameterException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.MissingParameterException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.RecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.IORecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.IORecordException(errorDocument_.getArguments());
                 }
             }
             throw e_;
@@ -247,9 +247,9 @@ Retrieve a list of archetype IDs known to the server encapsulated in JSON.
     public com.medvision360.medrecord.api.archetype.ArchetypeList listArchetypes(
     ) throws
         com.medvision360.medrecord.api.exceptions.PatternException,
-        com.medvision360.medrecord.spi.exceptions.ParseException,
-        com.medvision360.medrecord.spi.exceptions.RecordException,
-        com.medvision360.medrecord.spi.exceptions.IORecordException
+        com.medvision360.medrecord.api.exceptions.ParseException,
+        com.medvision360.medrecord.api.exceptions.RecordException,
+        com.medvision360.medrecord.api.exceptions.IORecordException
     {
       return listArchetypes(
         null
@@ -274,9 +274,9 @@ Retrieve a list of archetype IDs known to the server encapsulated in JSON.
         final ArchetypeListResourceListArchetypesParams queryParams_
     ) throws
         com.medvision360.medrecord.api.exceptions.PatternException,
-        com.medvision360.medrecord.spi.exceptions.ParseException,
-        com.medvision360.medrecord.spi.exceptions.RecordException,
-        com.medvision360.medrecord.spi.exceptions.IORecordException
+        com.medvision360.medrecord.api.exceptions.ParseException,
+        com.medvision360.medrecord.api.exceptions.RecordException,
+        com.medvision360.medrecord.api.exceptions.IORecordException
     {
         try
         {
@@ -300,11 +300,11 @@ Retrieve a list of archetype IDs known to the server encapsulated in JSON.
                     case "PATTERN_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.PatternException(errorDocument_.getArguments());
                     case "PARSE_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.ParseException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.ParseException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.RecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":
-                        throw new com.medvision360.medrecord.spi.exceptions.IORecordException(errorDocument_.getArguments());
+                        throw new com.medvision360.medrecord.api.exceptions.IORecordException(errorDocument_.getArguments());
                 }
             }
             throw e_;

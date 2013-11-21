@@ -1,4 +1,4 @@
-package com.medvision360.medrecord.spi.exceptions;
+package com.medvision360.medrecord.api.exceptions;
 
 import java.util.Collection;
 
@@ -9,39 +9,38 @@ import com.medvision360.lib.common.exceptions.Cause;
 @ApiException(
         status  = 400,
         cause   = Cause.CLIENT,
-        code    = "IN_USE_EXCEPTION",
-        message = "Resource is in use: {0}"
+        code    = "PATTERN_EXCEPTION",
+        message = "Invalid regular expression: {0}"
 )
-public class InUseException extends RecordException
+public class PatternException extends RecordException
 {
     private static final long serialVersionUID = 0x130L;
     
-    public InUseException()
+    public PatternException()
     {
-        super();
     }
 
-    public InUseException(String message)
+    public PatternException(String message)
     {
         super(message);
     }
 
-    public InUseException(String message, Throwable cause)
+    public PatternException(String message, Throwable cause)
     {
         super(message, cause);
     }
 
-    public InUseException(Throwable cause)
+    public PatternException(Throwable cause)
     {
         super(cause);
     }
 
-    public InUseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
+    public PatternException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
     {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public InUseException(Collection<String> arguments)
+    public PatternException(Collection<String> arguments)
     {
         super(arguments);
     }

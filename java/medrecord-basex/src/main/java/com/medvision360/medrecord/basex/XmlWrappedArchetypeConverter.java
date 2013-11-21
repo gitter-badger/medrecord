@@ -4,14 +4,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 import com.medvision360.medrecord.riio.RIAdlConverter;
 import com.medvision360.medrecord.spi.ArchetypeParser;
 import com.medvision360.medrecord.spi.ArchetypeSerializer;
 import com.medvision360.medrecord.spi.WrappedArchetype;
-import com.medvision360.medrecord.spi.exceptions.ParseException;
-import com.medvision360.medrecord.spi.exceptions.SerializeException;
+import com.medvision360.medrecord.api.exceptions.ParseException;
+import com.medvision360.medrecord.api.exceptions.SerializeException;
 import org.apache.commons.io.IOUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;

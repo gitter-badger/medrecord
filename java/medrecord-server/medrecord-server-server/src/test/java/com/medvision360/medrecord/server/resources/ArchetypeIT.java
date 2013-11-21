@@ -6,8 +6,8 @@ import com.medvision360.medrecord.api.archetype.ArchetypeResult;
 import com.medvision360.medrecord.api.exceptions.PatternException;
 import com.medvision360.medrecord.client.archetype.ArchetypeListResourceListArchetypesParams;
 import com.medvision360.medrecord.client.archetype.ArchetypeResource;
-import com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException;
-import com.medvision360.medrecord.spi.exceptions.NotFoundException;
+import com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException;
+import com.medvision360.medrecord.api.exceptions.NotFoundException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

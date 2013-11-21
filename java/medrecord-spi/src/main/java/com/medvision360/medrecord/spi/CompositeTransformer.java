@@ -3,7 +3,7 @@ package com.medvision360.medrecord.spi;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.medvision360.medrecord.spi.exceptions.TransformException;
+import com.medvision360.medrecord.api.exceptions.TransformException;
 import org.openehr.rm.common.archetyped.Locatable;
 
 import static com.google.common.base.Preconditions.checkNotNull;

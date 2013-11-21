@@ -1,4 +1,4 @@
-package com.medvision360.medrecord.spi.exceptions;
+package com.medvision360.medrecord.api.exceptions;
 
 @SuppressWarnings("UnusedDeclaration")
 public class RuntimeRecordException extends RuntimeException

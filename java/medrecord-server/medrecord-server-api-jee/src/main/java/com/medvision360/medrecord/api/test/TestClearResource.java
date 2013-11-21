@@ -1,6 +1,6 @@
 package com.medvision360.medrecord.api.test;
 
-import com.medvision360.medrecord.spi.exceptions.RecordException;
+import com.medvision360.medrecord.api.exceptions.RecordException;
 import org.restlet.resource.Post;
 
 /**

@@ -4,12 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.medvision360.medrecord.spi.exceptions.RecordException;
-import com.medvision360.medrecord.spi.exceptions.RuntimeRecordException;
+import com.medvision360.medrecord.api.exceptions.RecordException;
+import com.medvision360.medrecord.api.exceptions.RuntimeRecordException;
 import org.openehr.rm.Attribute;
 import org.openehr.rm.FullConstructor;
 import org.openehr.rm.datatypes.quantity.datetime.DvDateTime;
-import org.openehr.rm.ehr.EHR;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.ObjectRef;
 

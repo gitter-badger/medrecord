@@ -3,8 +3,8 @@ package com.medvision360.medrecord.server.resources;
 import com.medvision360.lib.server.ServerResourceBase;
 import com.medvision360.medrecord.engine.MedRecordEngine;
 import com.medvision360.medrecord.server.MedRecordService;
-import com.medvision360.medrecord.spi.exceptions.InitializationException;
-import com.medvision360.medrecord.spi.exceptions.MissingParameterException;
+import com.medvision360.medrecord.api.exceptions.InitializationException;
+import com.medvision360.medrecord.api.exceptions.MissingParameterException;
 import org.restlet.service.Service;
 
 public abstract class AbstractServerResource

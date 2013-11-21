@@ -3,8 +3,8 @@ package com.medvision360.medrecord.spi.base;
 import java.io.IOException;
 
 import com.medvision360.medrecord.spi.ArchetypeStore;
-import com.medvision360.medrecord.spi.exceptions.NotFoundException;
-import com.medvision360.medrecord.spi.exceptions.TransactionException;
+import com.medvision360.medrecord.api.exceptions.NotFoundException;
+import com.medvision360.medrecord.api.exceptions.TransactionException;
 import org.openehr.rm.support.identification.ArchetypeID;
 
 public abstract class AbstractArchetypeStore implements ArchetypeStore

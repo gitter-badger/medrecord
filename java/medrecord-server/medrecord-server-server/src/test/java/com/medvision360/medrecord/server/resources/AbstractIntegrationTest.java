@@ -10,7 +10,7 @@ import com.medvision360.medrecord.engine.ArchetypeLoader;
 import com.medvision360.medrecord.memstore.MemArchetypeStore;
 import com.medvision360.medrecord.spi.ArchetypeStore;
 import com.medvision360.medrecord.spi.WrappedArchetype;
-import com.medvision360.medrecord.spi.exceptions.DuplicateException;
+import com.medvision360.medrecord.api.exceptions.DuplicateException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.openehr.rm.support.identification.ArchetypeID;

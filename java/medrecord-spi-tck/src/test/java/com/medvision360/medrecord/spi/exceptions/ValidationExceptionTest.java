@@ -1,7 +1,8 @@
 package com.medvision360.medrecord.spi.exceptions;
 
-import com.medvision360.medrecord.spi.ValidationReport;
-import com.medvision360.medrecord.spi.ValidationResult;
+import com.medvision360.medrecord.api.ValidationReport;
+import com.medvision360.medrecord.api.ValidationResult;
+import com.medvision360.medrecord.api.exceptions.ValidationException;
 import com.medvision360.medrecord.spi.tck.ExceptionTestBase;
 
 public class ValidationExceptionTest extends ExceptionTestBase<ValidationException>

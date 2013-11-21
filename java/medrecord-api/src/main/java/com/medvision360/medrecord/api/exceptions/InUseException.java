@@ -4,44 +4,44 @@ import java.util.Collection;
 
 import com.medvision360.lib.common.exceptions.ApiException;
 import com.medvision360.lib.common.exceptions.Cause;
-import com.medvision360.medrecord.spi.exceptions.ParseException;
 
 @SuppressWarnings("UnusedDeclaration")
 @ApiException(
         status  = 400,
         cause   = Cause.CLIENT,
-        code    = "CLIENT_PARSE_EXCEPTION",
-        message = "Problem parsing the resource: {0}"
+        code    = "IN_USE_EXCEPTION",
+        message = "Resource is in use: {0}"
 )
-public class ClientParseException extends ParseException
+public class InUseException extends RecordException
 {
     private static final long serialVersionUID = 0x130L;
     
-    public ClientParseException()
+    public InUseException()
     {
+        super();
     }
 
-    public ClientParseException(String message)
+    public InUseException(String message)
     {
         super(message);
     }
 
-    public ClientParseException(String message, Throwable cause)
+    public InUseException(String message, Throwable cause)
     {
         super(message, cause);
     }
 
-    public ClientParseException(Throwable cause)
+    public InUseException(Throwable cause)
     {
         super(cause);
     }
 
-    public ClientParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
+    public InUseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
     {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public ClientParseException(Collection<String> arguments)
+    public InUseException(Collection<String> arguments)
     {
         super(arguments);
     }

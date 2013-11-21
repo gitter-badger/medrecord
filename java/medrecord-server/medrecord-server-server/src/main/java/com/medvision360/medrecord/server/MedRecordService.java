@@ -1,7 +1,7 @@
 package com.medvision360.medrecord.server;
 
 import com.medvision360.medrecord.engine.MedRecordEngine;
-import com.medvision360.medrecord.spi.exceptions.InitializationException;
+import com.medvision360.medrecord.api.exceptions.InitializationException;
 import org.restlet.service.Service;
 
 public class MedRecordService extends Service

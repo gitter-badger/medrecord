@@ -2,14 +2,14 @@ package com.medvision360.medrecord.spi;
 
 import java.io.IOException;
 
-import com.medvision360.medrecord.spi.exceptions.DisposalException;
-import com.medvision360.medrecord.spi.exceptions.DuplicateException;
-import com.medvision360.medrecord.spi.exceptions.InitializationException;
-import com.medvision360.medrecord.spi.exceptions.NotFoundException;
-import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
-import com.medvision360.medrecord.spi.exceptions.ParseException;
-import com.medvision360.medrecord.spi.exceptions.SerializeException;
-import com.medvision360.medrecord.spi.exceptions.ValidationException;
+import com.medvision360.medrecord.api.exceptions.DisposalException;
+import com.medvision360.medrecord.api.exceptions.DuplicateException;
+import com.medvision360.medrecord.api.exceptions.InitializationException;
+import com.medvision360.medrecord.api.exceptions.NotFoundException;
+import com.medvision360.medrecord.api.exceptions.NotSupportedException;
+import com.medvision360.medrecord.api.exceptions.ParseException;
+import com.medvision360.medrecord.api.exceptions.SerializeException;
+import com.medvision360.medrecord.api.exceptions.ValidationException;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.demographic.Person;
 import org.openehr.rm.ehr.EHR;

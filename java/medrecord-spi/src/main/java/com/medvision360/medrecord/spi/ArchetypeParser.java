@@ -3,7 +3,7 @@ package com.medvision360.medrecord.spi;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.medvision360.medrecord.spi.exceptions.ParseException;
+import com.medvision360.medrecord.api.exceptions.ParseException;
 
 public interface ArchetypeParser extends TypeSelector // todo javadoc / api spec / exceptions
 {

@@ -1,5 +1,6 @@
 package com.medvision360.medrecord.spi.exceptions;
 
+import com.medvision360.medrecord.api.exceptions.TransactionException;
 import com.medvision360.medrecord.spi.tck.ExceptionTestBase;
 
 public class TransactionExceptionTest extends ExceptionTestBase<TransactionException>

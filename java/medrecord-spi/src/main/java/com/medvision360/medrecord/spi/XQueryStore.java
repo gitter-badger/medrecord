@@ -10,7 +10,7 @@ package com.medvision360.medrecord.spi;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.medvision360.medrecord.spi.exceptions.NotSupportedException;
+import com.medvision360.medrecord.api.exceptions.NotSupportedException;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.ehr.EHR;
 
@@ -37,7 +37,7 @@ public interface XQueryStore extends LocatableStore
      * @return an iterable of locatables. Can be empty if there are no matches.
      * @throws NullPointerException if any of the provided arguments are null.
      * @throws IllegalArgumentException if the provided query cannot be parsed or understood.
-     * @throws com.medvision360.medrecord.spi.exceptions.NotSupportedException if the provided query seems valid but it
+     * @throws com.medvision360.medrecord.api.exceptions.NotSupportedException if the provided query seems valid but it
      * uses an XQuery feature the store does not support, or it cannot be supported by the store for another reason.
      * @throws java.io.IOException if another error occurs interacting with storage.
      * @see com.google.common.collect.Iterables for convenient utilities to work with Iterables.
@@ -53,7 +53,7 @@ public interface XQueryStore extends LocatableStore
      * @return an iterable of locatables. Can be empty if there are no matches.
      * @throws NullPointerException if any of the provided arguments are null.
      * @throws IllegalArgumentException if the provided query cannot be parsed or understood.
-     * @throws com.medvision360.medrecord.spi.exceptions.NotSupportedException if the provided query seems valid but it
+     * @throws com.medvision360.medrecord.api.exceptions.NotSupportedException if the provided query seems valid but it
      * uses an XQuery feature the store does not support, or it cannot be supported by the store for another reason.
      * @throws java.io.IOException if another error occurs interacting with storage.
      * @see com.google.common.collect.Iterables for convenient utilities to work with Iterables.

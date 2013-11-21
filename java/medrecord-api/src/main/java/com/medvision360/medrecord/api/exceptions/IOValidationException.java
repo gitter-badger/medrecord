@@ -1,8 +1,8 @@
-package com.medvision360.medrecord.spi.exceptions;
+package com.medvision360.medrecord.api.exceptions;
 
 import java.io.IOException;
 
-import com.medvision360.medrecord.spi.ValidationReport;
+import com.medvision360.medrecord.api.ValidationReport;
 
 @SuppressWarnings("UnusedDeclaration")
 public class IOValidationException extends IOException

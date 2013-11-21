@@ -1,6 +1,6 @@
 package com.medvision360.medrecord.spi.base;
 
-import com.medvision360.medrecord.spi.ValidationResult;
+import com.medvision360.medrecord.api.ValidationResult;
 
 public class BaseValidationResult implements ValidationResult
 {

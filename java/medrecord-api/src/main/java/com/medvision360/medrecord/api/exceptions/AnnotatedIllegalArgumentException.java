@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import com.medvision360.lib.common.exceptions.ApiException;
 import com.medvision360.lib.common.exceptions.Cause;
-import com.medvision360.medrecord.spi.exceptions.RecordException;
 
 @SuppressWarnings("UnusedDeclaration")
 @ApiException(

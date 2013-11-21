@@ -7,7 +7,7 @@
  */
 package com.medvision360.medrecord.spi;
 
-import com.medvision360.medrecord.spi.exceptions.StatusException;
+import com.medvision360.medrecord.api.exceptions.StatusException;
 
 /**
  * Basic/generic interface to be implemented by components that may be transiently non-functioning and are capable of

@@ -6,10 +6,10 @@ import com.medvision360.medrecord.api.archetype.ArchetypeResource;
 import com.medvision360.medrecord.api.archetype.ArchetypeResult;
 import com.medvision360.medrecord.engine.MedRecordEngine;
 import com.medvision360.medrecord.spi.WrappedArchetype;
-import com.medvision360.medrecord.spi.exceptions.IORecordException;
-import com.medvision360.medrecord.spi.exceptions.InvalidArchetypeIDException;
-import com.medvision360.medrecord.spi.exceptions.MissingParameterException;
-import com.medvision360.medrecord.spi.exceptions.RecordException;
+import com.medvision360.medrecord.api.exceptions.IORecordException;
+import com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException;
+import com.medvision360.medrecord.api.exceptions.MissingParameterException;
+import com.medvision360.medrecord.api.exceptions.RecordException;
 import org.openehr.rm.support.identification.ArchetypeID;
 
 public class ArchetypeServerResource

@@ -7,7 +7,7 @@
  */
 package com.medvision360.medrecord.spi;
 
-import com.medvision360.medrecord.spi.exceptions.TransactionException;
+import com.medvision360.medrecord.api.exceptions.TransactionException;
 
 public interface TransactionalService
 {

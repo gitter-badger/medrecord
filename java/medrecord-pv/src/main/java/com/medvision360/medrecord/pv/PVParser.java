@@ -24,7 +24,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.medvision360.medrecord.rmutil.Node;
-import com.medvision360.medrecord.spi.exceptions.ParseException;
+import com.medvision360.medrecord.api.exceptions.ParseException;
 import org.openehr.build.RMObjectBuilder;
 import org.openehr.build.RMObjectBuildingException;
 import org.openehr.build.SystemValue;
