@@ -148,6 +148,7 @@ public class IntegrationTest extends RMTestBase
         validatedNs = 0;
         
         m_engine = new MedRecordEngine();
+        m_engine.setName("IntegrationTest");
         m_engine.setStoreValidation(false); // so we can split insert-able vs validate-able
         m_engine.initialize();
         
