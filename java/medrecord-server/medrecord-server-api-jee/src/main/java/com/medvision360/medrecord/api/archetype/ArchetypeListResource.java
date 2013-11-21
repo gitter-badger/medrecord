@@ -51,7 +51,7 @@ public interface ArchetypeListResource
      * 
      * Retrieve a list of archetype IDs known to the server encapsulated in JSON.
      * 
-     * @apipathparam q A regular expression to limit the returned archetypes by their name.
+     * @apiqueryparam q A regular expression to limit the returned archetypes by their name.
      *   [type=string,single,default=openEHR-EHR.*]
      */
     @Get
