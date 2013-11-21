@@ -1,4 +1,4 @@
-package com.medvision360.medrecord.server.resources;
+package com.medvision360.medrecord.server.archetype;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
@@ -8,12 +8,13 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.medvision360.medrecord.api.archetype.ArchetypeList;
+import com.medvision360.medrecord.api.IDList;
 import com.medvision360.medrecord.api.archetype.ArchetypeListResource;
 import com.medvision360.medrecord.api.archetype.ArchetypeRequest;
 import com.medvision360.medrecord.api.exceptions.ClientParseException;
 import com.medvision360.medrecord.api.exceptions.PatternException;
 import com.medvision360.medrecord.engine.MedRecordEngine;
+import com.medvision360.medrecord.server.AbstractServerResource;
 import com.medvision360.medrecord.spi.ArchetypeParser;
 import com.medvision360.medrecord.spi.WrappedArchetype;
 import com.medvision360.medrecord.api.exceptions.IORecordException;
@@ -28,16 +29,14 @@ public class ArchetypeListServerResource
         implements ArchetypeListResource
 {
     @Override
-    public void postArchetype(ArchetypeRequest archetype)
-            throws RecordException
+    public void postArchetype(ArchetypeRequest archetype) throws RecordException
     {
         String adl = archetype.getAdl();
         postArchetypeAsText(adl);
     }
 
     @Override
-    public void postArchetypeAsText(String adl)
-            throws RecordException
+    public void postArchetypeAsText(String adl) throws RecordException
     {
         try
         {
@@ -73,7 +72,7 @@ public class ArchetypeListServerResource
     }
 
     @Override
-    public ArchetypeList listArchetypes() throws RecordException
+    public IDList listArchetypes() throws RecordException
     {
         try
         {
@@ -124,8 +123,8 @@ public class ArchetypeListServerResource
                 });
             }
             
-            ArchetypeList result = new ArchetypeList();
-            result.setArchetypes(Lists.newArrayList(stringList));
+            IDList result = new IDList();
+            result.setIds(Lists.newArrayList(stringList));
             return result;
         }
         catch (IOException e)

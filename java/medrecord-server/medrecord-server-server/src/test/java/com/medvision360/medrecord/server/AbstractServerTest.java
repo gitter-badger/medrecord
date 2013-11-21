@@ -1,4 +1,4 @@
-package com.medvision360.medrecord.server.resources;
+package com.medvision360.medrecord.server;
 
 import com.medvision360.lib.client.ClientResourceConfig;
 import com.medvision360.lib.common.converter.ExtendedJacksonConverter;
@@ -17,7 +17,7 @@ import org.openehr.rm.support.identification.ArchetypeID;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
-public abstract class AbstractIntegrationTest
+public abstract class AbstractServerTest
 {
     protected static ClientResourceConfig m_resourceConfig;
     protected ArchetypeListResource m_archetypeListResource;

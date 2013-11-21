@@ -3,7 +3,6 @@ package com.medvision360.medrecord.api.archetype;
 import com.medvision360.medrecord.api.exceptions.IORecordException;
 import com.medvision360.medrecord.api.exceptions.InUseException;
 import com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException;
-import com.medvision360.medrecord.api.exceptions.MissingParameterException;
 import com.medvision360.medrecord.api.exceptions.NotFoundException;
 import com.medvision360.medrecord.api.exceptions.ParseException;
 import com.medvision360.medrecord.api.exceptions.RecordException;
@@ -27,7 +26,7 @@ public interface ArchetypeResource
     //@Get("json|xml")
     @Get("json")
     public ArchetypeResult getArchetype()
-            throws NotFoundException, MissingParameterException, ParseException, InvalidArchetypeIDException,
+            throws NotFoundException, ParseException, InvalidArchetypeIDException,
             RecordException, IORecordException;
 
     /**
@@ -39,7 +38,7 @@ public interface ArchetypeResource
      */
     @Get("txt")
     public String getArchetypeAsText()
-            throws NotFoundException, MissingParameterException, ParseException, InvalidArchetypeIDException,
+            throws NotFoundException, ParseException, InvalidArchetypeIDException,
             RecordException, IORecordException;
 
     /**
@@ -49,6 +48,6 @@ public interface ArchetypeResource
      */
     @Delete
     public void deleteArchetype()
-            throws NotFoundException, MissingParameterException, InUseException, InvalidArchetypeIDException,
+            throws NotFoundException, InUseException, InvalidArchetypeIDException,
             RecordException, IORecordException;
 }

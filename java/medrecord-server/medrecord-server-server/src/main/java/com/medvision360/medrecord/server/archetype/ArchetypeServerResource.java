@@ -1,10 +1,11 @@
-package com.medvision360.medrecord.server.resources;
+package com.medvision360.medrecord.server.archetype;
 
 import java.io.IOException;
 
 import com.medvision360.medrecord.api.archetype.ArchetypeResource;
 import com.medvision360.medrecord.api.archetype.ArchetypeResult;
 import com.medvision360.medrecord.engine.MedRecordEngine;
+import com.medvision360.medrecord.server.AbstractServerResource;
 import com.medvision360.medrecord.spi.WrappedArchetype;
 import com.medvision360.medrecord.api.exceptions.IORecordException;
 import com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException;
@@ -35,6 +36,20 @@ public class ArchetypeServerResource
         return wrappedArchetype.getAsString();
     }
 
+    @Override
+    public void deleteArchetype() throws RecordException
+    {
+        try
+        {
+            ArchetypeID archetypeID = getArchetypeIDAttribute();
+            engine().getArchetypeStore().delete(archetypeID);
+        }
+        catch (IOException e)
+        {
+            throw new IORecordException(e.getMessage(), e);
+        }
+    }
+
     private WrappedArchetype getWrappedArchetype() throws RecordException
     {
         try
@@ -60,21 +75,6 @@ public class ArchetypeServerResource
         catch (IllegalArgumentException e)
         {
             throw new InvalidArchetypeIDException(id);
-        }
-    }
-
-    @Override
-    public void deleteArchetype()
-            throws RecordException
-    {
-        try
-        {
-            ArchetypeID archetypeID = getArchetypeIDAttribute();
-            engine().getArchetypeStore().delete(archetypeID);
-        }
-        catch (IOException e)
-        {
-            throw new IORecordException(e.getMessage(), e);
         }
     }
 }

@@ -1,6 +1,6 @@
-package com.medvision360.medrecord.server.resources;
+package com.medvision360.medrecord.server.archetype;
 
-import com.medvision360.medrecord.api.archetype.ArchetypeList;
+import com.medvision360.medrecord.api.IDList;
 import com.medvision360.medrecord.api.archetype.ArchetypeRequest;
 import com.medvision360.medrecord.api.archetype.ArchetypeResult;
 import com.medvision360.medrecord.api.exceptions.PatternException;
@@ -8,6 +8,7 @@ import com.medvision360.medrecord.client.archetype.ArchetypeListResourceListArch
 import com.medvision360.medrecord.client.archetype.ArchetypeResource;
 import com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException;
 import com.medvision360.medrecord.api.exceptions.NotFoundException;
+import com.medvision360.medrecord.server.AbstractServerTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -16,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ArchetypeIT extends AbstractIntegrationTest
+public class ArchetypeIT extends AbstractServerTest
 {
     private ArchetypeResource resource(String id) throws Exception
     {
@@ -79,12 +80,12 @@ public class ArchetypeIT extends AbstractIntegrationTest
 
         ArchetypeResource resource = resource(archetypeName);
         ArchetypeResult result;
-        ArchetypeList list;
+        IDList list;
 
         // empty list
         clear(); // call clear again since another test may have added data
         list = m_archetypeListResource.listArchetypes();
-        assertEquals(0, list.getArchetypes().size());
+        assertEquals(0, list.getIds().size());
 
         // POST
         m_archetypeListResource.postArchetype(request);
@@ -101,9 +102,9 @@ public class ArchetypeIT extends AbstractIntegrationTest
         // LIST
         list = m_archetypeListResource.listArchetypes();
         assertNotNull(list);
-        assertNotNull(list.getArchetypes());
-        assertEquals(1, list.getArchetypes().size());
-        assertTrue(list.getArchetypes().contains(archetypeName));
+        assertNotNull(list.getIds());
+        assertEquals(1, list.getIds().size());
+        assertTrue(list.getIds().contains(archetypeName));
         
         // DELETE
         resource.deleteArchetype();
@@ -117,7 +118,7 @@ public class ArchetypeIT extends AbstractIntegrationTest
             assertTrue(e.getMessage().contains(archetypeName));
         }
         list = m_archetypeListResource.listArchetypes();
-        assertEquals(0, list.getArchetypes().size());
+        assertEquals(0, list.getIds().size());
         
         // re-POST
         m_archetypeListResource.postArchetype(request);
@@ -138,18 +139,18 @@ public class ArchetypeIT extends AbstractIntegrationTest
 
         ArchetypeListResourceListArchetypesParams params = new ArchetypeListResourceListArchetypesParams();
         params.setQ("lab_test-blood.*?v[12]");
-        ArchetypeList list = m_archetypeListResource.listArchetypes(params);
-        assertNotNull(list.getArchetypes());
-        assertTrue(list.getArchetypes().contains(bloodGlucoseArchetype));
-        assertTrue(list.getArchetypes().contains(bloodMatchArchetype));
-        assertFalse(list.getArchetypes().contains(histopathologyArchetype));
+        IDList list = m_archetypeListResource.listArchetypes(params);
+        assertNotNull(list.getIds());
+        assertTrue(list.getIds().contains(bloodGlucoseArchetype));
+        assertTrue(list.getIds().contains(bloodMatchArchetype));
+        assertFalse(list.getIds().contains(histopathologyArchetype));
         
         // try full match with ^ $
         params = new ArchetypeListResourceListArchetypesParams();
         params.setQ("^openEHR-EHR-OBSERVATION\\.lab_test-blood.*\\.v1$");
         list = m_archetypeListResource.listArchetypes(params);
-        assertNotNull(list.getArchetypes());
-        assertTrue(list.getArchetypes().contains(bloodGlucoseArchetype));
+        assertNotNull(list.getIds());
+        assertTrue(list.getIds().contains(bloodGlucoseArchetype));
     }
     
     @Test

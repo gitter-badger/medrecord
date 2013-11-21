@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.medvision360.lib.common.exceptions.AnnotatedResourceException;
 import com.medvision360.lib.server.service.JsonStatusService;
 import com.medvision360.medrecord.api.exceptions.AnnotatedIllegalArgumentException;
+import com.medvision360.medrecord.api.exceptions.AnnotatedUnsupportedOperationException;
 import com.medvision360.medrecord.api.exceptions.RecordException;
 import com.medvision360.medrecord.api.exceptions.RuntimeRecordException;
 import org.restlet.Request;
@@ -21,7 +22,11 @@ public class CustomStatusService extends JsonStatusService
     {
         if (throwable instanceof IllegalArgumentException)
         {
-            throwable = new AnnotatedIllegalArgumentException(throwable);
+            throwable = new AnnotatedIllegalArgumentException(throwable.getMessage(), throwable);
+        }
+        if (throwable instanceof UnsupportedOperationException)
+        {
+            throwable = new AnnotatedUnsupportedOperationException(throwable.getMessage(), throwable);
         }
         else if (
                 throwable instanceof IOException ||

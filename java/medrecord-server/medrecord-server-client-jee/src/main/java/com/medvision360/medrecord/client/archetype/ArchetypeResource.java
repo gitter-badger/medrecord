@@ -58,7 +58,6 @@ Retrieve an archetype encapsulated in JSON.
     public com.medvision360.medrecord.api.archetype.ArchetypeResult getArchetype(
     ) throws
         com.medvision360.medrecord.api.exceptions.NotFoundException,
-        com.medvision360.medrecord.api.exceptions.MissingParameterException,
         com.medvision360.medrecord.api.exceptions.ParseException,
         com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException,
         com.medvision360.medrecord.api.exceptions.RecordException,
@@ -84,7 +83,6 @@ Retrieve an archetype encapsulated in JSON.
         final ArchetypeResourceGetArchetypeParams queryParams_
     ) throws
         com.medvision360.medrecord.api.exceptions.NotFoundException,
-        com.medvision360.medrecord.api.exceptions.MissingParameterException,
         com.medvision360.medrecord.api.exceptions.ParseException,
         com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException,
         com.medvision360.medrecord.api.exceptions.RecordException,
@@ -111,8 +109,6 @@ Retrieve an archetype encapsulated in JSON.
                 {
                     case "NOT_FOUND_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.NotFoundException(errorDocument_.getArguments());
-                    case "MISSING_PARAMETER_EXCEPTION":
-                        throw new com.medvision360.medrecord.api.exceptions.MissingParameterException(errorDocument_.getArguments());
                     case "PARSE_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.ParseException(errorDocument_.getArguments());
                     case "INVALID_ARCHETYPE_ID_EXCEPTION":
@@ -147,7 +143,6 @@ Retrieve an archetype as an ADL string (plain text).
     public java.lang.String getArchetypeAsText(
     ) throws
         com.medvision360.medrecord.api.exceptions.NotFoundException,
-        com.medvision360.medrecord.api.exceptions.MissingParameterException,
         com.medvision360.medrecord.api.exceptions.ParseException,
         com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException,
         com.medvision360.medrecord.api.exceptions.RecordException,
@@ -175,7 +170,6 @@ Retrieve an archetype as an ADL string (plain text).
         final ArchetypeResourceGetArchetypeAsTextParams queryParams_
     ) throws
         com.medvision360.medrecord.api.exceptions.NotFoundException,
-        com.medvision360.medrecord.api.exceptions.MissingParameterException,
         com.medvision360.medrecord.api.exceptions.ParseException,
         com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException,
         com.medvision360.medrecord.api.exceptions.RecordException,
@@ -202,8 +196,6 @@ Retrieve an archetype as an ADL string (plain text).
                 {
                     case "NOT_FOUND_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.NotFoundException(errorDocument_.getArguments());
-                    case "MISSING_PARAMETER_EXCEPTION":
-                        throw new com.medvision360.medrecord.api.exceptions.MissingParameterException(errorDocument_.getArguments());
                     case "PARSE_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.ParseException(errorDocument_.getArguments());
                     case "INVALID_ARCHETYPE_ID_EXCEPTION":
@@ -236,7 +228,6 @@ Delete a stored archetype.
     public void deleteArchetype(
     ) throws
         com.medvision360.medrecord.api.exceptions.NotFoundException,
-        com.medvision360.medrecord.api.exceptions.MissingParameterException,
         com.medvision360.medrecord.api.exceptions.InUseException,
         com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException,
         com.medvision360.medrecord.api.exceptions.RecordException,
@@ -262,7 +253,6 @@ Delete a stored archetype.
         final ArchetypeResourceDeleteArchetypeParams queryParams_
     ) throws
         com.medvision360.medrecord.api.exceptions.NotFoundException,
-        com.medvision360.medrecord.api.exceptions.MissingParameterException,
         com.medvision360.medrecord.api.exceptions.InUseException,
         com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException,
         com.medvision360.medrecord.api.exceptions.RecordException,
@@ -289,8 +279,6 @@ Delete a stored archetype.
                 {
                     case "NOT_FOUND_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.NotFoundException(errorDocument_.getArguments());
-                    case "MISSING_PARAMETER_EXCEPTION":
-                        throw new com.medvision360.medrecord.api.exceptions.MissingParameterException(errorDocument_.getArguments());
                     case "IN_USE_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.InUseException(errorDocument_.getArguments());
                     case "INVALID_ARCHETYPE_ID_EXCEPTION":

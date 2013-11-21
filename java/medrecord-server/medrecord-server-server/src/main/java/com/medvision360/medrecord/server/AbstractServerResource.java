@@ -1,4 +1,4 @@
-package com.medvision360.medrecord.server.resources;
+package com.medvision360.medrecord.server;
 
 import com.medvision360.lib.server.ServerResourceBase;
 import com.medvision360.medrecord.engine.MedRecordEngine;

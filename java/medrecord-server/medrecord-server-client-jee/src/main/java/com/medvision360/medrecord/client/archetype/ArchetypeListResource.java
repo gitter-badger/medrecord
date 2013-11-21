@@ -47,8 +47,6 @@ Note that for non-web-based tools, simply using the plain text API is probably m
 <code>curl -X POST -T foo.adl -H "Content-Type: text/plain" $URL/medrecord/v2/archetype</code>
 works fine.
 
-Store an archetype encapsulated in JSON.
-
 
 
        <p>
@@ -84,8 +82,6 @@ it. Updating archetypes once they are in use is not possible.
 Note that for non-web-based tools, simply using the plain text API is probably much easier, i.e. something like
 <code>curl -X POST -T foo.adl -H "Content-Type: text/plain" $URL/medrecord/v2/archetype</code>
 works fine.
-
-Store an archetype encapsulated in JSON.
 
 
 
@@ -244,7 +240,7 @@ Retrieve a list of archetype IDs known to the server encapsulated in JSON.
 
 
      */
-    public com.medvision360.medrecord.api.archetype.ArchetypeList listArchetypes(
+    public com.medvision360.medrecord.api.IDList listArchetypes(
     ) throws
         com.medvision360.medrecord.api.exceptions.PatternException,
         com.medvision360.medrecord.api.exceptions.ParseException,
@@ -270,7 +266,7 @@ Retrieve a list of archetype IDs known to the server encapsulated in JSON.
 
 
      */
-    public com.medvision360.medrecord.api.archetype.ArchetypeList listArchetypes(
+    public com.medvision360.medrecord.api.IDList listArchetypes(
         final ArchetypeListResourceListArchetypesParams queryParams_
     ) throws
         com.medvision360.medrecord.api.exceptions.PatternException,
