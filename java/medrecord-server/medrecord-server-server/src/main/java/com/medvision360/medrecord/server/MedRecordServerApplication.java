@@ -40,13 +40,17 @@ public class MedRecordServerApplication extends RestletApplication
         
         // need to enable preferences and extensions tunnel to be able
         // to use document.en.json
+        //
         setTunnelService(
             new TunnelService(
                 true,   // enabled
                 false,  // method tunnel
                 true,   // preferences tunnel
                 false,  // query tunnel
-                true,   // extensions tunnel
+                // unfortunately, it seems the extension mapping triggers
+                //   https://github.com/restlet/restlet-framework-java/issues/801
+                //true,   // extensions tunnel
+                false,
                 false,  // user agent tunnel
                 false   // headers tunnel
             )
