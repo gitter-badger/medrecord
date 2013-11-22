@@ -1,15 +1,3 @@
-repositories {
-    // required for buildlib
-    mavenLocal()
-
-    // required for license-gradle-plugin
-    mavenCentral()
-
-    maven {
-        url 'http://files.basex.org/maven'
-    }
-}
-
 // some standard settings for Java applications (language level etc)
 apply plugin: 'medvision-java'
 

@@ -19,7 +19,7 @@ dependencies {
   compile group: 'org.slf4j', name: 'jul-to-slf4j', version:"${ext.version.slf4j}"
   compile group: 'org.slf4j', name: 'jcl-over-slf4j', version:"${ext.version.slf4j}"
 
-  testCompile "junit:junit:4.11"
+  testCompile "junit:junit:${ext.version.junit}"
   testCompile "org.restlet.jee:org.restlet.ext.httpclient:${ext.version.restlet}"
   testCompile project(":medrecord-server-client-jee")
   testCompile project(':medrecord-itest')

@@ -5,6 +5,22 @@ buildscript {
 
         // required for license-gradle-plugin
         mavenCentral()
+        
+        // required for downloading buildlib on a completely fresh build        
+        maven {
+          url "https://repository-zorggemak.forge.cloudbees.com/release/"
+          credentials {
+            username project.ext.cloudbeesUser
+            password project.ext.cloudbeesPassword
+          }
+        }
+        maven {
+          url "https://repository-zorggemak.forge.cloudbees.com/snapshot/"
+          credentials {
+            username project.ext.cloudbeesUser
+            password project.ext.cloudbeesPassword
+          }
+        }
     }
     dependencies {
         // this is the medvision buildlib
@@ -59,6 +75,13 @@ subprojects {
     // Use the MEDvision360 repos (cloudbees, repo.medvision360.org)
     apply plugin: 'medvision-repo'
 
+    // make sure all projects get the right basex
+    repositories {
+        maven {
+            url 'http://files.basex.org/maven'
+        }
+    }
+
     // Update the license header on all files
     // run 'gradle licenseFormatMain' to update the license headers
     apply plugin: 'license'
@@ -91,10 +114,12 @@ subprojects {
                 commonsLang3        : '3.1',
                 freemarker          : '2.3.20',
                 guava               : '15.0',
+                gson                : '2.2.4',
                 jackson             : '2.2.3',
                 jaxen               : '1.1.4',
                 jdom                : '2.0.2',
                 jodatime            : '2.2',
+                jstl                : '1.2',
                 junit               : '4.11',
                 logback             : '1.0.13',
                 medvisionlib        : 'latest.integration',
@@ -102,8 +127,11 @@ subprojects {
                 postgresql          : '9.2-1003-jdbc4',
                 restlet             : '2.2-M1',
                 saxon               : '9.5.1-3',
+                servlet             : '3.1.0',
                 slf4j               : '1.7.5',
-                spring              : '3.2.4.RELEASE',
+                spring              : '3.2.5.RELEASE',
+                tomcat              : '7.0.34',
+                wslog               : '1.0.3',
         ]
     }
 

@@ -26,7 +26,7 @@ dependencies {
     compile "com.medvision360.lib:libs-api-jee:${ext.version.medvisionlib}"
     compile "com.medvision360.lib:libs-common-jee:${ext.version.medvisionlib}"
     compile "org.restlet.jee:org.restlet:${ext.version.restlet}"
-    xslt "net.sf.saxon:Saxon-HE:9.5.1-1"
+    xslt "net.sf.saxon:Saxon-HE:${ext.version.saxon}"
 }
 
 generateClientSource {
