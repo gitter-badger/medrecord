@@ -6,21 +6,34 @@ buildscript {
         // required for license-gradle-plugin
         mavenCentral()
         
-        // required for downloading buildlib on a completely fresh build        
-        maven {
-          url "https://repository-zorggemak.forge.cloudbees.com/release/"
-          credentials {
-            username project.ext.cloudbeesUser
-            password project.ext.cloudbeesPassword
-          }
-        }
-        maven {
-          url "https://repository-zorggemak.forge.cloudbees.com/snapshot/"
-          credentials {
-            username project.ext.cloudbeesUser
-            password project.ext.cloudbeesPassword
-          }
-        }
+        /*
+        If you don't have buildlib in your maven local repo, you can change your ~/.gradle/init.gradle to know to 
+        download it from our repository, with something like
+            allprojects {
+              ext {
+                cloudbeesUser="zorggemak"
+                cloudbeesPassword="XXXXXXXXXXX"
+              }
+              buildscript {
+                repositories {
+                  maven {
+                    url "https://repository-zorggemak.forge.cloudbees.com/release/"
+                    credentials {
+                      username project.ext.cloudbeesUser
+                      password project.ext.cloudbeesPassword
+                    }
+                  }
+                  maven {
+                    url "https://repository-zorggemak.forge.cloudbees.com/snapshot/"
+                    credentials {
+                      username project.ext.cloudbeesUser
+                      password project.ext.cloudbeesPassword
+                    }
+                  }
+                }
+              }
+            }
+        */
     }
     dependencies {
         // this is the medvision buildlib
@@ -75,7 +88,7 @@ subprojects {
     // Use the MEDvision360 repos (cloudbees, repo.medvision360.org)
     apply plugin: 'medvision-repo'
 
-    // make sure all projects get the right basex
+    // make sure all projects get the right basex & restlet
     repositories {
         mavenLocal()
         mavenCentral()
