@@ -37,6 +37,6 @@ dependencies {
     //
     compile "commons-cli:commons-cli:${ext.version.commonsCli}"
     compile "commons-io:commons-io:${ext.version.commonsIo}"
-    compile "openehr:adl-parser:${ext.version.openEhr}"
+    compile "com.medvision360.openehr:adl-parser:${ext.version.openEhr}"
     compile "org.apache.commons:commons-lang3:${ext.version.commonsLang3}"
 }

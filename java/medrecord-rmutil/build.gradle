@@ -58,8 +58,8 @@ dependencies {
     //compile "commons-logging:commons-logging:${ext.version.commonsLogging}"
     compile "org.slf4j:jcl-over-slf4j:${ext.version.slf4j}"
     compile "org.apache.commons:commons-lang3:${ext.version.commonsLang3}"
-    compile "openehr:openehr-aom:${ext.version.openEhr}"
-    compile "openehr:openehr-rm-core:${ext.version.openEhr}"
-    compile "openehr:openehr-rm-domain:${ext.version.openEhr}"
-    compile "openehr:rm-builder:${ext.version.openEhr}"
+    compile "com.medvision360.openehr:openehr-aom:${ext.version.openEhr}"
+    compile "com.medvision360.openehr:openehr-rm-core:${ext.version.openEhr}"
+    compile "com.medvision360.openehr:openehr-rm-domain:${ext.version.openEhr}"
+    compile "com.medvision360.openehr:rm-builder:${ext.version.openEhr}"
 }
