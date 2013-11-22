@@ -5,6 +5,7 @@
 /// start contents of settings.gradle
 
 include(
+        'medrecord-api',
         'medrecord-basex',
         'medrecord-client-archetypes',
         'medrecord-engine',
