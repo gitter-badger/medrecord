@@ -51,9 +51,9 @@ public class ServletListener implements ServletContextListener {
 
         @Override
         public void run() {
-            if (log.isDebugEnabled()) {
+            if (log.isTraceEnabled()) {
                 SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
-                log.debug("DataCheckTask: " + format.format(new Date()));
+                log.trace("DataCheckTask: " + format.format(new Date()));
             }
             DataManager.getInstance().loop();
         }

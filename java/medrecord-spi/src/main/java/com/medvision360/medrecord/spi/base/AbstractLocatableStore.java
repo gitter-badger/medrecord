@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import com.medvision360.medrecord.api.exceptions.DisposalException;
 import com.medvision360.medrecord.spi.LocatableSelector;
 import com.medvision360.medrecord.spi.LocatableSelectorBuilder;
 import com.medvision360.medrecord.api.exceptions.DuplicateException;
@@ -51,6 +52,10 @@ public abstract class AbstractLocatableStore
     }
 
     public void initialize() throws IOException
+    {
+    }
+    
+    public void dispose() throws DisposalException
     {
     }
 

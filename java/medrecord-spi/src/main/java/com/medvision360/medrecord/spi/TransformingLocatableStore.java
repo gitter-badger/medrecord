@@ -2,6 +2,7 @@ package com.medvision360.medrecord.spi;
 
 import java.io.IOException;
 
+import com.medvision360.medrecord.api.exceptions.DisposalException;
 import com.medvision360.medrecord.spi.base.AbstractLocatableStore;
 import com.medvision360.medrecord.api.exceptions.DuplicateException;
 import com.medvision360.medrecord.api.exceptions.NotFoundException;
@@ -156,5 +157,17 @@ public class TransformingLocatableStore extends AbstractLocatableStore implement
     protected void transform(Locatable locatable) throws TransformException
     {
         m_transformer.transform(locatable);
+    }
+
+    @Override
+    public void initialize() throws IOException
+    {
+        m_delegate.initialize();
+    }
+
+    @Override
+    public void dispose() throws DisposalException
+    {
+        m_delegate.dispose();
     }
 }

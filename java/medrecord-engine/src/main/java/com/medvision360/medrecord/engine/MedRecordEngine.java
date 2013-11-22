@@ -237,7 +237,7 @@ public class MedRecordEngine implements Engine, AuditService
         initializeLocatableSupport();
         
         m_initialized = true;
-        log.trace("<-- initialize()");
+        log.debug("MedRecordEngine initialized");
     }
 
     private synchronized void initializeArchetypeSupport() throws InitializationException
@@ -372,9 +372,46 @@ public class MedRecordEngine implements Engine, AuditService
 
     public void dispose() throws DisposalException
     {
+        DisposalException ex = null;
+        
+        try
+        {
+            m_archetypeStore.dispose();
+        }
+        catch(DisposalException e)
+        {
+            ex = e;
+        }
+        try
+        {
+            m_ehrStore.dispose();
+        }
+        catch(DisposalException e)
+        {
+            ex = e;
+        }
+        try
+        {
+            m_locatableStore.dispose();
+        }
+        catch(DisposalException e)
+        {
+            ex = e;
+        }
+        
         for (Context context : m_baseXContexts)
         {
             context.close();
+        }
+        
+        if (ex != null)
+        {
+            log.debug("MedRecordEngine disposed with error", ex);
+            throw ex;
+        }
+        else
+        {
+            log.debug("MedRecordEngine disposed");
         }
     }
 

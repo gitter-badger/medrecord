@@ -7,6 +7,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.Iterables;
+import com.medvision360.medrecord.api.exceptions.DisposalException;
 import com.medvision360.medrecord.basex.cmd.Exists;
 import com.medvision360.medrecord.basex.cmd.ExistsDB;
 import com.medvision360.medrecord.basex.cmd.GetDoc;
@@ -19,6 +20,7 @@ import com.medvision360.medrecord.api.exceptions.StatusException;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.Add;
+import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropDB;
@@ -31,6 +33,8 @@ import org.openehr.rm.ehr.EHR;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.UIDBasedID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -67,6 +71,7 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
     //   * we register a shutdown hook to get rid of the schedule on shutdown
     //   * we always run optimize immediately when opening a database (i.e. on app startup)
 
+    private final static Logger log = LoggerFactory.getLogger(AbstractBaseXStore.class);
     public static final int OPTIMIZER_INITIAL_DELAY = 10;
     public static final int OPTIMIZER_DELAY = 5;
 
@@ -88,7 +93,7 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
         checkArgument(name.matches(NAME_REGEX), "name has to match regex %s", NAME_REGEX);
         setPath(name, path);
 
-        //startConcurrentOptimizer();
+        startConcurrentOptimizer();
     }
 
     public AbstractBaseXStore(Context ctx, String name, String path)
@@ -104,6 +109,7 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
             return;
         }
         m_initialized = true;
+        log.debug("BaseX store {} initializing", m_name);
 
         if (!dbExists())
         {
@@ -111,6 +117,49 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
             optimizeNow();
         }
         dbOpen();
+    }
+    
+    @Override
+    public void dispose() throws DisposalException
+    {
+        log.debug("BaseX store {} disposing", m_name);
+        
+        if (m_optimizeExecutor != null)
+        {
+            m_optimizeExecutor.shutdown();
+            boolean terminated = false;
+            try
+            {
+                terminated = m_optimizeExecutor.awaitTermination(5, TimeUnit.SECONDS);
+            }
+            catch (InterruptedException e)
+            {
+                // yessir
+            }
+            if (!terminated)
+            {
+                m_optimizeExecutor.shutdownNow();
+            }
+        }
+        m_optimizeExecutor = null;
+        
+        BaseXException ex = null;
+        try
+        {
+            dbClose();
+        }
+        catch (BaseXException e)
+        {
+            ex = e;
+        }
+
+        m_initialized = false;
+        if (ex != null)
+        {
+            log.debug("BaseX store {} disposed with error", m_name, ex);
+            throw new DisposalException(ex);
+        }
+        log.debug("BaseX store {} disposed", m_name);
     }
 
     public void clear() throws IOException
@@ -206,6 +255,11 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
         new Open(m_name).execute(m_ctx);
     }
 
+    protected void dbClose() throws BaseXException
+    {
+        new Close().execute(m_ctx);
+    }
+
     protected void dropDb() throws BaseXException
     {
         new DropDB(m_name).execute(m_ctx);
@@ -224,7 +278,7 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
 
     protected void startConcurrentOptimizer()
     {
-        m_optimizeExecutor = new ScheduledThreadPoolExecutor(1);
+        m_optimizeExecutor = new ScheduledThreadPoolExecutor(1, new OptimizeThreadFactory(m_name));
         m_optimizeExecutor.scheduleWithFixedDelay(new Runnable()
         {
             @Override
@@ -255,21 +309,13 @@ public abstract class AbstractBaseXStore extends AbstractLocatableStore
             @Override
             public void run()
             {
-                if (m_optimizeExecutor != null)
+                try
                 {
-                    m_optimizeExecutor.shutdown();
-                    try
-                    {
-                        boolean terminated = m_optimizeExecutor.awaitTermination(5, TimeUnit.SECONDS);
-                        if (!terminated)
-                        {
-                            m_optimizeExecutor.shutdownNow();
-                        }
-                    }
-                    catch (InterruptedException e)
-                    {
-                        // yessir
-                    }
+                    dispose();
+                }
+                catch (DisposalException e)
+                {
+                    // shutting down, ignore
                 }
             }
         });

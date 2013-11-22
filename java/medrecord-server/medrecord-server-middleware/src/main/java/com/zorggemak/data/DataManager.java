@@ -37,8 +37,8 @@ public class DataManager {
                 timeObj = (Long) observingMap.get(objId);
                 if ((timeObj.longValue() + ZorgGemakDefines.REFER_TIMEOUT) < System.currentTimeMillis()) {
                     // Object timeout
-                    if (log.isDebugEnabled()) {
-                        log.debug("purge object " + objId);
+                    if (log.isTraceEnabled()) {
+                        log.trace("purge object " + objId);
                     }
                     storingMap.remove(objId);
                     observingMap.remove(objId);
@@ -60,7 +60,10 @@ public class DataManager {
     public Object getObject(String objId) {
         if (keyExists(objId)) {
             updateTimestamp(objId);
-            log.debug("getObject object=" + storingMap.get(objId) + " (" + objId + ")");
+            if (log.isTraceEnabled())
+            {
+                log.trace("getObject object=" + storingMap.get(objId) + " (" + objId + ")");
+            }
             return (storingMap.get(objId));
         }
         return null;

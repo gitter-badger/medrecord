@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
+import com.medvision360.medrecord.api.exceptions.DisposalException;
 import com.medvision360.medrecord.basex.cmd.ListDocs;
 import com.medvision360.medrecord.spi.ArchetypeParser;
 import com.medvision360.medrecord.spi.ArchetypeSerializer;
@@ -40,6 +41,13 @@ public class BaseXArchetypeStore extends AbstractBaseXStore implements Archetype
         super(ctx, name, path);
         m_parser = checkNotNull(parser, "parser cannot be null");
         m_serializer = checkNotNull(serializer, "serializer cannot be null");
+    }
+
+    @Override
+    public void dispose() throws DisposalException
+    {
+        m_cache.invalidateAll();
+        super.dispose();
     }
 
     @Override

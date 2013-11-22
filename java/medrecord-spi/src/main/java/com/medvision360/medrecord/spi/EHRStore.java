@@ -2,6 +2,7 @@ package com.medvision360.medrecord.spi;
 
 import java.io.IOException;
 
+import com.medvision360.medrecord.api.exceptions.DisposalException;
 import com.medvision360.medrecord.api.exceptions.DuplicateException;
 import com.medvision360.medrecord.api.exceptions.NotFoundException;
 import com.medvision360.medrecord.api.exceptions.NotSupportedException;
@@ -28,6 +29,8 @@ public interface EHRStore extends TransactionalService, StatusService // todo ja
     public Iterable<HierObjectID> list() throws IOException;
 
     public void initialize() throws IOException;
+
+    public void dispose() throws DisposalException;
 
     public void clear() throws IOException;
 }

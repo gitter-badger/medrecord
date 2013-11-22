@@ -9,6 +9,7 @@ package com.medvision360.medrecord.spi;
 
 import java.io.IOException;
 
+import com.medvision360.medrecord.api.exceptions.DisposalException;
 import com.medvision360.medrecord.api.exceptions.DuplicateException;
 import com.medvision360.medrecord.api.exceptions.NotFoundException;
 import com.medvision360.medrecord.api.exceptions.NotSupportedException;
@@ -172,6 +173,8 @@ public interface LocatableStore extends LocatableSelector, TransactionalService,
      * @throws IOException if an error occurs interacting with storage.
      */
     public void initialize() throws IOException;
+
+    public void dispose() throws DisposalException;
 
     /**
      * Removes all data from the store. Structure and index configuration may remain This is an operation typically only

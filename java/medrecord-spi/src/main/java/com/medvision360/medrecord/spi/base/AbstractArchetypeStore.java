@@ -2,6 +2,7 @@ package com.medvision360.medrecord.spi.base;
 
 import java.io.IOException;
 
+import com.medvision360.medrecord.api.exceptions.DisposalException;
 import com.medvision360.medrecord.spi.ArchetypeStore;
 import com.medvision360.medrecord.api.exceptions.NotFoundException;
 import com.medvision360.medrecord.api.exceptions.TransactionException;
@@ -23,6 +24,11 @@ public abstract class AbstractArchetypeStore implements ArchetypeStore
 
     @Override
     public void initialize() throws IOException
+    {
+    }
+
+    @Override
+    public void dispose() throws DisposalException
     {
     }
 

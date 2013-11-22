@@ -2,6 +2,7 @@ package com.medvision360.medrecord.spi;
 
 import java.io.IOException;
 
+import com.medvision360.medrecord.api.exceptions.DisposalException;
 import com.medvision360.medrecord.api.exceptions.DuplicateException;
 import com.medvision360.medrecord.api.exceptions.InUseException;
 import com.medvision360.medrecord.api.exceptions.NotFoundException;
@@ -32,6 +33,8 @@ public interface ArchetypeStore extends TransactionalService, StatusService // t
     public Iterable<ArchetypeID> list() throws IOException;
 
     public void initialize() throws IOException;
+
+    public void dispose() throws DisposalException;
 
     public void clear() throws IOException;
 }

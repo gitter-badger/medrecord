@@ -59,6 +59,26 @@
 
   <!-- end medvision-server standard web-app stuff -->
   
+  <!--
+  it baffles me _why_ exactly, but enabling this causes 404 on
+        /medrecord/v2/apidocs/lib/jquery-1.8.0.min.js
+  probably its use causes something, somewhere, somehow, to not be able to
+  read some other things from the war at a later point
+  <listener>
+    <description>LoggingConfiguration</description>
+    <listener-class>com.medvision360.medrecord.server.LoggingConfigurationListener</listener-class>
+  </listener>
+  -->
+  
+  <listener>
+    <!--
+      we can't quite use the serverlib/restlet config loading mechanism
+      since we want to configure the middleware, too
+    -->
+    <description>BaseXConfiguration</description>
+    <listener-class>com.medvision360.medrecord.server.BaseXConfigurationListener</listener-class>
+  </listener>
+
   <!-- middleware web-app stuff -->
   <filter>
     <description>Filter for cross domain requests</description>
@@ -96,11 +116,6 @@
   <listener>
     <description>ServletContextListener</description>
     <listener-class>com.zorggemak.servlet.ServletListener</listener-class>
-  </listener>
-
-  <listener>
-    <description>LoggingConfigurer</description>
-    <listener-class>com.medvision360.medrecord.server.LoggingConfigurationListener</listener-class>
   </listener>
 
   <servlet>

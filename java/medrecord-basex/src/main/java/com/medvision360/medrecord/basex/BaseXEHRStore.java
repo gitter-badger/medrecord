@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.medvision360.medrecord.api.exceptions.DisposalException;
 import com.medvision360.medrecord.spi.DeletableEHR;
 import com.medvision360.medrecord.spi.EHRParser;
 import com.medvision360.medrecord.spi.EHRSerializer;
@@ -40,6 +41,13 @@ public class BaseXEHRStore extends AbstractBaseXStore implements EHRStore
         m_parser = checkNotNull(parser, "parser cannot be null");
         m_serializer = checkNotNull(serializer, "serializer cannot be null");
         m_systemID = checkNotNull(systemID, "systemID cannot be null");
+    }
+
+    @Override
+    public void dispose() throws DisposalException
+    {
+        m_cache.invalidateAll();
+        super.dispose();
     }
 
     @Override

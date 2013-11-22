@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
+import com.medvision360.medrecord.api.exceptions.DisposalException;
 import com.medvision360.medrecord.api.exceptions.DuplicateException;
 import com.medvision360.medrecord.api.exceptions.NotFoundException;
 import com.medvision360.medrecord.api.exceptions.NotSupportedException;
@@ -279,6 +280,28 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
         for (LocatableStore delegate : m_delegates)
         {
             delegate.initialize();
+        }
+    }
+
+    @Override
+    public void dispose() throws DisposalException
+    {
+        DisposalException ex = null;
+        
+        for (LocatableStore delegate : m_delegates)
+        {
+            try
+            {
+                delegate.dispose();
+            }
+            catch (DisposalException e)
+            {
+                ex = e;
+            }
+        }
+        if (ex != null)
+        {
+            throw ex;
         }
     }
 
