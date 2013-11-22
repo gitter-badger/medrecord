@@ -77,8 +77,13 @@ subprojects {
 
     // make sure all projects get the right basex
     repositories {
+        mavenLocal()
+        mavenCentral()
         maven {
             url 'http://files.basex.org/maven'
+        }
+        maven {
+          url 'http://maven.restlet.org'
         }
     }
 
