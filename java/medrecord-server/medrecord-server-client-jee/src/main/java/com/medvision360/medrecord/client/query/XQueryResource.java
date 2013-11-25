@@ -3,11 +3,11 @@
 
 package com.medvision360.medrecord.client.query;
 
+import org.restlet.Client;
 import org.restlet.data.Language;
 import org.restlet.data.Preference;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
-
 
 import com.medvision360.lib.client.ClientResourceBase;
 import com.medvision360.lib.client.ClientResourceConfig;
@@ -33,7 +33,24 @@ public class XQueryResource extends ClientResourceBase
         final ClientResourceConfig config_
     )
     {
-        super(config_, "/query/xquery");
+        super(null, config_, "/query/xquery");
+    }
+
+    /**
+     * Constructor.
+     *
+     * <p>This constructor can be used to create a new client for this resource.</p>
+     *
+     * @param client_ The client to use for making the connection.
+     * @param config_ Configuration object containing the location of the server
+     *   this resource sends requests to.
+     */
+    public XQueryResource(
+        final Client client_,
+        final ClientResourceConfig config_
+    )
+    {
+        super(client_, config_, "/query/xquery");
     }
 
     /**

@@ -1,0 +1,46 @@
+// usage:
+//   gradle run -Dmedrecord.url=http://medrecord.dev.medvision360.org/medrecord
+//
+
+// some standard settings for Java applications (language level etc)
+apply plugin: 'medvision-java'
+
+// add the 'run' task for running the artifact
+apply plugin: 'application'
+mainClassName = "com.medvision360.medrecord.tools.cliclient.ArchetypeUploader";
+
+description = 'MEDvision360 MEDrecord ADL uploader'
+
+// pass command line options to tool
+run {
+    if (project.hasProperty('args')) {
+        args project.args.split('\\s+')
+    }
+}
+
+dependencies {
+    compile(project(":medrecord-engine")) {
+      exclude group:'commons-logging', module:'commons-logging'
+    }
+    compile project(":medrecord-server-api-jee")
+    compile project(":medrecord-server-client-jee")
+
+    
+    compile "com.medvision360.archetypes:openehr-archetypes:${ext.version.archetypes}"
+    compile "com.medvision360.archetypes:openehr-archetypes-chiron:${ext.version.archetypes}"
+    compile "com.medvision360.archetypes:openehr-archetypes-medfit:${ext.version.archetypes}"
+    compile "com.medvision360.archetypes:openehr-archetypes-mobiguide:${ext.version.archetypes}"
+
+    compile "org.restlet.jee:org.restlet.ext.httpclient:${ext.version.restlet}"
+    compile "org.restlet.jee:org.restlet.ext.slf4j:${ext.version.restlet}"
+
+    compile "org.slf4j:slf4j-api:${ext.version.slf4j}"
+    compile "ch.qos.logback:logback-classic:${ext.version.logback}"
+    compile "org.slf4j:jcl-over-slf4j:${ext.version.slf4j}"
+    compile "org.slf4j:log4j-over-slf4j:${ext.version.slf4j}"
+    compile "org.slf4j:jul-to-slf4j:${ext.version.slf4j}"
+
+    compile "commons-cli:commons-cli:${ext.version.commonsCli}"
+    compile "commons-io:commons-io:${ext.version.commonsIo}"
+    compile "org.apache.commons:commons-lang3:${ext.version.commonsLang3}"
+}

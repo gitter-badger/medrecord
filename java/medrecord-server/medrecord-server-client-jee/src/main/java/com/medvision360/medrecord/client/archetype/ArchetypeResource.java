@@ -3,11 +3,11 @@
 
 package com.medvision360.medrecord.client.archetype;
 
+import org.restlet.Client;
 import org.restlet.data.Language;
 import org.restlet.data.Preference;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
-
 
 import com.medvision360.lib.client.ClientResourceBase;
 import com.medvision360.lib.client.ClientResourceConfig;
@@ -37,7 +37,26 @@ public class ArchetypeResource extends ClientResourceBase
         final String id
     )
     {
-        super(config_, "/archetype/" + id);
+        super(null, config_, "/archetype/" + id);
+    }
+
+    /**
+     * Constructor.
+     *
+     * <p>This constructor can be used to create a new client for this resource.</p>
+     *
+     * @param client_ The client to use for making the connection.
+     * @param config_ Configuration object containing the location of the server
+     *   this resource sends requests to.
+     * @param id An OpenEHR ArchetypeID value
+     */
+    public ArchetypeResource(
+        final Client client_,
+        final ClientResourceConfig config_,
+        final String id
+    )
+    {
+        super(client_, config_, "/archetype/" + id);
     }
 
     /**

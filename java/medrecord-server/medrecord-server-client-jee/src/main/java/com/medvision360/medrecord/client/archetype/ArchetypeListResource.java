@@ -3,11 +3,11 @@
 
 package com.medvision360.medrecord.client.archetype;
 
+import org.restlet.Client;
 import org.restlet.data.Language;
 import org.restlet.data.Preference;
 import org.restlet.resource.ClientResource;
 import org.restlet.resource.ResourceException;
-
 
 import com.medvision360.lib.client.ClientResourceBase;
 import com.medvision360.lib.client.ClientResourceConfig;
@@ -33,7 +33,24 @@ public class ArchetypeListResource extends ClientResourceBase
         final ClientResourceConfig config_
     )
     {
-        super(config_, "/archetype");
+        super(null, config_, "/archetype");
+    }
+
+    /**
+     * Constructor.
+     *
+     * <p>This constructor can be used to create a new client for this resource.</p>
+     *
+     * @param client_ The client to use for making the connection.
+     * @param config_ Configuration object containing the location of the server
+     *   this resource sends requests to.
+     */
+    public ArchetypeListResource(
+        final Client client_,
+        final ClientResourceConfig config_
+    )
+    {
+        super(client_, config_, "/archetype");
     }
 
     /**
