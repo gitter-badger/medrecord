@@ -28,6 +28,8 @@ public interface EHRStore extends TransactionalService, StatusService // todo ja
 
     public Iterable<HierObjectID> list() throws IOException;
 
+    public Iterable<HierObjectID> list(boolean excludeDeleted) throws IOException;
+
     public void initialize() throws IOException;
 
     public void dispose() throws DisposalException;

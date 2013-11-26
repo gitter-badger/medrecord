@@ -4,6 +4,7 @@ import com.medvision360.lib.client.ClientResourceConfig;
 import com.medvision360.lib.common.converter.ExtendedJacksonConverter;
 import com.medvision360.medrecord.api.archetype.ArchetypeRequest;
 import com.medvision360.medrecord.client.archetype.ArchetypeListResource;
+import com.medvision360.medrecord.client.ehr.EHRListResource;
 import com.medvision360.medrecord.client.test.TestClearResource;
 import com.medvision360.medrecord.client.test.TestClearResourceClearParams;
 import com.medvision360.medrecord.engine.ArchetypeLoader;
@@ -21,6 +22,7 @@ public abstract class AbstractServerTest
 {
     protected static ClientResourceConfig m_resourceConfig;
     protected ArchetypeListResource m_archetypeListResource;
+    protected EHRListResource m_ehrListResource;
     
     protected ArchetypeStore m_archetypeStore;
     protected ArchetypeLoader m_archetypeLoader;
@@ -53,6 +55,7 @@ public abstract class AbstractServerTest
                 m_adlMissingLanguageCompatible, m_adlEmptyPurposeCompatible);
 
         m_archetypeListResource = new ArchetypeListResource(m_resourceConfig);
+        m_ehrListResource = new EHRListResource(m_resourceConfig);
     }
     
     protected static void clear() throws Exception

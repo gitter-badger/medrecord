@@ -5,8 +5,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Predicate;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Iterables;
+import com.medvision360.medrecord.api.exceptions.DeletedException;
 import com.medvision360.medrecord.api.exceptions.DisposalException;
 import com.medvision360.medrecord.spi.DeletableEHR;
 import com.medvision360.medrecord.spi.EHRParser;
@@ -67,24 +70,30 @@ public class BaseXEHRStore extends AbstractBaseXStore implements EHRStore
     public EHR get(HierObjectID id) throws NotFoundException, IOException, ParseException
     {
         checkNotNull(id, "id cannot be null");
-        
-        EHR result = m_cache.getIfPresent(id);
-        if (result == null)
-        {
-            String path = fullPath(id);
-            result = get(path, id);
-        }
+
+        EHR result = cachedGet(id);
         
         if (result instanceof DeletableEHR)
         {
             DeletableEHR deletableEHR = (DeletableEHR) result;
             if (deletableEHR.isDeleted())
             {
-                throw new NotFoundException(String.format(
-                        "The EHR %s has been deleted", id));
+                throw new DeletedException(String.format(
+                        "The EHR %s has been deleted", id), result);
             }
         }
         
+        return result;
+    }
+
+    private EHR cachedGet(HierObjectID id) throws IOException, NotFoundException, ParseException
+    {
+        EHR result = m_cache.getIfPresent(id);
+        if (result == null)
+        {
+            String path = fullPath(id);
+            result = get(path, id);
+        }
         return result;
     }
 
@@ -177,6 +186,47 @@ public class BaseXEHRStore extends AbstractBaseXStore implements EHRStore
     {
         String path = fullPath("ehr");
         return list(path);
+    }
+
+    @Override
+    public Iterable<HierObjectID> list(boolean excludeDeleted) throws IOException
+    {
+        Iterable<HierObjectID> list = list();
+
+        if (excludeDeleted)
+        {
+            return Iterables.filter(list, new Predicate<HierObjectID>()
+            {
+                @Override
+                public boolean apply(HierObjectID id)
+                {
+                    try
+                    {
+                        EHR ehr = cachedGet(id);
+                        if (ehr == null)
+                        {
+                            return false;
+                        }
+                        if (ehr instanceof DeletableEHR)
+                        {
+                            if (((DeletableEHR) ehr).isDeleted())
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                    catch (NotFoundException|IOException|ParseException e)
+                    {
+                        return false;
+                    }
+                }
+            });
+        }
+        else
+        {
+            return list;
+        }
     }
 
     ///

@@ -19,4 +19,35 @@ import com.medvision360.lib.client.MethodParameterBase;
  */
 public class EHRLocatableListResourceListLocatablesParams extends MethodParameterBase
 {
+    /**
+     * Gets the value of the <code>ignoreDeleted</code> query parameter.
+     *
+     * <p>The default value for the query parameter is <code>null</code>
+     * meaning the parameter will not be included in the request.</p>
+     *
+     * <p><b>Description:</b> <i>Set to true to return the info even if the EHR has been marked as deleted</i></p>
+     *
+     * @return The value of the <code>ignoreDeleted</code> query parameter
+     *   or <code>null</code> when the query parameter is not set.
+     */
+    public String getIgnoreDeleted()
+    {
+        return getQueryArgument("ignoreDeleted");
+    }
+
+    /**
+     * Sets the <code>ignoreDeleted</code> query parameter.
+     *
+     * <p><b>Description:</b> <i>Set to true to return the info even if the EHR has been marked as deleted</i></p>
+     *
+     *
+     * @param value The new value for the <code>ignoreDeleted</code> query
+     *   parameter. Use <code>null</code> (which also is the default value)
+     *   to make sure the parameter is not added to the request.
+     */
+    public void setIgnoreDeleted(final String value)
+    {
+        setQueryArgument("ignoreDeleted", value);
+    }
+
 }

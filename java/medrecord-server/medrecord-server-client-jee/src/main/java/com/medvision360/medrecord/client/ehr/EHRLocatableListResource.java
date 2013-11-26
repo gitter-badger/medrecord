@@ -173,7 +173,10 @@ However, this API call is provided nonetheless, for API consistency, completenes
        method to pass additional query arguments.</p>
 
 
-       
+       @apiqueryparam ignoreDeleted Set to true to return the info even if the EHR has been marked as deleted.
+[type=string,single,default=false]
+
+
 
      */
     public com.medvision360.medrecord.api.IDList listLocatables(
@@ -201,7 +204,10 @@ However, this API call is provided nonetheless, for API consistency, completenes
 
        @param queryParams_ The query parameters to be added to the request.
 
-       
+       @apiqueryparam ignoreDeleted Set to true to return the info even if the EHR has been marked as deleted.
+[type=string,single,default=false]
+
+
      */
     public com.medvision360.medrecord.api.IDList listLocatables(
         final EHRLocatableListResourceListLocatablesParams queryParams_

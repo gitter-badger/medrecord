@@ -137,6 +137,19 @@ public class MemEHRStore extends AbstractEHRStore
     }
 
     @Override
+    public Iterable<HierObjectID> list(boolean excludeDeleted) throws IOException
+    {
+        if (excludeDeleted)
+        {
+            return list();
+        }
+        HashSet<HierObjectID> list = new HashSet<>();
+        list.addAll(m_storage.keySet());
+        list.addAll(m_deletedStorage.keySet());
+        return list;
+    }
+
+    @Override
     public void clear() throws IOException
     {
         m_storage.clear();

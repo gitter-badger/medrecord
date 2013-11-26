@@ -43,6 +43,9 @@ public interface EHRLocatableListResource
      * for locatables of a particular type. Use the <code>/query</code> API for that.
      * 
      * However, this API call is provided nonetheless, for API consistency, completeness and ease of testing.
+     * 
+     * @apiqueryparam ignoreDeleted Set to true to return the info even if the EHR has been marked as deleted.
+     *   [type=string,single,default=false]
      */
     @Get
     public IDList listLocatables()

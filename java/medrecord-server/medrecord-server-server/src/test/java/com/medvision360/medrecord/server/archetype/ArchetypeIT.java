@@ -21,7 +21,7 @@ public class ArchetypeIT extends AbstractServerTest
 {
     private ArchetypeResource resource(String id) throws Exception
     {
-        return  new ArchetypeResource(m_resourceConfig, id);
+        return new ArchetypeResource(m_resourceConfig, id);
     }
 
     @Test

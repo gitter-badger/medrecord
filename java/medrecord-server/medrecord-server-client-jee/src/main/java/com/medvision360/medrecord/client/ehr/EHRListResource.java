@@ -163,8 +163,9 @@ However, this API call is provided nonetheless, for API consistency, completenes
        method to pass additional query arguments.</p>
 
 
-       @apiqueryparam includeDeleted Set to true to include EHRs that have been marked as deleted in the
-returned list.
+       @apiqueryparam excludeDeleted Set to true to exclude EHRs that have been marked as deleted in the
+returned list, to any other value to include them, or omit the parameter to have the implementation choose
+(typically using its most efficient option).
 [type=string,single,default=false]
 
 
@@ -196,8 +197,9 @@ However, this API call is provided nonetheless, for API consistency, completenes
 
        @param queryParams_ The query parameters to be added to the request.
 
-       @apiqueryparam includeDeleted Set to true to include EHRs that have been marked as deleted in the
-returned list.
+       @apiqueryparam excludeDeleted Set to true to exclude EHRs that have been marked as deleted in the
+returned list, to any other value to include them, or omit the parameter to have the implementation choose
+(typically using its most efficient option).
 [type=string,single,default=false]
 
 

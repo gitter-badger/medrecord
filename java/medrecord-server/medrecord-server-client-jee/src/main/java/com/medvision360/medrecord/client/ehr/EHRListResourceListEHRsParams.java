@@ -20,34 +20,34 @@ import com.medvision360.lib.client.MethodParameterBase;
 public class EHRListResourceListEHRsParams extends MethodParameterBase
 {
     /**
-     * Gets the value of the <code>includeDeleted</code> query parameter.
+     * Gets the value of the <code>excludeDeleted</code> query parameter.
      *
      * <p>The default value for the query parameter is <code>null</code>
      * meaning the parameter will not be included in the request.</p>
      *
-     * <p><b>Description:</b> <i>Set to true to include EHRs that have been marked as deleted in thereturned list.</i></p>
+     * <p><b>Description:</b> <i>Set to true to exclude EHRs that have been marked as deleted in thereturned list, to any other value to include them, or omit the parameter to have the implementation choose (typically using its most efficient option).</i></p>
      *
-     * @return The value of the <code>includeDeleted</code> query parameter
+     * @return The value of the <code>excludeDeleted</code> query parameter
      *   or <code>null</code> when the query parameter is not set.
      */
-    public String getIncludeDeleted()
+    public String getExcludeDeleted()
     {
-        return getQueryArgument("includeDeleted");
+        return getQueryArgument("excludeDeleted");
     }
 
     /**
-     * Sets the <code>includeDeleted</code> query parameter.
+     * Sets the <code>excludeDeleted</code> query parameter.
      *
-     * <p><b>Description:</b> <i>Set to true to include EHRs that have been marked as deleted in thereturned list.</i></p>
+     * <p><b>Description:</b> <i>Set to true to exclude EHRs that have been marked as deleted in thereturned list, to any other value to include them, or omit the parameter to have the implementation choose (typically using its most efficient option).</i></p>
      *
      *
-     * @param value The new value for the <code>includeDeleted</code> query
+     * @param value The new value for the <code>excludeDeleted</code> query
      *   parameter. Use <code>null</code> (which also is the default value)
      *   to make sure the parameter is not added to the request.
      */
-    public void setIncludeDeleted(final String value)
+    public void setExcludeDeleted(final String value)
     {
-        setQueryArgument("includeDeleted", value);
+        setQueryArgument("excludeDeleted", value);
     }
 
 }

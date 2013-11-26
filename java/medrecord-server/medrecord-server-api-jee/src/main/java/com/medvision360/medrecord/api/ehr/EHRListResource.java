@@ -43,8 +43,9 @@ public interface EHRListResource
      * 
      * However, this API call is provided nonetheless, for API consistency, completeness and ease of testing.
      * 
-     * @apiqueryparam includeDeleted Set to true to include EHRs that have been marked as deleted in the 
-     *   returned list.
+     * @apiqueryparam excludeDeleted Set to true to exclude EHRs that have been marked as deleted in the 
+     *   returned list, to any other value to include them, or omit the parameter to have the implementation choose
+     *   (typically using its most efficient option).
      *   [type=string,single,default=false]
      */
     @Get
