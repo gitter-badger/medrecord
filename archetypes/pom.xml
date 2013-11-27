@@ -31,8 +31,5 @@
   </build>
   <modules>
     <module>openehr-archetypes</module>
-    <module>openehr-archetypes-chiron</module>
-    <module>openehr-archetypes-medfit</module>
-    <module>openehr-archetypes-mobiguide</module>
   </modules>
 </project>
