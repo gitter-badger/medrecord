@@ -99,7 +99,7 @@ To use our repository with maven, add it to your `pom.xml`:
           </snapshots>
           <id>mvReleases</id>
           <name>MEDvision Releases</name>
-          <url>http://repo.medvision360.org/releases/</url>
+          <url>http://repo.medvision360.org/release/</url>
           <layout>default</layout>
         </repository>
       </repositories>
