@@ -1,3 +1,6 @@
 [submodule "java/medrecord-vendor/ref_impl_java"]
 	path = java/medrecord-vendor/ref_impl_java
 	url = git@github.com:ZorgGemak/java-libs.git
+[submodule "archetypes/archetypes/openehr"]
+	path = archetypes/archetypes/openehr
+	url = git@github.com:MEDvision/archetypes-openehr.git
