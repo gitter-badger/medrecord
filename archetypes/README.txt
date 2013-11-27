@@ -1,4 +1,4 @@
-This is a large collection of archetypes jars built from ../ZorgGemak-Common.
+This is a large collection of archetypes jars built from MEDvision/archetypes.
 
 It's primary use here is to provide a large, stable set of files to load into
 unit tests and the like.
