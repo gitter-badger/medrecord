@@ -6,6 +6,13 @@ buildscript {
         // required for license-gradle-plugin
         mavenCentral()
         
+        maven {
+            url "http://repo.medvision360.org/release/"
+        }
+        
+        maven {
+            url "http://repo.medvision360.org/snapshot/"
+        }
         /*
         If you don't have buildlib in your maven local repo, you can change your ~/.gradle/init.gradle to know to 
         download it from our repository, with something like
