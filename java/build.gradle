@@ -1,11 +1,5 @@
 buildscript {
     repositories {
-        // required for buildlib
-        mavenLocal()
-
-        // required for license-gradle-plugin
-        mavenCentral()
-        
         maven {
             url "http://repo.medvision360.org/release/"
         }
@@ -13,34 +7,10 @@ buildscript {
         maven {
             url "http://repo.medvision360.org/snapshot/"
         }
-        /*
-        If you don't have buildlib in your maven local repo, you can change your ~/.gradle/init.gradle to know to 
-        download it from our repository, with something like
-            allprojects {
-              ext {
-                cloudbeesUser="zorggemak"
-                cloudbeesPassword="XXXXXXXXXXX"
-              }
-              buildscript {
-                repositories {
-                  maven {
-                    url "https://repository-zorggemak.forge.cloudbees.com/release/"
-                    credentials {
-                      username project.ext.cloudbeesUser
-                      password project.ext.cloudbeesPassword
-                    }
-                  }
-                  maven {
-                    url "https://repository-zorggemak.forge.cloudbees.com/snapshot/"
-                    credentials {
-                      username project.ext.cloudbeesUser
-                      password project.ext.cloudbeesPassword
-                    }
-                  }
-                }
-              }
-            }
-        */
+
+        mavenLocal()
+
+        mavenCentral()
     }
     dependencies {
         // this is the medvision buildlib
@@ -97,11 +67,21 @@ subprojects {
 
     // make sure all projects get the right basex & restlet
     repositories {
+        maven {
+            url "http://repo.medvision360.org/release/"
+        }
+        maven {
+            url "http://repo.medvision360.org/snapshot/"
+        }
+
         mavenLocal()
+
         mavenCentral()
+
         maven {
             url 'http://files.basex.org/maven'
         }
+
         maven {
           url 'http://maven.restlet.org'
         }
