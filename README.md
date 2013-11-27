@@ -50,7 +50,11 @@ you're talking to the MEDrecord API from java or android, we highly recommend us
 creating your own.
 
 You can see an example of this java client in use in the [cliclient](java/medrecord-tools/medrecord-tools-cliclient) 
-module.
+module. For example, its
+[RemoteArchetypeStore](java/medrecord-tools/medrecord-tools-cliclient/src/main/java/com/medvision360/medrecord/tools/cliclient/RemoteArchetypeStore.java#L47)
+shows how easy it is to work with the
+[/v2/archetype](http://medrecord.test.medvision360.org/medrecord/v2/apidocs/#!/com_medvision360_medrecord_api_archetype)
+API using the java client.
 
 Full javadocs are available at
 * http://repo.medvision360.org/javadoc/medrecord-server-client-jee/
