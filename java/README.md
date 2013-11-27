@@ -1,6 +1,7 @@
 MEDrecord Java Code
 ===================
-This is the implementation of MEDrecord and its tools. See http://medrecord.medvision360.org/ for more information.
+This is the implementation of MEDrecord and its tools. See http://medrecord.medvision360.org/ for general information,
+and https://zorggemak.atlassian.net/wiki/display/DOC/MEDrecord for overview documentation.
 
 Online demo
 -----------
