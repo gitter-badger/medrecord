@@ -85,4 +85,20 @@ public class BaseValidationReport implements ValidationReport
         str.append("}");
         return str.toString();
     }
+    
+    public void addAll(ValidationReport report)
+    {
+        if (report == null)
+        {
+            return;
+        }
+        Iterable<ValidationResult> results = report.getReport();
+        for (ValidationResult result : results)
+        {
+            if (!m_list.contains(result))
+            {
+                m_list.add(result);
+            }
+        }
+    }
 }

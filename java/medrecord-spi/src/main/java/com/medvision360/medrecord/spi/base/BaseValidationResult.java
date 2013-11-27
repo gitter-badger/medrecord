@@ -132,4 +132,83 @@ public class BaseValidationResult implements ValidationResult
         str.append("}");
         return str.toString();
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof BaseValidationResult))
+        {
+            return false;
+        }
+
+        BaseValidationResult that = (BaseValidationResult) o;
+
+        if (m_lineNumber != that.m_lineNumber)
+        {
+            return false;
+        }
+        if (m_rowNumber != that.m_rowNumber)
+        {
+            return false;
+        }
+        if (m_valid != that.m_valid)
+        {
+            return false;
+        }
+        // we don't want to match up stack traces and such
+        if (!shallowExceptionEquals(that))
+        {
+            return false;
+        }
+        if (m_fragment != null ? !m_fragment.equals(that.m_fragment) : that.m_fragment != null)
+        {
+            return false;
+        }
+        if (m_message != null ? !m_message.equals(that.m_message) : that.m_message != null)
+        {
+            return false;
+        }
+        if (m_path != null ? !m_path.equals(that.m_path) : that.m_path != null)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean shallowExceptionEquals(BaseValidationResult that)
+    {
+        if (m_details == null)
+        {
+            return that.m_details == null;
+        }
+        if (that == null)
+        {
+            return false;
+        }
+        if (!m_details.getClass().isAssignableFrom(that.m_details.getClass()))
+        {
+            return false;
+        }
+        String message = m_details.getMessage();
+        String thatMessage = that.m_details.getMessage();
+        return message == null ? thatMessage == null : message.equals(thatMessage);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = (m_valid ? 1 : 0);
+        result = 31 * result + (int) (m_lineNumber ^ (m_lineNumber >>> 32));
+        result = 31 * result + (int) (m_rowNumber ^ (m_rowNumber >>> 32));
+        result = 31 * result + (m_message != null ? m_message.hashCode() : 0);
+        result = 31 * result + (m_fragment != null ? m_fragment.hashCode() : 0);
+        result = 31 * result + (m_path != null ? m_path.hashCode() : 0);
+        //result = 31 * result + (m_details != null ? m_details.hashCode() : 0);
+        return result;
+    }
 }

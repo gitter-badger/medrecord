@@ -17,6 +17,7 @@ import java.util.List;
 import com.medvision360.medrecord.api.ValidationReport;
 import com.medvision360.medrecord.api.exceptions.NotSupportedException;
 import com.medvision360.medrecord.api.exceptions.ValidationException;
+import com.medvision360.medrecord.spi.base.BaseValidationReport;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 
@@ -51,9 +52,12 @@ public class CompositeValidator implements LocatableValidator, CompositeService<
         return result;
     }
 
-    private ValidationReport mergeReports(ValidationReport result, ValidationReport validate)
+    private ValidationReport mergeReports(ValidationReport one, ValidationReport two)
     {
-        throw new UnsupportedOperationException("todo: implement CompositeValidator.mergeReports()"); // todo
+        BaseValidationReport result = new BaseValidationReport();
+        result.addAll(one);
+        result.addAll(two);
+        return result;
     }
 
     @Override
