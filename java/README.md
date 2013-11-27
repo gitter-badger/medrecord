@@ -103,7 +103,7 @@ Run the server
 Now point your browser to http://localhost:8100/medrecord . Of particular interest should be the interactive API docs
 for the `/v2` API at http://localhost:8100/medrecord/v2/apidocs/ which should look something like
  
-![Screenshot of Swagger GUI](docs/apidocs.jpg)
+![Screenshot of Swagger GUI](../docs/apidocs.jpg)
 
 The `/v1` API (called the `middleware` in some places) is for backward compatibility with an earlier MEDvision360 
 product and is not likely to be of much interest to most users.
@@ -116,9 +116,9 @@ At MEDvision, we are using IntelliJ to develop medrecord. Gradle can be used to 
 - run: `gradle idea`
 - open the generated `java.ipr` with IntelliJ
 - navigate to `medrecord-vendor/pom.xml` in the project explorer and add it as a maven project:
-  ![Screenshot of IntelliJ add-as-maven-project](docs/add_as_maven_project.jpg)
+  ![Screenshot of IntelliJ add-as-maven-project](../docs/add_as_maven_project.jpg)
 - if you don't have IntelliJ configured to do this automatically, download sources and docs for the maven dependencies:
-  ![Screenshot of IntelliJ download-sources](docs/sources_and_docs.jpg)
+  ![Screenshot of IntelliJ download-sources](../docs/sources_and_docs.jpg)
 
 
 Using the BaseX GUI
@@ -127,7 +127,7 @@ If you have run the integration tests, your local BaseX database repository will
 example data. It's interesting to download the
 [BaseX GUI](http://basex.org/products/gui/) to look at and experiment with the underlying XML storage:
 
-![Screenshot of BaseX GUI](docs/basex_gui.jpg)
+![Screenshot of BaseX GUI](../docs/basex_gui.jpg)
 
 
 Installing the server
