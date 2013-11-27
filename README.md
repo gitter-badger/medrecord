@@ -6,7 +6,7 @@ Online demo
 -----------
 Visit
 
-    http://medrecord.test.medvision360.org/medrecord/
+* http://medrecord.test.medvision360.org/medrecord/
 
 for a live demo version of medrecord. Feel free to experiment with this installation: that's what it's for!
 
@@ -16,7 +16,7 @@ License
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (the 
 "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
-    http://creativecommons.org/licenses/by-nc-sa/4.0/
+* http://creativecommons.org/licenses/by-nc-sa/4.0/
 
 
 Getting started
