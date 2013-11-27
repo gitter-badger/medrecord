@@ -7,7 +7,6 @@
 include(
         'medrecord-api',
         'medrecord-basex',
-        'medrecord-client-archetypes',
         'medrecord-engine',
         'medrecord-itest',
         'medrecord-memstore',
@@ -25,7 +24,6 @@ include(
         'medrecord-server-middleware',
 )
 
-project(':medrecord-client-archetypes').projectDir = new File(rootDir, 'medrecord-client/medrecord-client-archetypes')
 project(':medrecord-tools-cliclient').projectDir = new File(rootDir, 'medrecord-tools/medrecord-tools-cliclient')
 project(':medrecord-tools-dumpadl').projectDir = new File(rootDir, 'medrecord-tools/medrecord-tools-dumpadl')
 
