@@ -46,7 +46,7 @@ public class ArchetypeUploader
         SLF4JBridgeHandler.install();
         log.debug("Upload starting");
         
-        String baseUrl = System.getProperty("medrecord.url", "http://medrecord.dev.medvision360.org/medrecord");
+        String baseUrl = System.getProperty("medrecord.url", "http://medrecord.test.medvision360.org/medrecord");
         if (baseUrl.endsWith("/"))
         {
             baseUrl = baseUrl.substring(0, baseUrl.length()-1);
@@ -66,8 +66,8 @@ public class ArchetypeUploader
     private void loadArchetypes() throws IOException, ParseException
     {
         m_archetypeLoader.loadAll("openehr");
-        m_archetypeLoader.loadAll("medfit");
-        m_archetypeLoader.loadAll("chiron");
-        m_archetypeLoader.loadAll("mobiguide");
+        //m_archetypeLoader.loadAll("medfit");
+        //m_archetypeLoader.loadAll("chiron");
+        //m_archetypeLoader.loadAll("mobiguide");
     }
 }

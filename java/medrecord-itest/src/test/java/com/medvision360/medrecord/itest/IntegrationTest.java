@@ -244,9 +244,9 @@ public class IntegrationTest extends RMTestBase
     {
         m_archetypeStore.clear();
         m_archetypeLoader.loadAll("openehr");
-        m_archetypeLoader.loadAll("medfit");
-        m_archetypeLoader.loadAll("chiron");
-        m_archetypeLoader.loadAll("mobiguide");
+        //m_archetypeLoader.loadAll("medfit");
+        //m_archetypeLoader.loadAll("chiron");
+        //m_archetypeLoader.loadAll("mobiguide");
     }
 
     private void generateAll() throws Exception

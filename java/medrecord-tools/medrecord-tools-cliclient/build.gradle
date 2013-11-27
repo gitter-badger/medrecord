@@ -27,9 +27,9 @@ dependencies {
 
     
     compile "com.medvision360.archetypes:openehr-archetypes:${ext.version.archetypes}"
-    compile "com.medvision360.archetypes:openehr-archetypes-chiron:${ext.version.archetypes}"
-    compile "com.medvision360.archetypes:openehr-archetypes-medfit:${ext.version.archetypes}"
-    compile "com.medvision360.archetypes:openehr-archetypes-mobiguide:${ext.version.archetypes}"
+    //compile "com.medvision360.archetypes:openehr-archetypes-chiron:${ext.version.archetypes}"
+    //compile "com.medvision360.archetypes:openehr-archetypes-medfit:${ext.version.archetypes}"
+    //compile "com.medvision360.archetypes:openehr-archetypes-mobiguide:${ext.version.archetypes}"
 
     compile "org.restlet.jee:org.restlet.ext.httpclient:${ext.version.restlet}"
     compile "org.restlet.jee:org.restlet.ext.slf4j:${ext.version.restlet}"

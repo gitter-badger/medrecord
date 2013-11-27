@@ -17,9 +17,9 @@ dependencies {
     compile "junit:junit:${ext.version.junit}"
 
     compile "com.medvision360.archetypes:openehr-archetypes:${ext.version.archetypes}"
-    compile "com.medvision360.archetypes:openehr-archetypes-chiron:${ext.version.archetypes}"
-    compile "com.medvision360.archetypes:openehr-archetypes-medfit:${ext.version.archetypes}"
-    compile "com.medvision360.archetypes:openehr-archetypes-mobiguide:${ext.version.archetypes}"
+    //compile "com.medvision360.archetypes:openehr-archetypes-chiron:${ext.version.archetypes}"
+    //compile "com.medvision360.archetypes:openehr-archetypes-medfit:${ext.version.archetypes}"
+    //compile "com.medvision360.archetypes:openehr-archetypes-mobiguide:${ext.version.archetypes}"
 
     testCompile "ch.qos.logback:logback-classic:${ext.version.logback}"
 }
