@@ -102,6 +102,9 @@ for the /v2 API at http://localhost:8100/medrecord/v2/apidocs/ which should look
  
 ![Screenshot of Swagger GUI](docs/apidocs.jpg)
 
+The /v1 API (called the "middleware" in some places) is for backward compatibility with an earlier MEDvision360 
+product and is not likely to be of much interest to most users.
+
 
 Generate IDEA project files
 ---------------------------
