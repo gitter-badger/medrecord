@@ -118,6 +118,7 @@ public class IntegrationTest extends RMTestBase
     int serialized = 0;
     
     int validated = 0;
+    int notValidated = 0;
     int valid = 0;
     int invalid = 0;
     int validRule = 0;
@@ -147,6 +148,7 @@ public class IntegrationTest extends RMTestBase
         serialized = 0;
     
         validated = 0;
+        notValidated = 0;
         valid = 0;
         invalid = 0;
         validRule = 0;
@@ -406,7 +408,15 @@ public class IntegrationTest extends RMTestBase
             {
                 continue;
             }
-            validate(locatable);
+            try
+            {
+                validate(locatable);
+            }
+            catch (NotSupportedException e)
+            {
+                log.error(e.getMessage(), e);
+                notValidated++;
+            }
         }
         validatedNs += System.nanoTime() - ct;
     }
@@ -502,8 +512,9 @@ public class IntegrationTest extends RMTestBase
                 inserted, inserted - storedInMemory));
         log.info(String.format("Serialized %s instances (total %s, retrieved %s, failed %s, internal %s)",
                 serialized, totalIDs, retrieved, serializeFailed, internalUIDs));
-        log.info(String.format("Validated %s instances (valid %s, invalid %s, valid rules %s, invalid rules %s)",
-                validated, valid, invalid, validRule, invalidRule));
+        log.info(String.format("Validated %s instances (valid %s, invalid %s, valid rules %s, invalid rules %s, " +
+                "not validated %s)",
+                validated, valid, invalid, validRule, invalidRule, notValidated));
         log.info(String.format("generated/s %.2f, inserted/s %.2f, validated/s %.2f, " +
                 "retrieved/s %.2f, serialized/s %.2f",
                 generated/(generatedNs/10E8),
