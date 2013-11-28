@@ -37,26 +37,7 @@ public class ArchetypeResource extends ClientResourceBase
         final String id
     )
     {
-        super(null, config_, "/archetype/" + id);
-    }
-
-    /**
-     * Constructor.
-     *
-     * <p>This constructor can be used to create a new client for this resource.</p>
-     *
-     * @param client_ The client to use for making the connection.
-     * @param config_ Configuration object containing the location of the server
-     *   this resource sends requests to.
-     * @param id An OpenEHR ArchetypeID value
-     */
-    public ArchetypeResource(
-        final Client client_,
-        final ClientResourceConfig config_,
-        final String id
-    )
-    {
-        super(client_, config_, "/archetype/" + id);
+        super(config_, "/archetype/" + id);
     }
 
     /**
@@ -107,21 +88,25 @@ Retrieve an archetype encapsulated in JSON.
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
             }
 
             final com.medvision360.medrecord.api.archetype.ArchetypeResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.archetype.ArchetypeResource.class);
-            return wrapped_.getArchetype(
+            final com.medvision360.medrecord.api.archetype.ArchetypeResult result_ = wrapped_.getArchetype(
             );
+
+            handleCookies(resource_);
+
+            return result_;
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())
@@ -194,21 +179,25 @@ Retrieve an archetype as an ADL string (plain text).
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
             }
 
             final com.medvision360.medrecord.api.archetype.ArchetypeResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.archetype.ArchetypeResource.class);
-            return wrapped_.getArchetypeAsText(
+            final java.lang.String result_ = wrapped_.getArchetypeAsText(
             );
+
+            handleCookies(resource_);
+
+            return result_;
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())
@@ -277,9 +266,9 @@ Delete a stored archetype.
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
@@ -288,10 +277,14 @@ Delete a stored archetype.
             final com.medvision360.medrecord.api.archetype.ArchetypeResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.archetype.ArchetypeResource.class);
             wrapped_.deleteArchetype(
             );
+
+            handleCookies(resource_);
+
+            
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())

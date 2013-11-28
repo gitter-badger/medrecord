@@ -31,5 +31,6 @@
   </build>
   <modules>
     <module>openehr-archetypes</module>
+    <module>openehr-archetypes-unittest</module>
   </modules>
 </project>

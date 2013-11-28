@@ -1,0 +1,16 @@
+<!-- this file is used during testing and referenced by the gradle build script -->
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %.-5level %X{requestid}: %class %msg %ex{7}%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- reduce logging of things which are too noisy on debug level -->
+  <logger name="org.springframework" level="ERROR"/>
+  <!--<logger name="com.medvision360.medrecord.engine" level="TRACE"/>-->
+
+  <root level="DEBUG">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>

@@ -33,24 +33,7 @@ public class ArchetypeListResource extends ClientResourceBase
         final ClientResourceConfig config_
     )
     {
-        super(null, config_, "/archetype");
-    }
-
-    /**
-     * Constructor.
-     *
-     * <p>This constructor can be used to create a new client for this resource.</p>
-     *
-     * @param client_ The client to use for making the connection.
-     * @param config_ Configuration object containing the location of the server
-     *   this resource sends requests to.
-     */
-    public ArchetypeListResource(
-        final Client client_,
-        final ClientResourceConfig config_
-    )
-    {
-        super(client_, config_, "/archetype");
+        super(config_, "/archetype");
     }
 
     /**
@@ -116,9 +99,9 @@ works fine.
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
@@ -128,10 +111,14 @@ works fine.
             wrapped_.postArchetype(
                 archetype
             );
+
+            handleCookies(resource_);
+
+            
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())
@@ -203,9 +190,9 @@ works fine.
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
@@ -215,10 +202,14 @@ works fine.
             wrapped_.postArchetypeAsText(
                 adl
             );
+
+            handleCookies(resource_);
+
+            
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())
@@ -291,21 +282,25 @@ Retrieve a list of archetype IDs known to the server encapsulated in JSON.
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
             }
 
             final com.medvision360.medrecord.api.archetype.ArchetypeListResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.archetype.ArchetypeListResource.class);
-            return wrapped_.listArchetypes(
+            final com.medvision360.medrecord.api.IDList result_ = wrapped_.listArchetypes(
             );
+
+            handleCookies(resource_);
+
+            return result_;
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())

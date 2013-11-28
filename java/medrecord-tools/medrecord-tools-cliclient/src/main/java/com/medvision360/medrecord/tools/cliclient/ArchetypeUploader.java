@@ -66,6 +66,7 @@ public class ArchetypeUploader
     private void loadArchetypes() throws IOException, ParseException
     {
         m_archetypeLoader.loadAll("openehr");
+        m_archetypeLoader.loadAll("unittest");
         //m_archetypeLoader.loadAll("medfit");
         //m_archetypeLoader.loadAll("chiron");
         //m_archetypeLoader.loadAll("mobiguide");

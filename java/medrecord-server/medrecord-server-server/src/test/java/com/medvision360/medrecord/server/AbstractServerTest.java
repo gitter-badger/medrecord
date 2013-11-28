@@ -23,13 +23,16 @@ import com.medvision360.medrecord.memstore.MemArchetypeStore;
 import com.medvision360.medrecord.spi.ArchetypeStore;
 import com.medvision360.medrecord.spi.WrappedArchetype;
 import com.medvision360.medrecord.api.exceptions.DuplicateException;
+import com.medvision360.medrecord.spi.tck.RMTestBase;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.openehr.rm.support.identification.ArchetypeID;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
-public abstract class AbstractServerTest
+public abstract class AbstractServerTest extends RMTestBase
 {
     protected static ClientResourceConfig m_resourceConfig;
     protected ArchetypeListResource m_archetypeListResource;
@@ -45,18 +48,29 @@ public abstract class AbstractServerTest
     @BeforeClass
     public static void baseClassSetUp() throws Exception
     {
+        SLF4JBridgeHandler.install();
+        // unfortunately, this messes with the log category name
+        System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
+
         ExtendedJacksonConverter.register();
         //noinspection SpellCheckingInspection
+        String serviceURL = System.getProperty("integrationtest.service.url");
+        if (serviceURL == null || serviceURL.isEmpty())
+        {
+            //noinspection SpellCheckingInspection
+            throw new IllegalStateException("Missing system property integrationtest.service.url");
+        }
         m_resourceConfig = new ClientResourceConfig(
-               System.getProperty("integrationtest.service.url") + "/v2"
+               serviceURL + "/v2"
            );
         
         clear();
     }
 
     @Before
-    public void baseSetUp() throws Exception
+    public void setUp() throws Exception
     {
+        super.setUp();
         m_archetypeStore = new MemArchetypeStore();
         m_resolver = new PathMatchingResourcePatternResolver();
         m_archetypeLoaderBasePath = "archetypes";
@@ -67,6 +81,12 @@ public abstract class AbstractServerTest
 
         m_archetypeListResource = new ArchetypeListResource(m_resourceConfig);
         m_ehrListResource = new EHRListResource(m_resourceConfig);
+    }
+    
+    @After
+    public void tearDown() throws Exception
+    {
+        super.tearDown();
     }
     
     protected static void clear() throws Exception
@@ -83,10 +103,10 @@ public abstract class AbstractServerTest
         resource.clear(params);
     }
     
-    protected ArchetypeRequest loadArchetype(String archetypeName) throws Exception
+    protected ArchetypeRequest loadArchetypeRequest(String collection, String archetypeName) throws Exception
     {
         ArchetypeID archetypeID = new ArchetypeID(archetypeName);
-        m_archetypeLoader.load("openehr", archetypeName);
+        m_archetypeLoader.load(collection, archetypeName);
         WrappedArchetype archetype = m_archetypeStore.get(archetypeID);
 
         ArchetypeRequest request = new ArchetypeRequest();
@@ -94,10 +114,15 @@ public abstract class AbstractServerTest
         return request;
     }
 
-    protected void ensureArchetype(String archetypeName) throws Exception
+    protected ArchetypeRequest loadArchetypeRequest(String archetypeName) throws Exception
+    {
+        return loadArchetypeRequest("openehr", archetypeName);
+    }
+    
+    protected void ensureArchetype(String collection, String archetypeName) throws Exception
     {
         ArchetypeRequest request;
-        request = loadArchetype(archetypeName);
+        request = loadArchetypeRequest(collection, archetypeName);
         try
         {
             m_archetypeListResource.postArchetype(request);
@@ -106,5 +131,10 @@ public abstract class AbstractServerTest
         {
             // ok
         }
+    }
+
+    protected void ensureArchetype(String archetypeName) throws Exception
+    {
+        ensureArchetype("openehr", archetypeName);
     }
 }

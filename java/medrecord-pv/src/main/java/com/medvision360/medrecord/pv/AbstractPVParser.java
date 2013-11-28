@@ -175,8 +175,9 @@ public abstract class AbstractPVParser extends RMUtil implements LocatableParser
         Object result = parse(root);
         if (!(result instanceof Locatable))
         {
+            String className = result == null ? "null" : result.getClass().getSimpleName();
             throw new ParseException(String.format("Got a %s while parsing, which is not a locatable",
-                    result.getClass().getSimpleName()));
+                    className));
         }
         return (Locatable) result;
     }

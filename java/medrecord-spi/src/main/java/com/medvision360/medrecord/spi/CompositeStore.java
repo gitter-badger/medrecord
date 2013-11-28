@@ -100,7 +100,10 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
                 return delegate.insert(locatable);
             }
         }
-        throw new NotSupportedException(String.format("No delegate store supports the locatable %s", locatable));
+        throw new NotSupportedException(String.format(
+                "No delegate store supports the locatable (type %s, archetype %s)",
+                locatable.getClass().getSimpleName(),
+                locatable.getArchetypeDetails().getArchetypeId().getValue()));
     }
 
     @Override
@@ -116,7 +119,10 @@ public class CompositeStore implements XQueryStore, CompositeService<LocatableSt
                 return delegate.insert(EHR, locatable);
             }
         }
-        throw new NotSupportedException(String.format("No delegate store supports the locatable %s", locatable));
+        throw new NotSupportedException(String.format(
+                "No delegate store supports the locatable (type %s, archetype %s)",
+                locatable.getClass().getSimpleName(),
+                locatable.getArchetypeDetails().getArchetypeId().getValue()));
     }
 
     @Override

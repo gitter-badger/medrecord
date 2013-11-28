@@ -33,24 +33,7 @@ public class XQueryLocatableResource extends ClientResourceBase
         final ClientResourceConfig config_
     )
     {
-        super(null, config_, "/query/xquery/locatable");
-    }
-
-    /**
-     * Constructor.
-     *
-     * <p>This constructor can be used to create a new client for this resource.</p>
-     *
-     * @param client_ The client to use for making the connection.
-     * @param config_ Configuration object containing the location of the server
-     *   this resource sends requests to.
-     */
-    public XQueryLocatableResource(
-        final Client client_,
-        final ClientResourceConfig config_
-    )
-    {
-        super(client_, config_, "/query/xquery/locatable");
+        super(config_, "/query/xquery/locatable");
     }
 
     /**
@@ -200,9 +183,9 @@ or performant, depending on the server storage implementation(s) in use.
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
@@ -210,12 +193,16 @@ or performant, depending on the server storage implementation(s) in use.
 
             resource_.addQueryParameter("q", q);
             final com.medvision360.medrecord.api.query.XQueryLocatableResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.query.XQueryLocatableResource.class);
-            return wrapped_.locatableXQuery(
+            final org.restlet.representation.Representation result_ = wrapped_.locatableXQuery(
             );
+
+            handleCookies(resource_);
+
+            return result_;
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())

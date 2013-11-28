@@ -27,6 +27,7 @@ dependencies {
 
     
     compile "com.medvision360.archetypes:openehr-archetypes:${ext.version.archetypes}"
+    compile "com.medvision360.archetypes:openehr-archetypes-unittest:${ext.version.archetypes}"
     //compile "com.medvision360.archetypes:openehr-archetypes-chiron:${ext.version.archetypes}"
     //compile "com.medvision360.archetypes:openehr-archetypes-medfit:${ext.version.archetypes}"
     //compile "com.medvision360.archetypes:openehr-archetypes-mobiguide:${ext.version.archetypes}"

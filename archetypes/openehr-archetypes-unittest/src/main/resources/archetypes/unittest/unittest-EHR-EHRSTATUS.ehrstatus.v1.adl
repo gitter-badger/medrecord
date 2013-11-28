@@ -1,0 +1,40 @@
+archetype (adl_version=1.4)
+	unittest-EHR-EHRSTATUS.ehrstatus.v1
+
+concept
+	[at0001]	-- ehrstatus
+language
+	original_language = <[ISO_639-1::en]>
+description
+	original_author = <
+		["organisation"] = <"MEDvision360 Leiden">
+		["name"] = <"Leo Simons">
+		["email"] = <"leo@medvision360.com">
+	>
+	details = <
+		["en"] = <
+			language = <[ISO_639-1::en]>
+			use = <"ehrstatus, unit test">
+			purpose = <"Simple EHR status">
+		>
+	>
+	lifecycle_state = <"draft">
+
+definition
+	EHR_STATUS[at0001] matches {	-- ehrstatus
+		*
+	}
+
+ontology
+	primary_language = <"en">
+	languages_available = <"en",...>
+	term_definitions = <
+		["en"] = <
+			items = <
+				["at0001"] = <
+					description = <"ehrstatus">
+					text = <"ehrstatus">
+				>
+			>
+		>
+	>

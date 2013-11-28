@@ -246,6 +246,7 @@ public class IntegrationTest extends RMTestBase
     {
         m_archetypeStore.clear();
         m_archetypeLoader.loadAll("openehr");
+        m_archetypeLoader.loadAll("unittest");
         //m_archetypeLoader.loadAll("medfit");
         //m_archetypeLoader.loadAll("chiron");
         //m_archetypeLoader.loadAll("mobiguide");
@@ -254,7 +255,7 @@ public class IntegrationTest extends RMTestBase
     private void generateAll() throws Exception
     {
         subject = subject();
-        Archetyped arch = new Archetyped(new ArchetypeID("openEHR-EHR-EHRSTATUS.medvision_ehrstatus.v1"), "1.0.2");
+        Archetyped arch = new Archetyped(new ArchetypeID("unittest-EHR-EHRSTATUS.ehrstatus.v1"), "1.0.2");
         EHRStatus status = new EHRStatus(makeUID(), "at0001", text("EHR Status"),
                 arch, null, null, null, subject, true, true, null);
 

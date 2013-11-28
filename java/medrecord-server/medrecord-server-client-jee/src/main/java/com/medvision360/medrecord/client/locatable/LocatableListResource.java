@@ -33,24 +33,7 @@ public class LocatableListResource extends ClientResourceBase
         final ClientResourceConfig config_
     )
     {
-        super(null, config_, "/locatable");
-    }
-
-    /**
-     * Constructor.
-     *
-     * <p>This constructor can be used to create a new client for this resource.</p>
-     *
-     * @param client_ The client to use for making the connection.
-     * @param config_ Configuration object containing the location of the server
-     *   this resource sends requests to.
-     */
-    public LocatableListResource(
-        final Client client_,
-        final ClientResourceConfig config_
-    )
-    {
-        super(client_, config_, "/locatable");
+        super(config_, "/locatable");
     }
 
     /**
@@ -120,22 +103,26 @@ associate a locatable with an EHR after it has been created.
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
             }
 
             final com.medvision360.medrecord.api.locatable.LocatableListResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.locatable.LocatableListResource.class);
-            return wrapped_.postLocatable(
+            final com.medvision360.medrecord.api.ID result_ = wrapped_.postLocatable(
                 representation
             );
+
+            handleCookies(resource_);
+
+            return result_;
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())
@@ -214,21 +201,25 @@ However, this API call is provided nonetheless, for API consistency, completenes
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
             }
 
             final com.medvision360.medrecord.api.locatable.LocatableListResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.locatable.LocatableListResource.class);
-            return wrapped_.listLocatables(
+            final com.medvision360.medrecord.api.IDList result_ = wrapped_.listLocatables(
             );
+
+            handleCookies(resource_);
+
+            return result_;
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())

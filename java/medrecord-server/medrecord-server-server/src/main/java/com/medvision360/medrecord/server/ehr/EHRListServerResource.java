@@ -16,13 +16,17 @@ import java.io.IOException;
 import com.medvision360.medrecord.api.ID;
 import com.medvision360.medrecord.api.IDList;
 import com.medvision360.medrecord.api.ehr.EHRListResource;
+import com.medvision360.medrecord.api.exceptions.ClientParseException;
 import com.medvision360.medrecord.api.exceptions.IORecordException;
 import com.medvision360.medrecord.api.exceptions.InvalidLocatableTypeException;
+import com.medvision360.medrecord.api.exceptions.ParseException;
 import com.medvision360.medrecord.api.exceptions.RecordException;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.ehr.EHRStatus;
 import org.openehr.rm.support.identification.HierObjectID;
+import org.restlet.data.Status;
 import org.restlet.representation.Representation;
+import org.restlet.resource.ResourceException;
 
 public class EHRListServerResource
         extends AbstractEHRResource
@@ -31,6 +35,10 @@ public class EHRListServerResource
     @Override
     public ID postEHR(Representation representation) throws RecordException
     {
+        if (representation == null)
+        {
+            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Missing body");
+        }
         try
         {
             Locatable locatable = toLocatable(representation);
@@ -44,6 +52,10 @@ public class EHRListServerResource
             ID result = new ID();
             result.setId(ehr.getEhrID().getValue());
             return result;
+        }
+        catch (ParseException e)
+        {
+            throw new ClientParseException(e.getMessage(), e);
         }
         catch (IOException e)
         {

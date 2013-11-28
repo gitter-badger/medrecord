@@ -689,7 +689,9 @@ public class ArchetypeBasedValidator extends AOMUtil implements LocatableValidat
     {
         if (!supports(locatable))
         {
-            throw new NotSupportedException("Locatable not supported");
+            throw new NotSupportedException(String.format(
+                    "Locatable not supported, unrecognized archetype %s",
+                    locatable == null ? null : locatable.getArchetypeDetails().getArchetypeId().getValue()));
         }
     }
 

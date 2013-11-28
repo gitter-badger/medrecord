@@ -37,26 +37,7 @@ public class EHRUndeleteResource extends ClientResourceBase
         final String id
     )
     {
-        super(null, config_, "/ehr/" + id + "/undelete");
-    }
-
-    /**
-     * Constructor.
-     *
-     * <p>This constructor can be used to create a new client for this resource.</p>
-     *
-     * @param client_ The client to use for making the connection.
-     * @param config_ Configuration object containing the location of the server
-     *   this resource sends requests to.
-     * @param id An OpenEHR HierObjectID value identifying an EHR
-     */
-    public EHRUndeleteResource(
-        final Client client_,
-        final ClientResourceConfig config_,
-        final String id
-    )
-    {
-        super(client_, config_, "/ehr/" + id + "/undelete");
+        super(config_, "/ehr/" + id + "/undelete");
     }
 
     /**
@@ -107,9 +88,9 @@ that was put there by a previous <code>DELETE /ehr/{id}</code>.
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
@@ -118,10 +99,14 @@ that was put there by a previous <code>DELETE /ehr/{id}</code>.
             final com.medvision360.medrecord.api.ehr.EHRUndeleteResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.ehr.EHRUndeleteResource.class);
             wrapped_.undeleteEHR(
             );
+
+            handleCookies(resource_);
+
+            
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())

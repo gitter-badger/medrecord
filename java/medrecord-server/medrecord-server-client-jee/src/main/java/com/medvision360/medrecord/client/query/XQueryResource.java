@@ -33,24 +33,7 @@ public class XQueryResource extends ClientResourceBase
         final ClientResourceConfig config_
     )
     {
-        super(null, config_, "/query/xquery");
-    }
-
-    /**
-     * Constructor.
-     *
-     * <p>This constructor can be used to create a new client for this resource.</p>
-     *
-     * @param client_ The client to use for making the connection.
-     * @param config_ Configuration object containing the location of the server
-     *   this resource sends requests to.
-     */
-    public XQueryResource(
-        final Client client_,
-        final ClientResourceConfig config_
-    )
-    {
-        super(client_, config_, "/query/xquery");
+        super(config_, "/query/xquery");
     }
 
     /**
@@ -200,9 +183,9 @@ for $x in collection()//openehr:*[contains(@xsi:type,"OBSERVATION")] return $x
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
@@ -210,12 +193,16 @@ for $x in collection()//openehr:*[contains(@xsi:type,"OBSERVATION")] return $x
 
             resource_.addQueryParameter("q", q);
             final com.medvision360.medrecord.api.query.XQueryResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.query.XQueryResource.class);
-            return wrapped_.xQuery(
+            final org.restlet.representation.Representation result_ = wrapped_.xQuery(
             );
+
+            handleCookies(resource_);
+
+            return result_;
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())

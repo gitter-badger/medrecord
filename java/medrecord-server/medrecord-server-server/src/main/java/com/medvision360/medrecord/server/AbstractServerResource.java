@@ -13,6 +13,8 @@ package com.medvision360.medrecord.server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 
 import com.google.common.base.Function;
@@ -33,6 +35,8 @@ import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.ObjectID;
 import org.restlet.representation.Representation;
 import org.restlet.service.Service;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractServerResource
         extends ServerResourceBase
@@ -63,7 +67,15 @@ public abstract class AbstractServerResource
     @SuppressWarnings("UnusedDeclaration")
     protected String getRequiredAttributeValue(String name) throws MissingParameterException
     {
-        String id = getAttribute(name);
+        String id;
+        try
+        {
+            id = URLDecoder.decode(getAttribute(name), "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new IllegalStateException(e);
+        }
         if (id == null)
         {
             throw new MissingParameterException(name);
@@ -81,7 +93,7 @@ public abstract class AbstractServerResource
         }
         catch (IllegalArgumentException e)
         {
-            throw new InvalidEHRIDException(e);
+            throw new InvalidEHRIDException(id, e);
         }
     }
 
@@ -89,6 +101,7 @@ public abstract class AbstractServerResource
     protected Locatable toLocatable(Representation representation)
             throws NotSupportedException, InitializationException, IOException, ParseException
     {
+        checkNotNull(representation, "representation cannot be null");
         LocatableParser parser = engine().getLocatableParser("application/json", "json-pv");
         InputStream is = representation.getStream();
         return parser.parse(is);

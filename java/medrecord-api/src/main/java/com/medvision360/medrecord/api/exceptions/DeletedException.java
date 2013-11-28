@@ -59,10 +59,9 @@ public class DeletedException extends NotFoundException
         m_deleted = deleted;
     }
 
-    public DeletedException(Collection<String> arguments, Object deleted)
+    public DeletedException(Collection<String> arguments)
     {
         super(arguments);
-        m_deleted = deleted;
     }
 
     public Object getDeleted()

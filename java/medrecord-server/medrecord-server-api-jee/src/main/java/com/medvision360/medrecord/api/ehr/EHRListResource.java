@@ -16,6 +16,7 @@ import com.medvision360.medrecord.api.IDList;
 import com.medvision360.medrecord.api.exceptions.ClientParseException;
 import com.medvision360.medrecord.api.exceptions.DuplicateException;
 import com.medvision360.medrecord.api.exceptions.IORecordException;
+import com.medvision360.medrecord.api.exceptions.NotSupportedException;
 import com.medvision360.medrecord.api.exceptions.ParseException;
 import com.medvision360.medrecord.api.exceptions.PatternException;
 import com.medvision360.medrecord.api.exceptions.RecordException;
@@ -41,7 +42,7 @@ public interface EHRListResource
      */
     @Post("json")
     public ID postEHR(Representation representation)
-            throws DuplicateException, ClientParseException,
+            throws DuplicateException, ClientParseException, NotSupportedException,
             RecordException, IORecordException;
 
     /**

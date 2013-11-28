@@ -12,6 +12,7 @@
 package com.medvision360.medrecord.api.ehr;
 
 import com.medvision360.medrecord.api.EHR;
+import com.medvision360.medrecord.api.exceptions.DeletedException;
 import com.medvision360.medrecord.api.exceptions.IORecordException;
 import com.medvision360.medrecord.api.exceptions.InvalidEHRIDException;
 import com.medvision360.medrecord.api.exceptions.InvalidLocatableIDException;
@@ -39,7 +40,7 @@ public interface EHRResource
      */
     @Get("json")
     public EHR getEHR()
-            throws NotFoundException, ParseException, InvalidEHRIDException,
+            throws NotFoundException, DeletedException, ParseException, InvalidEHRIDException,
             RecordException, IORecordException;
 
     /**
@@ -67,6 +68,6 @@ public interface EHRResource
      */
     @Delete
     public void deleteEHR()
-            throws NotFoundException, InvalidLocatableIDException,
+            throws NotFoundException, InvalidEHRIDException,
             RecordException, IORecordException;
 }

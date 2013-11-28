@@ -35,24 +35,7 @@ public class TestClearResource extends ClientResourceBase
         final ClientResourceConfig config_
     )
     {
-        super(null, config_, "/test/clear");
-    }
-
-    /**
-     * Constructor.
-     *
-     * <p>This constructor can be used to create a new client for this resource.</p>
-     *
-     * @param client_ The client to use for making the connection.
-     * @param config_ Configuration object containing the location of the server
-     *   this resource sends requests to.
-     */
-    public TestClearResource(
-        final Client client_,
-        final ClientResourceConfig config_
-    )
-    {
-        super(client_, config_, "/test/clear");
+        super(config_, "/test/clear");
     }
 
     /**
@@ -99,9 +82,9 @@ and any other stored data. This is a <strong>very</strong> destructive method in
     ) throws
         com.medvision360.medrecord.api.exceptions.RecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
@@ -110,10 +93,14 @@ and any other stored data. This is a <strong>very</strong> destructive method in
             final com.medvision360.medrecord.api.test.TestClearResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.test.TestClearResource.class);
             wrapped_.clear(
             );
+
+            handleCookies(resource_);
+
+            
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())

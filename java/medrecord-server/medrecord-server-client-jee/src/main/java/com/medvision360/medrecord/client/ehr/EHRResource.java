@@ -37,26 +37,7 @@ public class EHRResource extends ClientResourceBase
         final String id
     )
     {
-        super(null, config_, "/ehr/" + id);
-    }
-
-    /**
-     * Constructor.
-     *
-     * <p>This constructor can be used to create a new client for this resource.</p>
-     *
-     * @param client_ The client to use for making the connection.
-     * @param config_ Configuration object containing the location of the server
-     *   this resource sends requests to.
-     * @param id An OpenEHR HierObjectID value identifying an EHR
-     */
-    public EHRResource(
-        final Client client_,
-        final ClientResourceConfig config_,
-        final String id
-    )
-    {
-        super(client_, config_, "/ehr/" + id);
+        super(config_, "/ehr/" + id);
     }
 
     /**
@@ -80,6 +61,7 @@ Retrieve basic info about an EHR as a JSON structure.
     public com.medvision360.medrecord.api.EHR getEHR(
     ) throws
         com.medvision360.medrecord.api.exceptions.NotFoundException,
+        com.medvision360.medrecord.api.exceptions.DeletedException,
         com.medvision360.medrecord.api.exceptions.ParseException,
         com.medvision360.medrecord.api.exceptions.InvalidEHRIDException,
         com.medvision360.medrecord.api.exceptions.RecordException,
@@ -108,32 +90,39 @@ Retrieve basic info about an EHR as a JSON structure.
         final EHRResourceGetEHRParams queryParams_
     ) throws
         com.medvision360.medrecord.api.exceptions.NotFoundException,
+        com.medvision360.medrecord.api.exceptions.DeletedException,
         com.medvision360.medrecord.api.exceptions.ParseException,
         com.medvision360.medrecord.api.exceptions.InvalidEHRIDException,
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
             }
 
             final com.medvision360.medrecord.api.ehr.EHRResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.ehr.EHRResource.class);
-            return wrapped_.getEHR(
+            final com.medvision360.medrecord.api.EHR result_ = wrapped_.getEHR(
             );
+
+            handleCookies(resource_);
+
+            return result_;
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())
                 {
                     case "NOT_FOUND_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.NotFoundException(errorDocument_.getArguments());
+                    case "DELETED_EXCEPTION":
+                        throw new com.medvision360.medrecord.api.exceptions.DeletedException(errorDocument_.getArguments());
                     case "PARSE_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.ParseException(errorDocument_.getArguments());
                     case "INVALID_EHR_ID_EXCEPTION":
@@ -184,7 +173,7 @@ Built-in API support for such a purge operation may be provided in the future.
     public void deleteEHR(
     ) throws
         com.medvision360.medrecord.api.exceptions.NotFoundException,
-        com.medvision360.medrecord.api.exceptions.InvalidLocatableIDException,
+        com.medvision360.medrecord.api.exceptions.InvalidEHRIDException,
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
@@ -226,13 +215,13 @@ Built-in API support for such a purge operation may be provided in the future.
         final EHRResourceDeleteEHRParams queryParams_
     ) throws
         com.medvision360.medrecord.api.exceptions.NotFoundException,
-        com.medvision360.medrecord.api.exceptions.InvalidLocatableIDException,
+        com.medvision360.medrecord.api.exceptions.InvalidEHRIDException,
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
@@ -241,18 +230,22 @@ Built-in API support for such a purge operation may be provided in the future.
             final com.medvision360.medrecord.api.ehr.EHRResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.ehr.EHRResource.class);
             wrapped_.deleteEHR(
             );
+
+            handleCookies(resource_);
+
+            
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())
                 {
                     case "NOT_FOUND_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.NotFoundException(errorDocument_.getArguments());
-                    case "INVALID_LOCATABLE_ID_EXCEPTION":
-                        throw new com.medvision360.medrecord.api.exceptions.InvalidLocatableIDException(errorDocument_.getArguments());
+                    case "INVALID_EHR_ID_EXCEPTION":
+                        throw new com.medvision360.medrecord.api.exceptions.InvalidEHRIDException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":

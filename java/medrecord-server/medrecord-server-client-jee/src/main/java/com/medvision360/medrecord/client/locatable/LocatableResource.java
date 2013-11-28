@@ -37,26 +37,7 @@ public class LocatableResource extends ClientResourceBase
         final String id
     )
     {
-        super(null, config_, "/locatable/" + id);
-    }
-
-    /**
-     * Constructor.
-     *
-     * <p>This constructor can be used to create a new client for this resource.</p>
-     *
-     * @param client_ The client to use for making the connection.
-     * @param config_ Configuration object containing the location of the server
-     *   this resource sends requests to.
-     * @param id An OpenEHR UIDBasedID value identifying a Locatable
-     */
-    public LocatableResource(
-        final Client client_,
-        final ClientResourceConfig config_,
-        final String id
-    )
-    {
-        super(client_, config_, "/locatable/" + id);
+        super(config_, "/locatable/" + id);
     }
 
     /**
@@ -107,21 +88,25 @@ Retrieve a locatable as a path/value JSON structure.
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
             }
 
             final com.medvision360.medrecord.api.locatable.LocatableResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.locatable.LocatableResource.class);
-            return wrapped_.getLocatable(
+            final org.restlet.representation.Representation result_ = wrapped_.getLocatable(
             );
+
+            handleCookies(resource_);
+
+            return result_;
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())
@@ -194,9 +179,9 @@ or "expired".
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
@@ -205,10 +190,14 @@ or "expired".
             final com.medvision360.medrecord.api.locatable.LocatableResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.locatable.LocatableResource.class);
             wrapped_.deleteLocatable(
             );
+
+            handleCookies(resource_);
+
+            
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())
@@ -302,9 +291,9 @@ not currently available.
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
@@ -314,10 +303,14 @@ not currently available.
             wrapped_.putLocatable(
                 representation
             );
+
+            handleCookies(resource_);
+
+            
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())
@@ -407,9 +400,9 @@ not currently available.
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
@@ -419,10 +412,14 @@ not currently available.
             wrapped_.patchLocatable(
                 representation
             );
+
+            handleCookies(resource_);
+
+            
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())

@@ -33,24 +33,7 @@ public class QueryLocatableResource extends ClientResourceBase
         final ClientResourceConfig config_
     )
     {
-        super(null, config_, "/query/locatable");
-    }
-
-    /**
-     * Constructor.
-     *
-     * <p>This constructor can be used to create a new client for this resource.</p>
-     *
-     * @param client_ The client to use for making the connection.
-     * @param config_ Configuration object containing the location of the server
-     *   this resource sends requests to.
-     */
-    public QueryLocatableResource(
-        final Client client_,
-        final ClientResourceConfig config_
-    )
-    {
-        super(client_, config_, "/query/locatable");
+        super(config_, "/query/locatable");
     }
 
     /**
@@ -175,21 +158,25 @@ The provided parameter is compared against the archetype ID of the locatable.
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
             }
 
             final com.medvision360.medrecord.api.query.QueryLocatableResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.query.QueryLocatableResource.class);
-            return wrapped_.locatableQuery(
+            final com.medvision360.medrecord.api.IDList result_ = wrapped_.locatableQuery(
             );
+
+            handleCookies(resource_);
+
+            return result_;
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())

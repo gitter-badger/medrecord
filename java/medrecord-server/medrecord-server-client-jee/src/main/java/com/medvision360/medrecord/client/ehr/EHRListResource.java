@@ -33,24 +33,7 @@ public class EHRListResource extends ClientResourceBase
         final ClientResourceConfig config_
     )
     {
-        super(null, config_, "/ehr");
-    }
-
-    /**
-     * Constructor.
-     *
-     * <p>This constructor can be used to create a new client for this resource.</p>
-     *
-     * @param client_ The client to use for making the connection.
-     * @param config_ Configuration object containing the location of the server
-     *   this resource sends requests to.
-     */
-    public EHRListResource(
-        final Client client_,
-        final ClientResourceConfig config_
-    )
-    {
-        super(client_, config_, "/ehr");
+        super(config_, "/ehr");
     }
 
     /**
@@ -78,6 +61,7 @@ Returns the ID of the new EHR wrapped in a JSON document.
     ) throws
         com.medvision360.medrecord.api.exceptions.DuplicateException,
         com.medvision360.medrecord.api.exceptions.ClientParseException,
+        com.medvision360.medrecord.api.exceptions.NotSupportedException,
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
@@ -109,25 +93,30 @@ Returns the ID of the new EHR wrapped in a JSON document.
     ) throws
         com.medvision360.medrecord.api.exceptions.DuplicateException,
         com.medvision360.medrecord.api.exceptions.ClientParseException,
+        com.medvision360.medrecord.api.exceptions.NotSupportedException,
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
             }
 
             final com.medvision360.medrecord.api.ehr.EHRListResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.ehr.EHRListResource.class);
-            return wrapped_.postEHR(
+            final com.medvision360.medrecord.api.ID result_ = wrapped_.postEHR(
                 representation
             );
+
+            handleCookies(resource_);
+
+            return result_;
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())
@@ -136,6 +125,8 @@ Returns the ID of the new EHR wrapped in a JSON document.
                         throw new com.medvision360.medrecord.api.exceptions.DuplicateException(errorDocument_.getArguments());
                     case "CLIENT_PARSE_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.ClientParseException(errorDocument_.getArguments());
+                    case "NOT_SUPPORTED_EXCEPTION":
+                        throw new com.medvision360.medrecord.api.exceptions.NotSupportedException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":
@@ -212,21 +203,25 @@ returned list, to any other value to include them, or omit the parameter to have
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
+        final ClientResource resource_ = getClientResource();
         try
         {
-            final ClientResource resource_ = getClientResource();
             if (queryParams_ != null)
             {
                 queryParams_.applyTo(resource_);
             }
 
             final com.medvision360.medrecord.api.ehr.EHRListResource wrapped_ = resource_.wrap(com.medvision360.medrecord.api.ehr.EHRListResource.class);
-            return wrapped_.listEHRs(
+            final com.medvision360.medrecord.api.IDList result_ = wrapped_.listEHRs(
             );
+
+            handleCookies(resource_);
+
+            return result_;
         }
         catch(final ResourceException e_)
         {
-            final ErrorDocument errorDocument_ = getErrorDocument();
+            final ErrorDocument errorDocument_ = ErrorDocument.getFrom(resource_);
             if (errorDocument_ != null)
             {
                 switch(errorDocument_.getCode())

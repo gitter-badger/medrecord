@@ -96,12 +96,14 @@ public class CompositionTestBase extends DataStructureTestBase
 
     protected ItemList list(String name)
     {
+        String[] nodeIds = {"at1001", "at1002", "at1003"};
         String[] names = {"field 1", "field 2", "field 3"};
         String[] values = {"value 1", "value 2", "value 3"};
+        String[] codes = {"code1", "code2", "code3"};
         List<Element> items = new ArrayList<Element>();
         for (int i = 0; i < names.length; i++)
         {
-            items.add(element(names[i], values[i]));
+            items.add(element(nodeIds[i], names[i], values[i], codes[i]));
         }
         return new ItemList("at0100", text(name), items);
     }

@@ -21,13 +21,10 @@ import com.medvision360.medrecord.api.exceptions.InvalidArchetypeIDException;
 import com.medvision360.medrecord.api.exceptions.NotFoundException;
 import com.medvision360.medrecord.server.AbstractServerTest;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+@RunWith(JUnit4.class)
 public class ArchetypeIT extends AbstractServerTest
 {
     private ArchetypeResource resource(String id) throws Exception
@@ -87,7 +84,7 @@ public class ArchetypeIT extends AbstractServerTest
     public void crudOperationsOnArchetype() throws Exception
     {
         String archetypeName = "openEHR-EHR-OBSERVATION.blood_pressure.v1";
-        ArchetypeRequest request = loadArchetype(archetypeName);
+        ArchetypeRequest request = loadArchetypeRequest(archetypeName);
 
         ArchetypeResource resource = resource(archetypeName);
         ArchetypeResult result;

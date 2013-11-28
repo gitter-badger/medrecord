@@ -47,7 +47,10 @@ public class CompositeValidator implements LocatableValidator, CompositeService<
         }
         if (result == null)
         {
-            throw new NotSupportedException("None of the delegates support this locatable");
+            throw new NotSupportedException(String.format(
+                    "No delegate validator supports the locatable (type %s, archetype %s)",
+                    locatable.getClass().getSimpleName(),
+                    locatable.getArchetypeDetails().getArchetypeId().getValue()));
         }
         return result;
     }
