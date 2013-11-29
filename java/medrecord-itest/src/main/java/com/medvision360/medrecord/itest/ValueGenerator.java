@@ -90,16 +90,6 @@ public class ValueGenerator
         m_measurementService = measurementService;
     }
 
-    public TerminologyService getTerminologyService()
-    {
-        return m_terminologyService;
-    }
-
-    public MeasurementService getMeasurementService()
-    {
-        return m_measurementService;
-    }
-
     public CodePhrase generateCodePhrase(CCodePhrase domainType)
     {
         TerminologyID terminology;

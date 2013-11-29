@@ -61,18 +61,20 @@ task filterLocalWarResources(type: Copy) {
       servletName: project.group + '.' + project.name,
       applicationClass: applicationClass,
       agent: displayName + '/' + project.version,
-      configfile: '/etc/medvision360/' + projectId + '/configuration.properties'
+      configfile: '/etc/medvision360/' + projectId + '/configuration.properties',
+      version: project.version
     ]
   )
 }
 
-war.dependsOn(':medrecord-server-middleware:war')
+// disable merging in the middleware
+//war.dependsOn(':medrecord-server-middleware:war')
 war.dependsOn filterLocalWarResources
 war << {
-  // add middleware but don't override anything
-  ant.zip(destfile: war.archivePath, update: true, keepcompression: true, duplicate: 'preserve') {
-    zipfileset (src: project(':medrecord-server-middleware').war.archivePath)
-  }
+//  // add middleware but don't override anything
+//  ant.zip(destfile: war.archivePath, update: true, keepcompression: true, duplicate: 'preserve') {
+//    zipfileset (src: project(':medrecord-server-middleware').war.archivePath)
+//  }
     
   // add our own local webapp stuff, do override
   // http://stackoverflow.com/questions/2210041/updating-files-inside-an-existing-war-file

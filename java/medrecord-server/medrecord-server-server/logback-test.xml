@@ -3,24 +3,38 @@
   <appender name="ERRORS" class="ch.qos.logback.core.FileAppender">
     <file>build/log/server.log</file>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level : %X{requestid} %class %msg %ex{short}%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level : %X{requestid} %c %msg %ex{short}%n</pattern>
     </encoder>
   </appender>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %.-5level %X{requestid}: %class %msg %ex{7}%n</pattern>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %.-5level %X{requestid}: %c %msg %ex{7}%n</pattern>
     </encoder>
   </appender>
 
+  <appender name="WSLOG" class="com.medvision360.wslog.LogbackAppender">
+     <layout class="ch.qos.logback.classic.PatternLayout">
+        <!--<pattern>%d{HH:mm:ss:SSSS} %5p %c %.200m %rEx{1}</pattern>-->
+        <pattern>%d{HH:mm:ss:SSSS} %5p %-40.40c{15} %.200m %rEx{1}</pattern>
+     </layout>
+  </appender>
+  
   <!-- reduce logging of things which are too noisy on debug level -->
   <logger name="org.apache.tomcat" level="INFO"/>
   <logger name="org.apache.catalina" level="INFO"/>
   <logger name="org.springframework" level="ERROR"/>
+  <logger name="LogService" level="INFO"/>
+  <logger name="org.restlet.Component.MedRecordServerApplication" level="INFO"/>
+  <logger name="org.restlet.Component.ServerRouter" level="INFO"/>
+  <logger name="org.restlet.Component.ClientRouter" level="INFO"/>
+  <logger name="org.restlet.VirtualHost" level="INFO"/>
+  <logger name="com.medvision360.lib.server.filter.JsonStatusFilter" level="WARN"/>
   <!--<logger name="com.medvision360.medrecord.engine" level="TRACE"/>-->
 
   <root level="debug">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="ERRORS" />
+    <appender-ref ref="WSLOG" />
   </root>
 </configuration>

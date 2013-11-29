@@ -9,7 +9,7 @@
       <maxHistory>30</maxHistory>
     </rollingPolicy>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level : %X{requestid} %class %msg %ex{short}%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level : %X{requestid} %c %msg %ex{short}%n</pattern>
     </encoder>
   </appender>
 
@@ -29,7 +29,7 @@
 
   <appender name="WSLOG" class="com.medvision360.wslog.LogbackAppender">
      <layout class="ch.qos.logback.classic.PatternLayout">
-        <pattern>%d{HH:mm:ss:SSSS} %5p %-80.80c - %.200m</pattern>
+       <pattern>%d{HH:mm:ss:SSSS} %5p %-40.40c{15} %.200m %rEx{1}</pattern>
      </layout>
   </appender>
   
@@ -41,6 +41,12 @@
   <logger name="org.apache.tomcat" level="INFO"/>
   <logger name="org.apache.catalina" level="INFO"/>
   <logger name="org.springframework" level="ERROR"/>
+  <logger name="LogService" level="INFO"/>
+  <logger name="org.restlet.Component.MedRecordServerApplication" level="INFO"/>
+  <logger name="org.restlet.Component.ServerRouter" level="INFO"/>
+  <logger name="org.restlet.Component.ClientRouter" level="INFO"/>
+  <logger name="org.restlet.VirtualHost" level="INFO"/>
+  <logger name="com.medvision360.lib.server.filter.JsonStatusFilter" level="WARN"/>
 
   <root level="debug">
     <appender-ref ref="ERRORS" />
