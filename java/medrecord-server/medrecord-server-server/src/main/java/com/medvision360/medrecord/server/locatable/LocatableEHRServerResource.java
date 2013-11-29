@@ -18,6 +18,7 @@ import com.medvision360.medrecord.api.exceptions.IORecordException;
 import com.medvision360.medrecord.api.exceptions.RecordException;
 import com.medvision360.medrecord.api.locatable.LocatableEHRResource;
 import com.medvision360.medrecord.server.AbstractServerResource;
+import com.medvision360.wslog.Events;
 import org.openehr.rm.support.identification.HierObjectID;
 
 public class LocatableEHRServerResource
@@ -28,17 +29,45 @@ public class LocatableEHRServerResource
     public EHR getEHRForLocatable()
             throws RecordException
     {
-        HierObjectID uid = getLocatableID();
-
+        String id = null;
         try
         {
-            org.openehr.rm.ehr.EHR ehr = engine().getEHRForLocatable(uid);
-            EHR result = toEHRResult(ehr);
-            return result;
+            HierObjectID uid = getLocatableID();
+            id = uid.getValue();
+
+            try
+            {
+                org.openehr.rm.ehr.EHR ehr = engine().getEHRForLocatable(uid);
+                EHR result = toEHRResult(ehr);
+                id = result.getId();
+                Events.append(
+                        "GET",
+                        id,
+                        "EHR",
+                        "getEHRForLocatable",
+                        String.format(
+                                "Retrieved EHR %s for locatable %s",
+                                id,
+                                uid.getValue()));
+                return result;
+            }
+            catch (IOException e)
+            {
+                throw new IORecordException(e.getMessage(), e);
+            }
         }
-        catch (IOException e)
+        catch (RecordException|RuntimeException e)
         {
-            throw new IORecordException(e.getMessage(), e);
+            Events.append(
+                    "ERROR",
+                    id,
+                    "Locatable",
+                    "getEHRForLocatableFailure",
+                    String.format(
+                            "Error getting EHR for locatable %s: %s",
+                            id,
+                            e.getMessage()));
+            throw e;
         }
     }
 }

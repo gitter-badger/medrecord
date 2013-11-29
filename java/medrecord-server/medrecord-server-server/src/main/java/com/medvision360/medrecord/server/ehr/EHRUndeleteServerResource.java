@@ -16,6 +16,7 @@ import java.io.IOException;
 import com.medvision360.medrecord.api.ehr.EHRUndeleteResource;
 import com.medvision360.medrecord.api.exceptions.IORecordException;
 import com.medvision360.medrecord.api.exceptions.RecordException;
+import com.medvision360.wslog.Events;
 import org.openehr.rm.support.identification.HierObjectID;
 
 public class EHRUndeleteServerResource
@@ -25,14 +26,40 @@ public class EHRUndeleteServerResource
     @Override
     public void undeleteEHR() throws RecordException
     {
-        HierObjectID id = getEHRID();
+        String id = null;
         try
         {
-            engine().getEHRStore().undelete(id);
+            HierObjectID hierObjectID = getEHRID();
+            id = hierObjectID.getValue();
+            try
+            {
+                engine().getEHRStore().undelete(hierObjectID);
+                Events.append(
+                        "UNDELETE",
+                        id,
+                        "EHR",
+                        "undeleteEHR",
+                        String.format(
+                                "Restored EHR %s",
+                                id));
+            }
+            catch (IOException e)
+            {
+                throw new IORecordException(e.getMessage(), e);
+            }
         }
-        catch (IOException e)
+        catch (RecordException|RuntimeException e)
         {
-            throw new IORecordException(e.getMessage(), e);
+            Events.append(
+                    "ERROR",
+                    id,
+                    "EHR",
+                    "undeleteEHRFailure",
+                    String.format(
+                            "Error restoring EHR %s: %s",
+                            id,
+                            e.getMessage()));
+            throw e;
         }
     }
 }

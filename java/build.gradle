@@ -136,7 +136,7 @@ subprojects {
                 slf4j               : '1.7.5',
                 spring              : '3.2.5.RELEASE',
                 tomcat              : '7.0.34',
-                wslog               : '1.0.3',
+                wslog               : '1.0.4',
         ]
     }
 

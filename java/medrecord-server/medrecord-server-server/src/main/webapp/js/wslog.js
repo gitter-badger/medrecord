@@ -49,9 +49,16 @@ var WsLog = (function(log) {
     },
 
     handleEvent: function (service, message) {
-      var event = $.parseJSON(message.data);
-      event.service = service;
-      log.event(event);
+      var event;
+      try {
+        event = $.parseJSON(message.data);
+        event.service = service;
+        log.event(event);
+      } catch (e) {
+        console.log(_.sprintf("%s parsing event: %s:", e.name, e.message));
+        console.log(message.data);
+        console.log(e);
+      }
     },
 
     handleLog: function (service, message) {

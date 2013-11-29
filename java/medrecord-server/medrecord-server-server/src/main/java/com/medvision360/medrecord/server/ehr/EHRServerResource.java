@@ -17,6 +17,7 @@ import com.medvision360.medrecord.api.EHR;
 import com.medvision360.medrecord.api.ehr.EHRResource;
 import com.medvision360.medrecord.api.exceptions.IORecordException;
 import com.medvision360.medrecord.api.exceptions.RecordException;
+import com.medvision360.wslog.Events;
 import org.openehr.rm.support.identification.HierObjectID;
 
 public class EHRServerResource
@@ -26,22 +27,74 @@ public class EHRServerResource
     public EHR getEHR()
             throws RecordException
     {
-        org.openehr.rm.ehr.EHR ehr = getEHRModel();
-        EHR result = toEHRResult(ehr);
-        return result;
+        String id = null;
+        try
+        {
+            org.openehr.rm.ehr.EHR ehr = getEHRModel();
+            EHR result = toEHRResult(ehr);
+            id = result.getId();
+            Events.append(
+                    "GET",
+                    id,
+                    "EHR",
+                    "getEHR",
+                    String.format(
+                            "Retrieved EHR %s",
+                            id));
+            return result;
+        }
+        catch (RecordException|RuntimeException e)
+        {
+            Events.append(
+                    "ERROR",
+                    id,
+                    "EHR",
+                    "getEHRFailure",
+                    String.format(
+                            "Failed to get EHR %s: %s",
+                            id,
+                            e.getMessage()));
+            throw e;
+        }
     }
 
     @Override
     public void deleteEHR() throws RecordException
     {
-        HierObjectID id = getEHRID();
+        String id = null;
         try
         {
-            engine().getEHRStore().delete(id);
+            HierObjectID hierObjectID = getEHRID();
+            id = hierObjectID.getValue();
+            try
+            {
+                engine().getEHRStore().delete(hierObjectID);
+                Events.append(
+                        "DELETE",
+                        id,
+                        "EHR",
+                        "deleteEHR",
+                        String.format(
+                                "Deleted EHR %s",
+                                id));
+            }
+            catch (IOException e)
+            {
+                throw new IORecordException(e.getMessage(), e);
+            }
         }
-        catch (IOException e)
+        catch (RecordException|RuntimeException e)
         {
-            throw new IORecordException(e.getMessage(), e);
+            Events.append(
+                    "ERROR",
+                    id,
+                    "EHR",
+                    "deleteEHRFailure",
+                    String.format(
+                            "Failed to delete EHR %s: %s",
+                            id,
+                            e.getMessage()));
+            throw e;
         }
     }
 

@@ -14,10 +14,13 @@ package com.medvision360.medrecord.server.test;
 import java.io.IOException;
 
 import com.medvision360.medrecord.api.exceptions.AnnotatedIllegalArgumentException;
-import com.medvision360.medrecord.api.test.TestClearResource;
 import com.medvision360.medrecord.api.exceptions.IORecordException;
+import com.medvision360.medrecord.api.exceptions.InitializationException;
+import com.medvision360.medrecord.api.exceptions.MissingParameterException;
 import com.medvision360.medrecord.api.exceptions.RecordException;
+import com.medvision360.medrecord.api.test.TestClearResource;
 import com.medvision360.medrecord.server.AbstractServerResource;
+import com.medvision360.wslog.Events;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,23 +33,48 @@ public class TestClearServerResource
     @Override
     public void clear() throws RecordException
     {
-        String confirmation = getRequiredQueryValue("confirm");
-        if (!confirmation.equals("CONFIRM"))
-        {
-            throw new AnnotatedIllegalArgumentException("confirm should be set to CONFIRM");
-        }
-        
-        log.warn("Clearing out the server!");
-        
+        String confirmation = null;
         try
         {
-            engine().getArchetypeStore().clear();
-            engine().getLocatableStore().clear();
-            engine().getEHRStore().clear();
+            confirmation = getRequiredQueryValue("confirm");
+            if (!confirmation.equals("CONFIRM"))
+            {
+                throw new AnnotatedIllegalArgumentException("confirm should be set to CONFIRM");
+            }
+
+            log.warn("Clearing out the server!");
+
+            try
+            {
+                engine().getArchetypeStore().clear();
+                engine().getLocatableStore().clear();
+                engine().getEHRStore().clear();
+                Events.append(
+                        "CLEAR",
+                        "all",
+                        "ALL",
+                        "clear",
+                        String.format(
+                                "Cleared everything (confirm: %s): %s",
+                                confirmation));
+            }
+            catch (IOException e)
+            {
+                throw new IORecordException(e.getMessage(), e);
+            }
         }
-        catch (IOException e)
+        catch (RecordException|RuntimeException e)
         {
-            throw new IORecordException(e.getMessage(), e);
+            Events.append(
+                    "ERROR",
+                    "all",
+                    "ALL",
+                    "clearFailure",
+                    String.format(
+                            "Failed to clear everything (confirm: %s): %s",
+                            confirmation,
+                            e.getMessage()));
+            throw e;
         }
     }
 }

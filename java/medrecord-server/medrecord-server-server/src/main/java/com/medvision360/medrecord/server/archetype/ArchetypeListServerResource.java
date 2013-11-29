@@ -23,15 +23,16 @@ import com.medvision360.medrecord.api.IDList;
 import com.medvision360.medrecord.api.archetype.ArchetypeListResource;
 import com.medvision360.medrecord.api.archetype.ArchetypeRequest;
 import com.medvision360.medrecord.api.exceptions.ClientParseException;
+import com.medvision360.medrecord.api.exceptions.IORecordException;
+import com.medvision360.medrecord.api.exceptions.MissingParameterException;
+import com.medvision360.medrecord.api.exceptions.ParseException;
 import com.medvision360.medrecord.api.exceptions.PatternException;
+import com.medvision360.medrecord.api.exceptions.RecordException;
 import com.medvision360.medrecord.engine.MedRecordEngine;
 import com.medvision360.medrecord.server.AbstractServerResource;
 import com.medvision360.medrecord.spi.ArchetypeParser;
 import com.medvision360.medrecord.spi.WrappedArchetype;
-import com.medvision360.medrecord.api.exceptions.IORecordException;
-import com.medvision360.medrecord.api.exceptions.MissingParameterException;
-import com.medvision360.medrecord.api.exceptions.ParseException;
-import com.medvision360.medrecord.api.exceptions.RecordException;
+import com.medvision360.wslog.Events;
 import org.apache.commons.io.IOUtils;
 import org.openehr.rm.support.identification.ArchetypeID;
 
@@ -49,98 +50,149 @@ public class ArchetypeListServerResource
     @Override
     public void postArchetypeAsText(String adl) throws RecordException
     {
+        String archetypeId = null;
         try
         {
-            if (adl == null || adl.isEmpty())
-            {
-                throw new MissingParameterException("Provide a non-empty ADL containing the archetype definition");
-            }
-            
-            MedRecordEngine engine = engine();
-            ArchetypeParser parser = engine.getArchetypeParser("text/plain", "adl");
-            WrappedArchetype archetype;
             try
             {
-                archetype = parser.parse(IOUtils.toInputStream(adl, "UTF-8"));
-            }
-            catch (ParseException e)
-            {
-                Throwable root = e;
-                int limit = 10, i = 0;
-                while (e.getCause() != null && i < limit)
+                if (adl == null || adl.isEmpty())
                 {
-                    root = e.getCause();
-                    i++;
+                    throw new MissingParameterException("Provide a non-empty ADL containing the archetype definition");
                 }
-                throw new ClientParseException(root.getMessage(), e);
+                
+                MedRecordEngine engine = engine();
+                ArchetypeParser parser = engine.getArchetypeParser("text/plain", "adl");
+                WrappedArchetype archetype;
+                try
+                {
+                    archetype = parser.parse(IOUtils.toInputStream(adl, "UTF-8"));
+                }
+                catch (ParseException e)
+                {
+                    Throwable root = e;
+                    int limit = 10, i = 0;
+                    while (e.getCause() != null && i < limit)
+                    {
+                        root = e.getCause();
+                        i++;
+                    }
+                    throw new ClientParseException(root.getMessage(), e);
+                }
+                archetypeId = archetype.getArchetype().getArchetypeId().getValue();
+                engine.getArchetypeStore().insert(archetype);
             }
-            engine.getArchetypeStore().insert(archetype);
+            catch (IOException e)
+            {
+                throw new IORecordException(e.getMessage(), e);
+            }
+            Events.append(
+                    "INSERT",
+                    archetypeId,
+                    "ARCHETYPE",
+                    "postArchetype",
+                    String.format(
+                            "Inserted archetype %s",
+                            archetypeId));
         }
-        catch (IOException e)
+        catch (RecordException|RuntimeException e)
         {
-            throw new IORecordException(e.getMessage(), e);
+            Events.append(
+                    "ERROR",
+                    archetypeId,
+                    "ARCHETYPE",
+                    "postArchetypeFailure",
+                    String.format(
+                            "Failure to insert archetype %s: %s",
+                            archetypeId,
+                            e.getMessage()));
+            throw e;
         }
     }
 
     @Override
     public IDList listArchetypes() throws RecordException
     {
+        String q = null;
         try
         {
-            Pattern pattern = null;
-            String q = getQueryValue("q");
-            if (q != null && !q.isEmpty())
+            try
             {
-                if (!q.startsWith("^"))
+                Pattern pattern = null;
+                q = getQueryValue("q");
+                if (q != null && !q.isEmpty())
                 {
-                    q = "^.*?" + q;
-                }
-                if (!q.endsWith("$"))
-                {
-                    q += ".*?$";
-                }
-                try
-                {
-                    pattern = Pattern.compile(q);
-                }
-                catch (PatternSyntaxException e)
-                {
-                    throw new PatternException(e.getMessage());
-                }
-            }
-            
-            Iterable<ArchetypeID> idList = engine().getArchetypeStore().list();
-            Iterable<String> stringList = Iterables.transform(idList, new Function<ArchetypeID,String>() {
-                @Override
-                public String apply(ArchetypeID input)
-                {
-                    if (input == null)
+                    if (!q.startsWith("^"))
                     {
-                        return null;
+                        q = "^.*?" + q;
                     }
-                    return input.getValue();
-                }
-            });
-            if (pattern != null)
-            {
-                final Pattern finalPattern = pattern;
-                stringList = Iterables.filter(stringList, new Predicate<String>()
-                {
-                    @Override
-                    public boolean apply(String input)
+                    if (!q.endsWith("$"))
                     {
-                        return finalPattern.matcher(input).matches();
+                        q += ".*?$";
+                    }
+                    try
+                    {
+                        pattern = Pattern.compile(q);
+                    }
+                    catch (PatternSyntaxException e)
+                    {
+                        throw new PatternException(e.getMessage());
+                    }
+                }
+                
+                Iterable<ArchetypeID> idList = engine().getArchetypeStore().list();
+                Iterable<String> stringList = Iterables.transform(idList, new Function<ArchetypeID,String>() {
+                    @Override
+                    public String apply(ArchetypeID input)
+                    {
+                        if (input == null)
+                        {
+                            return null;
+                        }
+                        return input.getValue();
                     }
                 });
+                if (pattern != null)
+                {
+                    final Pattern finalPattern = pattern;
+                    stringList = Iterables.filter(stringList, new Predicate<String>()
+                    {
+                        @Override
+                        public boolean apply(String input)
+                        {
+                            return finalPattern.matcher(input).matches();
+                        }
+                    });
+                }
+                
+                IDList result = new IDList();
+                result.setIds(Lists.newArrayList(stringList));
+                Events.append(
+                        "LIST",
+                        q == null ? "all" : q,
+                        "ARCHETYPE_LIST",
+                        "listArchetypes",
+                        String.format(
+                                "Listed archetypes%s",
+                                q == null ? "" : " matching " + q));
+                return result;
             }
-            
-            IDList result = new IDList();
-            result.setIds(Lists.newArrayList(stringList));
-            return result;
+            catch (IOException e)
+            {
+                throw new IORecordException(e.getMessage(), e);
+            }
         }
-        catch (IOException e)
+        catch(RecordException|RuntimeException e)
         {
-            throw new IORecordException(e.getMessage(), e);
+            Events.append(
+                    "ERROR",
+                    q == null ? "all" : q,
+                    "ARCHETYPE_LIST",
+                    "listArchetypesFailure",
+                    String.format(
+                            "Failure to list archetypes%s: %s",
+                            q == null ? "" : " matching " + q,
+                            e.getMessage()));
+            throw e;
         }
     }
 }

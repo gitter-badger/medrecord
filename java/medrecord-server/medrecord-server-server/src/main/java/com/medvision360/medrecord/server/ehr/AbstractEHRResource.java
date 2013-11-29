@@ -13,7 +13,6 @@ package com.medvision360.medrecord.server.ehr;
 
 import java.io.IOException;
 
-import com.medvision360.medrecord.api.EHR;
 import com.medvision360.medrecord.api.exceptions.DeletedException;
 import com.medvision360.medrecord.api.exceptions.IORecordException;
 import com.medvision360.medrecord.api.exceptions.InitializationException;

@@ -12,7 +12,6 @@
 package com.medvision360.medrecord.server;
 
 import java.io.IOException;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 

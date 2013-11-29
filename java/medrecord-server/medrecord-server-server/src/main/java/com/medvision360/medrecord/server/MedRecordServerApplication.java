@@ -11,6 +11,9 @@
  */
 package com.medvision360.medrecord.server;
 
+import com.medvision360.lib.server.RestletApplication;
+import com.medvision360.lib.server.config.ConfigurationException;
+import com.medvision360.lib.server.config.ConfigurationWrapper;
 import com.medvision360.medrecord.server.archetype.ArchetypeListServerResource;
 import com.medvision360.medrecord.server.archetype.ArchetypeServerResource;
 import com.medvision360.medrecord.server.ehr.EHRListServerResource;
@@ -22,18 +25,14 @@ import com.medvision360.medrecord.server.locatable.LocatableListServerResource;
 import com.medvision360.medrecord.server.locatable.LocatableServerResource;
 import com.medvision360.medrecord.server.query.QueryEHRServerResource;
 import com.medvision360.medrecord.server.query.QueryLocatableServerResource;
-import com.medvision360.medrecord.server.test.TestClearServerResource;
 import com.medvision360.medrecord.server.query.XQueryLocatableServerResource;
 import com.medvision360.medrecord.server.query.XQueryServerResource;
+import com.medvision360.medrecord.server.test.TestClearServerResource;
 import org.restlet.Restlet;
 import org.restlet.resource.Directory;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
 import org.restlet.service.TunnelService;
-
-import com.medvision360.lib.server.RestletApplication;
-import com.medvision360.lib.server.config.ConfigurationException;
-import com.medvision360.lib.server.config.ConfigurationWrapper;
 
 @SuppressWarnings("UnusedDeclaration")
 public class MedRecordServerApplication extends RestletApplication

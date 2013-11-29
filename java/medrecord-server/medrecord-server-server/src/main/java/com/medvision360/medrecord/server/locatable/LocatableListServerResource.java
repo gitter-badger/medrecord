@@ -16,18 +16,15 @@ import java.io.InputStream;
 
 import com.medvision360.medrecord.api.ID;
 import com.medvision360.medrecord.api.IDList;
-import com.medvision360.medrecord.api.exceptions.AnnotatedIllegalArgumentException;
-import com.medvision360.medrecord.api.exceptions.AnnotatedUnsupportedOperationException;
 import com.medvision360.medrecord.api.exceptions.ClientParseException;
 import com.medvision360.medrecord.api.exceptions.IORecordException;
 import com.medvision360.medrecord.api.exceptions.ParseException;
 import com.medvision360.medrecord.api.exceptions.RecordException;
-import com.medvision360.medrecord.api.exceptions.RuntimeRecordException;
 import com.medvision360.medrecord.api.locatable.LocatableListResource;
 import com.medvision360.medrecord.server.AbstractServerResource;
 import com.medvision360.medrecord.spi.LocatableParser;
+import com.medvision360.wslog.Events;
 import org.openehr.rm.common.archetyped.Locatable;
-import org.openehr.rm.ehr.EHR;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -40,27 +37,57 @@ public class LocatableListServerResource
     @Override
     public ID postLocatable(Representation representation) throws RecordException
     {
-        if (representation == null)
-        {
-            throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Missing body");
-        }
+        String id = null;
+        String className = "Locatable";
+        String archetypeId = null;
         try
         {
-            LocatableParser parser = engine().getLocatableParser(representation.getMediaType().getName(), null);
-            InputStream is = representation.getStream();
-            Locatable locatable = parser.parse(is);
-            Locatable inserted = engine().getLocatableStore().insert(locatable);
-            ID id = new ID();
-            id.setId(inserted.getUid().getValue());
-            return id;
+            if (representation == null)
+            {
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Missing body");
+            }
+            try
+            {
+                LocatableParser parser = engine().getLocatableParser(representation.getMediaType().getName(), null);
+                InputStream is = representation.getStream();
+                Locatable locatable = parser.parse(is);
+                id = locatable.getUid() == null ? null : locatable.getUid().getValue();
+                className = locatable.getClass().getSimpleName();
+                archetypeId = locatable.getArchetypeDetails().getArchetypeId().getValue();
+                Locatable inserted = engine().getLocatableStore().insert(locatable);
+                id = inserted.getUid().getValue();
+                ID result = new ID();
+                result.setId(id);
+                Events.append(
+                        "INSERT",
+                        id,
+                        className,
+                        "postLocatable",
+                        String.format(
+                                "Inserted %s %s of archetype %s",
+                                className, id, archetypeId));
+                return result;
+            }
+            catch (ParseException e)
+            {
+                throw new ClientParseException(e.getMessage(), e);
+            }
+            catch (IOException e)
+            {
+                throw new IORecordException(e.getMessage(), e);
+            }
         }
-        catch (ParseException e)
+        catch (RecordException|RuntimeException e)
         {
-            throw new ClientParseException(e.getMessage(), e);
-        }
-        catch (IOException e)
-        {
-            throw new IORecordException(e.getMessage(), e);
+            Events.append(
+                    "ERROR",
+                    id,
+                    className,
+                    "postLocatableFailure",
+                    String.format(
+                            "Failed to insert %s %s of archetype %s: %s",
+                            className, id, archetypeId, e.getMessage()));
+            throw e;
         }
     }
 
@@ -69,13 +96,34 @@ public class LocatableListServerResource
     {
         try
         {
-            Iterable<HierObjectID> list = engine().getLocatableStore().list();
-            IDList result = toIdList(list);
-            return result;
+            try
+            {
+                Iterable<HierObjectID> list = engine().getLocatableStore().list();
+                IDList result = toIdList(list);
+                Events.append(
+                        "LIST",
+                        "all",
+                        "Locatable",
+                        "listLocatables",
+                        "Listed locatables");
+                return result;
+            }
+            catch (IOException e)
+            {
+                throw new IORecordException(e.getMessage(), e);
+            }
         }
-        catch (IOException e)
+        catch (RecordException|RuntimeException e)
         {
-            throw new IORecordException(e.getMessage(), e);
+            Events.append(
+                    "ERROR",
+                    "all",
+                    "Locatable",
+                    "listLocatablesFailure",
+                    String.format(
+                            "Failed listing locatables: %s",
+                            e.getMessage()));
+            throw e;
         }
     }
 }

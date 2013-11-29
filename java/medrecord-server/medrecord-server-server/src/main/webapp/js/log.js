@@ -79,9 +79,9 @@ var Log = (function() {
               _.sprintf('<span class="logType">%s</span>',
                   _.escape(event.type)) +
               _.sprintf('<span class="logSubjectType">%s</span>',
-                  formatEventType(_.escape(event))) +
+                  _.escape(formatEventType(event))) +
               _.sprintf('<span class="logSubject">%s</span>',
-                  formatEventSubject(_.escape(event))) +
+                  _.escape(formatEventSubject(event))) +
               _.sprintf('<span class="logDetail">%s</span>',
                   _.escape(event.detail)) +
               '</li>'
