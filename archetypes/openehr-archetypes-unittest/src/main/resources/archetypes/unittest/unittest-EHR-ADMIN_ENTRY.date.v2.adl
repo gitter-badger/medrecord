@@ -1,8 +1,8 @@
 archetype (adl_version=1.4)
-	unittest-EHR-EHRSTATUS.ehrstatus.v1
+	unittest-EHR-ADMIN_ENTRY.date.v2
 
 concept
-	[at0001]
+	[at0002]
 language
 	original_language = <[ISO_639-1::en]>
 description
@@ -14,14 +14,14 @@ description
 	details = <
 		["en"] = <
 			language = <[ISO_639-1::en]>
-			use = <"ehrstatus, unit test">
-			purpose = <"Simple EHR status">
+			use = <"adminentry, unit test">
+			purpose = <"Simple admin entry">
 		>
 	>
 	lifecycle_state = <"draft">
 
 definition
-	EHR_STATUS[at0001] matches {
+	ADMIN_ENTRY[at0002] matches {
 		*
 	}
 
@@ -31,9 +31,9 @@ ontology
 	term_definitions = <
 		["en"] = <
 			items = <
-				["at0001"] = <
-					description = <"ehrstatus">
-					text = <"ehrstatus">
+				["at0002"] = <
+					description = <"admin entry">
+					text = <"adminentry">
 				>
 			>
 		>

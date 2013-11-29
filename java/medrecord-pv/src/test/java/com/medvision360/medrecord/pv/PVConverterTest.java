@@ -21,8 +21,6 @@ import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.spi.tck.LocatableConverterTCKTestBase;
 import org.openehr.am.archetype.Archetype;
 import org.openehr.rm.common.archetyped.Locatable;
-import com.medvision360.medrecord.spi.tck.TestMeasurementService;
-import com.medvision360.medrecord.spi.tck.TestTerminologyService;
 
 public class PVConverterTest extends LocatableConverterTCKTestBase
 {
@@ -41,8 +39,8 @@ public class PVConverterTest extends LocatableConverterTCKTestBase
     @Override
     protected LocatableParser getParser() throws Exception
     {
-        PVParser parser = new PVParser(new TestTerminologyService(), new TestMeasurementService(), encoding, lang, 
-            territory());
+        PVParser parser = new PVParser(TERMINOLOGY_SERVICE, MEASUREMENT_SERVICE, ENCODING, LANGUAGE, 
+            TERRITORY);
         parser.setRmVersion("1.0.2");
         return parser;
     }
@@ -69,8 +67,8 @@ public class PVConverterTest extends LocatableConverterTCKTestBase
         for (int i = 0; i < sample.length; i++)
         {
             String path = sample[i];
-            sample[i] = String.format(path, "unittest-EHR-COMPOSITION.composition.v1",
-                    "unittest-EHR-ADMIN_ENTRY.date.v2");
+            sample[i] = String.format(path, COMPOSITION_ARCHETYPE,
+                    ADMIN_ENTRY_ARCHETYPE);
         }
 
         String json = toJSON(sample);

@@ -20,22 +20,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
-import com.medvision360.medrecord.rmutil.ExactPathComparator;
 import com.medvision360.medrecord.rmutil.Node;
-import com.medvision360.medrecord.rmutil.RMUtil;
 import com.medvision360.medrecord.spi.LocatableParser;
 import com.medvision360.medrecord.api.exceptions.ParseException;
 import org.openehr.rm.common.archetyped.Locatable;
 
 @SuppressWarnings("rawtypes")
-public abstract class AbstractPVParser extends RMUtil implements LocatableParser
+public abstract class AbstractPVParser extends PVReader implements LocatableParser
 {
     protected String m_encoding;
 
@@ -53,41 +47,7 @@ public abstract class AbstractPVParser extends RMUtil implements LocatableParser
     @Override
     public Locatable parse(InputStream is, String encoding) throws IOException, ParseException
     {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode rootNode = mapper.readValue(is, JsonNode.class);
-
-        Iterator<Map.Entry<String, JsonNode>> fields = rootNode.fields();
-        SortedMap<String, String> pv = new TreeMap<>(new ExactPathComparator());
-        while (fields.hasNext())
-        {
-            Map.Entry<String, JsonNode> field = fields.next();
-            String key = field.getKey();
-            JsonNode node = field.getValue();
-            JsonNodeType nodeType = node.getNodeType();
-            String value;
-            switch (nodeType)
-            {
-                case NULL:
-                    value = null;
-                    break;
-                case BOOLEAN:
-                case NUMBER:
-                case STRING:
-                    value = node.asText();
-                    break;
-                case ARRAY:
-                case BINARY:
-                case OBJECT:
-                case MISSING:
-                case POJO:
-                default:
-                    throw new ParseException(String.format(
-                            "Path %s value is of type %s, need a primitive",
-                            key, nodeType));
-            }
-            pv.put(key, value);
-        }
-
+        SortedMap<String, String> pv = toMap(is);
         return parse(pv);
     }
 

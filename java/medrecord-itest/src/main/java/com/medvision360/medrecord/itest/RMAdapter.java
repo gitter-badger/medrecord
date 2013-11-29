@@ -684,6 +684,10 @@ public class RMAdapter extends RMUtil
                 {
                     valueMap.put("subject", m_valueGenerator.generateSubject());
                 }
+                if (!valueMap.containsKey("data"))
+                {
+                    valueMap.put("data", m_valueGenerator.generateAdminData());
+                }
                 if (!valueMap.containsKey("description") || valueMap.get("description") == null)
                 {
                     valueMap.put("description", m_valueGenerator.generateDescription());
@@ -870,7 +874,7 @@ public class RMAdapter extends RMUtil
                 }
                 if (!valueMap.containsKey("data"))
                 {
-                    valueMap.put("data", m_valueGenerator.generateObservationEventData());
+                    valueMap.put("data", m_valueGenerator.generateItemList());
                 }
                 if (!valueMap.containsKey("time"))
                 {

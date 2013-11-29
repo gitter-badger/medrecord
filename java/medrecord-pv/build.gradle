@@ -11,6 +11,8 @@ tasks.withType(License).each { licenseTask ->
     licenseTask.exclude 'com/medvision360/medrecord/pv/PVParser.java'
     licenseTask.exclude 'com/medvision360/medrecord/pv/AbstractPVSerializer.java'
     licenseTask.exclude 'com/medvision360/medrecord/pv/AbstractPVParser.java'
+    licenseTask.exclude 'com/medvision360/medrecord/pv/PVMapSerializer.java'
+    licenseTask.exclude 'com/medvision360/medrecord/pv/PVReader.java'
 }
 
 dependencies {

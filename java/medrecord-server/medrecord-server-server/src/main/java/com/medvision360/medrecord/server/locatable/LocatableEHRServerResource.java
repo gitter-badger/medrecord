@@ -11,29 +11,34 @@
  */
 package com.medvision360.medrecord.server.locatable;
 
-import com.medvision360.medrecord.api.ID;
-import com.medvision360.medrecord.api.IDList;
-import com.medvision360.medrecord.api.exceptions.AnnotatedIllegalArgumentException;
-import com.medvision360.medrecord.api.exceptions.AnnotatedUnsupportedOperationException;
+import java.io.IOException;
+
+import com.medvision360.medrecord.api.EHR;
+import com.medvision360.medrecord.api.exceptions.IORecordException;
 import com.medvision360.medrecord.api.exceptions.RecordException;
-import com.medvision360.medrecord.api.exceptions.RuntimeRecordException;
-import com.medvision360.medrecord.api.locatable.LocatableListResource;
+import com.medvision360.medrecord.api.locatable.LocatableEHRResource;
 import com.medvision360.medrecord.server.AbstractServerResource;
-import org.restlet.representation.Representation;
+import org.openehr.rm.support.identification.HierObjectID;
 
 public class LocatableEHRServerResource
         extends AbstractServerResource
-        implements LocatableListResource
+        implements LocatableEHRResource
 {
     @Override
-    public ID postLocatable(Representation representation) throws RecordException
+    public EHR getEHRForLocatable()
+            throws RecordException
     {
-        throw new AnnotatedUnsupportedOperationException("todo implement");
-    }
+        HierObjectID uid = getLocatableID();
 
-    @Override
-    public IDList listLocatables() throws RecordException
-    {
-        throw new AnnotatedUnsupportedOperationException("todo implement");
+        try
+        {
+            org.openehr.rm.ehr.EHR ehr = engine().getEHRForLocatable(uid);
+            EHR result = toEHRResult(ehr);
+            return result;
+        }
+        catch (IOException e)
+        {
+            throw new IORecordException(e.getMessage(), e);
+        }
     }
 }

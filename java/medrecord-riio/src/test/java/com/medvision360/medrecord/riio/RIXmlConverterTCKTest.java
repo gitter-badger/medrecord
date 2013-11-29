@@ -3,26 +3,18 @@ package com.medvision360.medrecord.riio;
 import com.medvision360.medrecord.spi.LocatableParser;
 import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.spi.tck.LocatableConverterTCKTestBase;
-import org.openehr.rm.support.measurement.MeasurementService;
-import com.medvision360.medrecord.spi.tck.TestMeasurementService;
-import org.openehr.rm.support.terminology.TerminologyService;
-import com.medvision360.medrecord.spi.tck.TestTerminologyService;
 
 public class RIXmlConverterTCKTest extends LocatableConverterTCKTestBase
 {
     @Override
     protected LocatableParser getParser() throws Exception
     {
-        return new RIXmlConverter(ts, ms, encoding, lang);
+        return new RIXmlConverter(TERMINOLOGY_SERVICE, MEASUREMENT_SERVICE, ENCODING, LANGUAGE);
     }
 
     @Override
     protected LocatableSerializer getSerializer() throws Exception
     {
-        return new RIXmlConverter(ts, ms, encoding, lang);
+        return new RIXmlConverter(TERMINOLOGY_SERVICE, MEASUREMENT_SERVICE, ENCODING, LANGUAGE);
     }
-
-    // sometimes intellij doesn't want to find the superclass instances :/
-    protected TerminologyService ts = TestTerminologyService.getInstance();
-    protected MeasurementService ms = TestMeasurementService.getInstance();
 }

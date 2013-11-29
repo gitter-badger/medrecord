@@ -17,7 +17,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -25,6 +24,7 @@ import java.util.TreeMap;
 
 import com.medvision360.medrecord.rmutil.Node;
 import com.medvision360.medrecord.api.exceptions.ParseException;
+import com.medvision360.medrecord.spi.Terminology;
 import org.openehr.build.RMObjectBuilder;
 import org.openehr.build.RMObjectBuildingException;
 import org.openehr.build.SystemValue;
@@ -96,11 +96,8 @@ public class PVParser extends AbstractPVParser
                 "systemValues.LANGUAGE cannot be null");
         m_territory = checkNotNull((CodePhrase) systemValues.get(SystemValue.TERRITORY), 
                 "systemValues.TERRITORY cannot be null");
-        
-        TerminologyService terminologyService = checkNotNull(
-                (TerminologyService) systemValues.get(SystemValue.TERMINOLOGY_SERVICE), 
-                "systemValues.TERMINOLOGY_SERVICE cannot be null");
-        findCategoryEvent(terminologyService);
+
+        findCategoryEvent();
         
         m_builder = RMObjectBuilder.getInstance(systemValues);
     }
@@ -121,26 +118,14 @@ public class PVParser extends AbstractPVParser
         systemValues.put(SystemValue.TERRITORY, territory);
         m_territory = territory;
 
-        findCategoryEvent(terminologyService);
+        findCategoryEvent();
         
         m_builder = RMObjectBuilder.getInstance(systemValues);
     }
 
-    private void findCategoryEvent(TerminologyService terminologyService)
+    private void findCategoryEvent()
     {
-        Iterator<CodePhrase> it = terminologyService
-                .terminology(TerminologyService.OPENEHR)
-                .codesForGroupName("composition category", m_language.getCodeString())
-                .iterator();
-        while (it.hasNext())
-        {
-            CodePhrase code = it.next();
-            if (code.getCodeString().equalsIgnoreCase("event"))
-            {
-                m_categoryEvent = new DvCodedText("event", code);
-                break;
-            }
-        }
+        m_categoryEvent = new DvCodedText("event", Terminology.CATEGORY_event);
     }
 
     public void setRmVersion(String rmVersion)

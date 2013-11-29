@@ -16,8 +16,8 @@ package com.medvision360.medrecord.spi.tck;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.medvision360.medrecord.spi.Terminology;
 import org.openehr.rm.common.archetyped.Archetyped;
-import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.common.generic.PartyIdentified;
 import org.openehr.rm.common.generic.PartySelf;
 import org.openehr.rm.composition.EventContext;
@@ -40,7 +40,9 @@ import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.PartyRef;
 import org.openehr.rm.support.measurement.MeasurementService;
+import org.openehr.rm.support.measurement.SimpleMeasurementService;
 import org.openehr.rm.support.terminology.TerminologyService;
+import org.openehr.terminology.SimpleTerminologyService;
 
 /**
  * EntryTestBase
@@ -48,9 +50,16 @@ import org.openehr.rm.support.terminology.TerminologyService;
  * @author Rong Chen
  * @version 1.0
  */
-@SuppressWarnings({"UnusedDeclaration", "Convert2Diamond"})
 public class CompositionTestBase extends DataStructureTestBase
 {
+    protected final static CodePhrase ENCODING = Terminology.CHARSET_UTF8;
+    protected final static CodePhrase LANGUAGE = Terminology.L_en;
+    protected final static CodePhrase TERRITORY = Terminology.C_NL;
+    protected final static TerminologyService TERMINOLOGY_SERVICE = SimpleTerminologyService.getInstance();
+    protected final static MeasurementService MEASUREMENT_SERVICE = SimpleMeasurementService.getInstance();
+    protected final static DvCodedText CATEGORY_EVENT = new DvCodedText("event",
+                LANGUAGE, ENCODING, Terminology.CATEGORY_event,
+                TERMINOLOGY_SERVICE);
 
     public CompositionTestBase(String test)
     {
@@ -60,22 +69,22 @@ public class CompositionTestBase extends DataStructureTestBase
     // test context
     protected EventContext context() throws Exception
     {
-        DvCodedText setting = new DvCodedText("setting", lang, encoding,
-                new CodePhrase("test", "setting_code"), ts);
-        return new EventContext(null, time("2006-02-01T12:00:09"), null, null,
-                null, setting, null, ts);
+        DvCodedText setting = new DvCodedText("primary medical", LANGUAGE, ENCODING,
+                Terminology.SETTING_primary_medical, TERMINOLOGY_SERVICE);
+        return new EventContext(null, time("2013-11-23T12:00:09"), null, null,
+                null, setting, null, TERMINOLOGY_SERVICE);
     }
 
     protected Section section(String name) throws Exception
     {
-        List<ContentItem> items = new ArrayList<ContentItem>();
+        List<ContentItem> items = new ArrayList<>();
         items.add(observation());
         return new Section("at0000", new DvText(name), items);
     }
 
     protected Section section(String name, String observation) throws Exception
     {
-        List<ContentItem> items = new ArrayList<ContentItem>();
+        List<ContentItem> items = new ArrayList<>();
         items.add(observation(observation));
         return new Section("at0000", new DvText(name), items);
     }
@@ -91,7 +100,7 @@ public class CompositionTestBase extends DataStructureTestBase
         Archetyped arch = new Archetyped(new ArchetypeID(
                 "openehr-ehr_rm-observation.physical_examination.v3"), "1.1");
         return new Observation("at0001", meaning, arch, language("en"),
-                language("en"), subject(), provider(), event("history"), ts);
+                language("en"), subject(), provider(), event(), TERMINOLOGY_SERVICE);
     }
 
     protected ItemList list(String name)
@@ -100,7 +109,7 @@ public class CompositionTestBase extends DataStructureTestBase
         String[] names = {"field 1", "field 2", "field 3"};
         String[] values = {"value 1", "value 2", "value 3"};
         String[] codes = {"code1", "code2", "code3"};
-        List<Element> items = new ArrayList<Element>();
+        List<Element> items = new ArrayList<>();
         for (int i = 0; i < names.length; i++)
         {
             items.add(element(nodeIds[i], names[i], values[i], codes[i]));
@@ -108,20 +117,12 @@ public class CompositionTestBase extends DataStructureTestBase
         return new ItemList("at0100", text(name), items);
     }
 
-    public void assertItemAtPath(String path, Locatable target,
-            Locatable expected) throws Exception
-    {
-        Locatable actual = (Locatable) target.itemAtPath(path);
-        assertEquals("unexpected item: " + actual.getName().getValue()
-                + " for path: " + path, expected, actual);
-    }
-
-    protected History<ItemStructure> event(String name)
+    protected History<ItemStructure> event()
     {
         // element = element("element name", "value");
         String[] ITEMS = {"event one", "event two", "event three"};
         String[] CODES = {"code one", "code two", "code three"};
-        List<Event<ItemStructure>> items = new ArrayList<Event<ItemStructure>>();
+        List<Event<ItemStructure>> items = new ArrayList<>();
         for (int i = 0; i < ITEMS.length; i++)
         {
             Element element = element("element " + i, CODES[i]);
@@ -133,16 +134,10 @@ public class CompositionTestBase extends DataStructureTestBase
             // uid, archetypeNodeId, name, archetypeDetails, feederAudit, links,
             // parent, time, data, state
         }
-        return new History<ItemStructure>(null, "at0002", text("history"),
-                null, null, null, null, new DvDateTime("2006-06-25T23:11:11"),
+        return new History<>(null, "at0002", text("history"),
+                null, null, null, null, new DvDateTime("2013-11-23T23:11:11"),
                 items, DvDuration.getInstance("PT1h"), DvDuration
                 .getInstance("PT3h"), null);
-    }
-
-    // test territory
-    protected CodePhrase territory()
-    {
-        return new CodePhrase("test", "se");
     }
 
     // test subject
@@ -168,14 +163,6 @@ public class CompositionTestBase extends DataStructureTestBase
 
     protected CodePhrase language(String language) throws Exception
     {
-        return new CodePhrase("test", language);
+        return new CodePhrase(Terminology.ISO_639_1, language);
     }
-
-    /* field */
-    protected CodePhrase lang = TestCodeSetAccess.ENGLISH;
-    protected CodePhrase encoding = TestCodeSetAccess.UTF_8;
-    protected TerminologyService ts = TestTerminologyService.getInstance();
-    protected MeasurementService ms = TestMeasurementService.getInstance();
-    protected String path;
-    protected Object value;
 }

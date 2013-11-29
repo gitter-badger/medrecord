@@ -699,7 +699,7 @@ public class ValueGenerator
         return description;
     }
 
-    public Element generateObservationEventElement()
+    public Element generateElement()
     {
         String nodeId = generateNodeId();
         DvText name = generateName("element");
@@ -708,7 +708,7 @@ public class ValueGenerator
         return element;
     }
 
-    public ItemList generateObservationEventData()
+    public ItemList generateItemList()
     {
         String nodeId = generateNodeId();
         DvText name = generateName("item-list");
@@ -717,7 +717,7 @@ public class ValueGenerator
         int listSize = m_randomSupport.listSize(4);
         for (int i = 0; i < listSize; i++)
         {
-            items.add(generateObservationEventElement());
+            items.add(generateElement());
         }
 
         ItemList data = new ItemList(nodeId, name, items);
@@ -729,7 +729,7 @@ public class ValueGenerator
         String nodeId = generateNodeId();
         DvText name = generateName("event");
         DvDateTime origin = generateDateTime(null);
-        ItemList data = generateObservationEventData();
+        ItemList data = generateItemList();
         PointEvent<ItemList> event = new PointEvent<>(nodeId, name, origin, data);
         return event;
     }
@@ -750,6 +750,11 @@ public class ValueGenerator
         //noinspection Convert2Diamond
         History<ItemList> history = new History<ItemList>(nodeId, name, origin, events);
         return history;
+    }
+    
+    public ItemList generateAdminData()
+    {
+        return generateItemList();
     }
 
     public ISMTransition generateIsmTransition()

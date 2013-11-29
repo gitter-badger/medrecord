@@ -67,7 +67,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
     public void testBasicCRUD() throws Exception
     {
         HierObjectID uid = new HierObjectID(makeUUID());
-        Locatable orig = makeLocatable(uid, m_parent);
+        Locatable orig = makeLocatable(uid);
 
         assertFalse(store.has(uid));
 
@@ -93,7 +93,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
         Locatable retrieved = store.get(uid);
         assertEqualish(orig, retrieved);
 
-        Locatable modify = makeLocatable(uid, m_parent);
+        Locatable modify = makeLocatable(uid);
         modify.set("/name/value", "modified name");
         Locatable modified = store.update(modify);
         assertEqualish(modify, modified);
@@ -105,7 +105,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
         try
         {
             HierObjectID otherUid = new HierObjectID(makeUUID());
-            Locatable other = makeLocatable(otherUid, m_parent);
+            Locatable other = makeLocatable(otherUid);
             store.update(other);
             fail("Should not allow updating non-existent locatable");
         }
@@ -137,7 +137,7 @@ public abstract class LocatableStoreTCKTestBase extends LocatableStoreTestBase
         }
         
         HierObjectID uid = new HierObjectID(makeUUID());
-        Locatable orig = makeLocatable(uid, m_parent);
+        Locatable orig = makeLocatable(uid);
         
         Locatable inserted = store.insert(EHR, orig);
         assertEqualish(orig, inserted);

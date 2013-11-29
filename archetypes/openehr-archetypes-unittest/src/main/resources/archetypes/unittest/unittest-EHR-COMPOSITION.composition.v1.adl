@@ -1,5 +1,5 @@
 archetype (adl_version=1.4)
-	unittest-EHR-EHRSTATUS.ehrstatus.v1
+	unittest-EHR-COMPOSITION.composition.v1
 
 concept
 	[at0001]
@@ -14,14 +14,14 @@ description
 	details = <
 		["en"] = <
 			language = <[ISO_639-1::en]>
-			use = <"ehrstatus, unit test">
-			purpose = <"Simple EHR status">
+			use = <"composition, unit test">
+			purpose = <"Simple composition">
 		>
 	>
 	lifecycle_state = <"draft">
 
 definition
-	EHR_STATUS[at0001] matches {
+	COMPOSITION[at0001] matches {
 		*
 	}
 
@@ -32,8 +32,8 @@ ontology
 		["en"] = <
 			items = <
 				["at0001"] = <
-					description = <"ehrstatus">
-					text = <"ehrstatus">
+					description = <"composition">
+					text = <"composition">
 				>
 			>
 		>

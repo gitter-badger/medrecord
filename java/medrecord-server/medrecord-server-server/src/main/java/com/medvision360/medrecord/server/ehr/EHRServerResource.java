@@ -34,7 +34,7 @@ public class EHRServerResource
     @Override
     public void deleteEHR() throws RecordException
     {
-        HierObjectID id = getHierObjectIDAttribute();
+        HierObjectID id = getEHRID();
         try
         {
             engine().getEHRStore().delete(id);

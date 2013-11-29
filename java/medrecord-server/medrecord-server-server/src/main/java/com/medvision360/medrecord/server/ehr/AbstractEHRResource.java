@@ -27,23 +27,6 @@ import org.openehr.rm.support.identification.HierObjectID;
 
 public abstract class AbstractEHRResource extends AbstractServerResource
 {
-    protected EHR toEHRResult(org.openehr.rm.ehr.EHR ehr)
-    {
-        EHR result = new EHR();
-        if (ehr instanceof DeletableEHR)
-        {
-            result.setDeleted(((DeletableEHR) ehr).isDeleted());
-        }
-        if (ehr.getDirectory() != null)
-        {
-            result.setDirectoryId(ehr.getDirectory().getId().getValue());
-        }
-        result.setId(ehr.getEhrID().getValue());
-        result.setStatusId(ehr.getEhrStatus().getId().getValue());
-        result.setSystemId(ehr.getSystemID().getValue());
-        return result;
-    }
-
     protected org.openehr.rm.ehr.EHR getEHRModel()
             throws MissingParameterException, InvalidEHRIDException, NotFoundException, ParseException,
             InitializationException, IORecordException
@@ -57,7 +40,7 @@ public abstract class AbstractEHRResource extends AbstractServerResource
             throws MissingParameterException, InvalidEHRIDException, NotFoundException, ParseException,
             InitializationException, IORecordException
     {
-        HierObjectID id = getHierObjectIDAttribute();
+        HierObjectID id = getEHRID();
         org.openehr.rm.ehr.EHR ehr;
         try
         {

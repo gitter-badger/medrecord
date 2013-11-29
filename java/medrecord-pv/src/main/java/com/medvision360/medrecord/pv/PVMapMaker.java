@@ -12,16 +12,18 @@ package com.medvision360.medrecord.pv;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.medvision360.medrecord.api.exceptions.SerializeException;
 import org.openehr.rm.common.archetyped.Locatable;
 
 // based on DADLBinding from reference implementation
 
 @SuppressWarnings("rawtypes")
-public class PVSerializer extends AbstractPVSerializer
+public class PVMapMaker extends AbstractPVSerializer
 {
+    private SortedMap<String, Object> m_map = new TreeMap<>();
 
     @Override
     public void serialize(Locatable locatable, OutputStream os) throws IOException, SerializeException
@@ -32,15 +34,12 @@ public class PVSerializer extends AbstractPVSerializer
     @Override
     public void serialize(Locatable locatable, OutputStream os, String encoding) throws IOException, SerializeException
     {
-        final JsonGenerator jg = getJsonGenerator(os, encoding);
-
         // I feel like not putting the archetype in the path makes things a lot easier
         // String prefix = "[" + archetypeIdString + "]/";
         String prefix = "/";
 
-        SerializeVisitor visitor = new PVSerializeVisitor(jg);
+        SerializeVisitor visitor = new PVMapMakerVisitor(m_map);
 
-        jg.writeStartObject();
         try
         {
             walk(locatable, visitor, prefix);
@@ -53,22 +52,24 @@ public class PVSerializer extends AbstractPVSerializer
         {
             throw new SerializeException("Problem walking the RM object model", e);
         }
-        jg.writeEndObject();
-        jg.close();
     }
 
     @Override
     public String getMimeType()
     {
-        return "application/json";
+        return "application/x-java-serialized-object";
     }
 
     @Override
     public String getFormat()
     {
-        return "json-pv";
+        return "map-pv";
     }
 
+    public SortedMap<String, Object> getMap()
+    {
+        return m_map;
+    }
 }
 /*
  *  ***** BEGIN LICENSE BLOCK *****

@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.regex.Matcher;
 
-import com.medvision360.medrecord.rmutil.RMUtil;
 import com.medvision360.medrecord.spi.LocatableSerializer;
 import com.medvision360.medrecord.api.exceptions.SerializeException;
 import org.openehr.rm.Attribute;
@@ -30,7 +29,7 @@ import org.openehr.rm.datatypes.quantity.ProportionKind;
 import org.openehr.rm.support.identification.ArchetypeID;
 
 @SuppressWarnings("rawtypes")
-public abstract class AbstractPVSerializer extends RMUtil implements LocatableSerializer
+public abstract class AbstractPVSerializer extends PVWriter implements LocatableSerializer
 {
     @Override
     public boolean supports(Locatable test)

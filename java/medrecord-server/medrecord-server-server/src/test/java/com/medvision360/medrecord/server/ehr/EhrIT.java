@@ -11,8 +11,6 @@
  */
 package com.medvision360.medrecord.server.ehr;
 
-import java.io.ByteArrayOutputStream;
-
 import com.medvision360.medrecord.api.EHR;
 import com.medvision360.medrecord.api.ID;
 import com.medvision360.medrecord.api.IDList;
@@ -21,39 +19,15 @@ import com.medvision360.medrecord.api.exceptions.InvalidEHRIDException;
 import com.medvision360.medrecord.api.exceptions.NotFoundException;
 import com.medvision360.medrecord.client.ehr.EHRListResourceListEHRsParams;
 import com.medvision360.medrecord.client.ehr.EHRResource;
-import com.medvision360.medrecord.client.ehr.EHRUndeleteResource;
-import com.medvision360.medrecord.pv.PVSerializer;
 import com.medvision360.medrecord.server.AbstractServerTest;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.openehr.rm.ehr.EHRStatus;
-import org.restlet.data.MediaType;
-import org.restlet.representation.ByteArrayRepresentation;
 import org.restlet.representation.Representation;
 
 @RunWith(JUnit4.class)
 public class EhrIT extends AbstractServerTest
 {
-    public final static String COLLECTION = "unittest";
-    public final static String ARCHETYPE = "unittest-EHR-EHRSTATUS.ehrstatus.v1";
-
-    private EHRResource resource(String id) throws Exception
-    {
-        return new EHRResource(m_resourceConfig, id);
-    }
-    
-    private EHRUndeleteResource undeleteResource(String id) throws Exception
-    {
-        return new EHRUndeleteResource(m_resourceConfig, id);
-    }
-    
-    private void ensureEHRStatusArchetype() throws Exception
-    {
-        ensureArchetype(COLLECTION, ARCHETYPE);
-    }
-    
     @Test
     public void getEHRWithInvalidNameThrowsInvalidEHRIDException()
             throws Exception
@@ -61,7 +35,7 @@ public class EhrIT extends AbstractServerTest
         String id = "invalid ehr id";
         try
         {
-            resource(id).getEHR();
+            ehrResource(id).getEHR();
             fail("Exception expected...");
         }
         catch(InvalidEHRIDException e)
@@ -77,7 +51,7 @@ public class EhrIT extends AbstractServerTest
         String id = "D2138B66-D181-465E-B744-BB3B33CBD181";
         try
         {
-            resource(id).getEHR();
+            ehrResource(id).getEHR();
             fail("Exception expected...");
         }
         catch(NotFoundException e)
@@ -93,7 +67,7 @@ public class EhrIT extends AbstractServerTest
         String id = "invalid ehr id";
         try
         {
-            resource(id).deleteEHR();
+            ehrResource(id).deleteEHR();
             fail("Exception expected...");
         }
         catch(InvalidEHRIDException e)
@@ -108,7 +82,7 @@ public class EhrIT extends AbstractServerTest
     {
         try
         {
-            Representation request = toRequest(null);
+            Representation request = toJsonRequest(null);
             m_ehrListResource.postEHR(request);
             fail("Exception expected...");
         }
@@ -135,12 +109,12 @@ public class EhrIT extends AbstractServerTest
         assertEquals(0, list.getIds().size());
 
         // POST
-        request = toRequest(m_parent);
+        request = toJsonRequest(m_parent);
         ID id = m_ehrListResource.postEHR(request);
         String idString = id.getId();
         
         // GET
-        EHRResource resource = resource(idString);
+        EHRResource resource = ehrResource(idString);
         result = resource.getEHR();
         assertNotNull(result);
         assertNotNull(result.getId());
@@ -176,20 +150,8 @@ public class EhrIT extends AbstractServerTest
         assertEquals(1, list.getIds().size());
         
         // UNDELETE
-        undeleteResource(idString).undeleteEHR();
+        undeleteEHRResource(idString).undeleteEHR();
         resource.getEHR();
-    }
-
-    protected Representation toRequest(EHRStatus ehrStatus) throws Exception
-    {
-        PVSerializer pvSerializer = new PVSerializer();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        pvSerializer.serialize(ehrStatus, os);
-        byte[] serialized = os.toByteArray();
-        
-        Representation representation = new ByteArrayRepresentation(serialized, MediaType.APPLICATION_JSON, 
-                serialized.length);
-        return representation;
     }
 
     // todo test list locatables

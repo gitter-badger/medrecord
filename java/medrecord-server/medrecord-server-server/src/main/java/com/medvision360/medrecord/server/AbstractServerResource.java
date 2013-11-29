@@ -21,18 +21,23 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.medvision360.lib.server.ServerResourceBase;
+import com.medvision360.medrecord.api.EHR;
 import com.medvision360.medrecord.api.IDList;
 import com.medvision360.medrecord.api.exceptions.InvalidEHRIDException;
+import com.medvision360.medrecord.api.exceptions.InvalidLocatableIDException;
 import com.medvision360.medrecord.api.exceptions.NotSupportedException;
 import com.medvision360.medrecord.api.exceptions.ParseException;
 import com.medvision360.medrecord.engine.MedRecordEngine;
 import com.medvision360.medrecord.server.MedRecordService;
 import com.medvision360.medrecord.api.exceptions.InitializationException;
 import com.medvision360.medrecord.api.exceptions.MissingParameterException;
+import com.medvision360.medrecord.spi.DeletableEHR;
 import com.medvision360.medrecord.spi.LocatableParser;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.support.identification.HierObjectID;
 import org.openehr.rm.support.identification.ObjectID;
+import org.openehr.rm.support.identification.ObjectVersionID;
+import org.openehr.rm.support.identification.UIDBasedID;
 import org.restlet.representation.Representation;
 import org.restlet.service.Service;
 
@@ -84,7 +89,7 @@ public abstract class AbstractServerResource
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    protected HierObjectID getHierObjectIDAttribute() throws MissingParameterException, InvalidEHRIDException
+    protected HierObjectID getEHRID() throws MissingParameterException, InvalidEHRIDException
     {
         String id = getRequiredAttributeValue("id");
         try
@@ -95,6 +100,59 @@ public abstract class AbstractServerResource
         {
             throw new InvalidEHRIDException(id, e);
         }
+    }
+
+    @SuppressWarnings("UnusedDeclaration")
+    protected HierObjectID getLocatableID() throws MissingParameterException, InvalidLocatableIDException
+    {
+        String id = getRequiredAttributeValue("id");
+        try
+        {
+            return new HierObjectID(id);
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new InvalidLocatableIDException(id, e);
+        }
+    }
+
+//    @SuppressWarnings("UnusedDeclaration")
+//    protected UIDBasedID getUIDBasedIDAttribute()
+//            throws MissingParameterException, InvalidLocatableIDException
+//    {
+//        String id = getRequiredAttributeValue("id");
+//        try
+//        {
+//            return new HierObjectID(id);
+//        }
+//        catch (IllegalArgumentException e)
+//        {
+//            try
+//            {
+//                return new ObjectVersionID(id);
+//            }
+//            catch (IllegalArgumentException e2)
+//            {
+//                throw new InvalidLocatableIDException(id, e2);
+//            }
+//        }
+//    }
+
+    protected EHR toEHRResult(org.openehr.rm.ehr.EHR ehr)
+    {
+        EHR result = new EHR();
+        if (ehr instanceof DeletableEHR)
+        {
+            result.setDeleted(((DeletableEHR) ehr).isDeleted());
+        }
+        if (ehr.getDirectory() != null)
+        {
+            result.setDirectoryId(ehr.getDirectory().getId().getValue());
+        }
+        result.setId(ehr.getEhrID().getValue());
+        result.setStatusId(ehr.getEhrStatus().getId().getValue());
+        result.setSystemId(ehr.getSystemID().getValue());
+        return result;
     }
 
     @SuppressWarnings("UnusedDeclaration")

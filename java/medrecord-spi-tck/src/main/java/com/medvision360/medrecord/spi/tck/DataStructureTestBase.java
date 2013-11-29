@@ -103,7 +103,7 @@ public class DataStructureTestBase extends TestCase
         return new Element(archetypeNodeId, text(name), codedText(value, code));
     }
 
-    // create an element with quanity value
+    // create an element with quantity value
     protected Element element(String archetypeNodeId, String name, double value)
     {
         return new Element(archetypeNodeId, text(name), new DvQuantity(value));

@@ -11,15 +11,23 @@
  */
 package com.medvision360.medrecord.server;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+
 import com.medvision360.lib.client.ClientResourceConfig;
 import com.medvision360.lib.common.converter.ExtendedJacksonConverter;
 import com.medvision360.medrecord.api.archetype.ArchetypeRequest;
 import com.medvision360.medrecord.client.archetype.ArchetypeListResource;
 import com.medvision360.medrecord.client.ehr.EHRListResource;
+import com.medvision360.medrecord.client.ehr.EHRResource;
+import com.medvision360.medrecord.client.ehr.EHRUndeleteResource;
+import com.medvision360.medrecord.client.locatable.LocatableListResource;
 import com.medvision360.medrecord.client.test.TestClearResource;
 import com.medvision360.medrecord.client.test.TestClearResourceClearParams;
 import com.medvision360.medrecord.engine.ArchetypeLoader;
 import com.medvision360.medrecord.memstore.MemArchetypeStore;
+import com.medvision360.medrecord.pv.PVParser;
+import com.medvision360.medrecord.pv.PVSerializer;
 import com.medvision360.medrecord.spi.ArchetypeStore;
 import com.medvision360.medrecord.spi.WrappedArchetype;
 import com.medvision360.medrecord.api.exceptions.DuplicateException;
@@ -27,16 +35,23 @@ import com.medvision360.medrecord.spi.tck.RMTestBase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.support.identification.ArchetypeID;
+import org.restlet.data.MediaType;
+import org.restlet.representation.ByteArrayRepresentation;
+import org.restlet.representation.Representation;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 public abstract class AbstractServerTest extends RMTestBase
 {
+    public final static String COLLECTION = "unittest";
+    
     protected static ClientResourceConfig m_resourceConfig;
     protected ArchetypeListResource m_archetypeListResource;
     protected EHRListResource m_ehrListResource;
+    protected LocatableListResource m_locatableListResource;
     
     protected ArchetypeStore m_archetypeStore;
     protected ArchetypeLoader m_archetypeLoader;
@@ -81,6 +96,7 @@ public abstract class AbstractServerTest extends RMTestBase
 
         m_archetypeListResource = new ArchetypeListResource(m_resourceConfig);
         m_ehrListResource = new EHRListResource(m_resourceConfig);
+        m_locatableListResource = new LocatableListResource(m_resourceConfig);
     }
     
     @After
@@ -136,5 +152,41 @@ public abstract class AbstractServerTest extends RMTestBase
     protected void ensureArchetype(String archetypeName) throws Exception
     {
         ensureArchetype("openehr", archetypeName);
+    }
+    
+    
+    protected EHRResource ehrResource(String id) throws Exception
+    {
+        return new EHRResource(m_resourceConfig, id);
+    }
+    
+    protected EHRUndeleteResource undeleteEHRResource(String id) throws Exception
+    {
+        return new EHRUndeleteResource(m_resourceConfig, id);
+    }
+    
+    protected void ensureEHRStatusArchetype() throws Exception
+    {
+        ensureArchetype(COLLECTION, EHRSTATUS_ARCHETYPE);
+    }
+
+    protected Representation toJsonRequest(Locatable locatable) throws Exception
+    {
+        PVSerializer pvSerializer = new PVSerializer();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        pvSerializer.serialize(locatable, os);
+        byte[] serialized = os.toByteArray();
+        
+        Representation representation = new ByteArrayRepresentation(serialized, MediaType.APPLICATION_JSON, 
+                serialized.length);
+        return representation;
+    }
+
+    protected Locatable fromJsonRequest(Representation representation) throws Exception
+    {
+        InputStream is = representation.getStream();
+        PVParser pvParser = new PVParser(SYSTEM_VALUES);
+        Locatable locatable = pvParser.parse(is);
+        return locatable;
     }
 }
