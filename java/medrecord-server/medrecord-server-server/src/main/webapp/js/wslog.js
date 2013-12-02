@@ -143,7 +143,7 @@ var WsLog = (function(log) {
   $(function () {
 //    var protocol = _.startsWith(window.location.protocol, "https") ?
 //            "wss" : "ws",
-    var protocol = "wss",
+    var protocol = "ws",
         host = window.location.hostname,
 //        port = window.location.port === "" ?
 //            (protocol === "wss" ?
