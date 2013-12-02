@@ -1,0 +1,57 @@
+{
+  "[unittest-EHR-COMPOSITION.composition.v1]/name/value" : "composition (from composition_example.json)",
+  "[unittest-EHR-COMPOSITION.composition.v1]/archetype_node_id" : "at0001",
+
+  "[unittest-EHR-COMPOSITION.composition.v1]/category/value" : "event",
+  "[unittest-EHR-COMPOSITION.composition.v1]/category/defining_code/code_string" : "433",
+  "[unittest-EHR-COMPOSITION.composition.v1]/category/defining_code/terminology_id/value" : "openehr",
+
+  "[unittest-EHR-COMPOSITION.composition.v1]/language/code_string" : "en",
+  "[unittest-EHR-COMPOSITION.composition.v1]/language/terminology_id/value" : "ISO_639-1",
+  "[unittest-EHR-COMPOSITION.composition.v1]/territory/code_string" : "NL",
+  "[unittest-EHR-COMPOSITION.composition.v1]/territory/terminology_id/value" : "ISO_3166-1",
+  
+  "[unittest-EHR-COMPOSITION.composition.v1]/composer/name" : "Hello World Provider",
+  "[unittest-EHR-COMPOSITION.composition.v1]/composer/rm_entity" : "PartyIdentified",
+  "[unittest-EHR-COMPOSITION.composition.v1]/composer/external_ref/id/rm_entity" : "GenericID",
+  "[unittest-EHR-COMPOSITION.composition.v1]/composer/external_ref/id/value" : "HelloWorld.java",
+  "[unittest-EHR-COMPOSITION.composition.v1]/composer/external_ref/id/scheme" : "example",
+  "[unittest-EHR-COMPOSITION.composition.v1]/composer/external_ref/namespace" : "DEMOGRAPHIC",
+  "[unittest-EHR-COMPOSITION.composition.v1]/composer/external_ref/type" : "ORGANISATION",
+
+  "[unittest-EHR-COMPOSITION.composition.v1]/content/collection_type" : "LIST",
+
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/name/value" : "admin entry 1",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/archetype_node_id" : "at0002",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/rm_entity" : "ItemList",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items/collection_type" : "LIST",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items[at0005][1]/rm_entity" : "Element",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items[at0005][1]/name/rm_entity" : "DvText",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items[at0005][1]/name/value" : "value",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items[at0005][1]/value/rm_entity" : "DvDate",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/items[at0005][1]/value/value" : "2008-05-17",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/name/rm_entity" : "DvText",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/data[at0003]/name/value" : "item list",
+
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/encoding/code_string" : "UTF-8",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/encoding/terminology_id/value" : "IANA_character-sets",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/language/code_string" : "en",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/language/terminology_id/value" : "ISO_639-1",
+
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/provider/name" : "Hello World Example",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/provider/rm_entity" : "PartyIdentified",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/provider/external_ref/id/rm_entity" : "GenericID",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/provider/external_ref/id/value" : "HelloWorld.java",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/provider/external_ref/id/scheme" : "example",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/provider/external_ref/rm_entity" : "PartyRef",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/provider/external_ref/namespace" : "DEMOGRAPHIC",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/provider/external_ref/type" : "ORGANISATION",
+
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/subject/rm_entity" : "PartySelf",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/subject/external_ref/id/rm_entity" : "GenericID",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/subject/external_ref/id/value" : "Imaginary Example Person",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/subject/external_ref/id/scheme" : "example",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/subject/external_ref/rm_entity" : "PartyRef",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/subject/external_ref/namespace" : "DEMOGRAPHIC",
+  "[unittest-EHR-COMPOSITION.composition.v1]/content[unittest-EHR-ADMIN_ENTRY.date.v2][1]/subject/external_ref/type" : "PARTY"
+}

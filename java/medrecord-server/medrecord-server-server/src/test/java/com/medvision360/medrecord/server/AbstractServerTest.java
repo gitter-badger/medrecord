@@ -22,6 +22,7 @@ import com.medvision360.medrecord.client.ehr.EHRListResource;
 import com.medvision360.medrecord.client.ehr.EHRResource;
 import com.medvision360.medrecord.client.ehr.EHRUndeleteResource;
 import com.medvision360.medrecord.client.locatable.LocatableListResource;
+import com.medvision360.medrecord.client.locatable.LocatableResource;
 import com.medvision360.medrecord.client.test.TestClearResource;
 import com.medvision360.medrecord.client.test.TestClearResourceClearParams;
 import com.medvision360.medrecord.engine.ArchetypeLoader;
@@ -188,5 +189,20 @@ public abstract class AbstractServerTest extends RMTestBase
         PVParser pvParser = new PVParser(SYSTEM_VALUES);
         Locatable locatable = pvParser.parse(is);
         return locatable;
+    }
+
+    protected LocatableResource locatableResource(String id) throws Exception
+    {
+        return new LocatableResource(m_resourceConfig, id);
+    }
+    
+    protected void ensureCompositionArchetype() throws Exception
+    {
+        ensureArchetype(COLLECTION, COMPOSITION_ARCHETYPE);
+    }
+    
+    protected void ensureAdminEntryArchetype() throws Exception
+    {
+        ensureArchetype(COLLECTION, ADMIN_ENTRY_ARCHETYPE);
     }
 }

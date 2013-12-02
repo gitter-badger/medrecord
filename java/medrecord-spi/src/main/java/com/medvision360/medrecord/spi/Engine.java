@@ -20,6 +20,7 @@ import com.medvision360.medrecord.api.exceptions.NotFoundException;
 import com.medvision360.medrecord.api.exceptions.NotSupportedException;
 import com.medvision360.medrecord.api.exceptions.ParseException;
 import com.medvision360.medrecord.api.exceptions.SerializeException;
+import com.medvision360.medrecord.api.exceptions.UnsupportedQueryException;
 import com.medvision360.medrecord.api.exceptions.ValidationException;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.demographic.Person;
@@ -108,4 +109,8 @@ public interface Engine extends TransactionalService, NamedService, StatusServic
     Iterable<LocatableSummary> summarizeEHR(EHR EHR) throws NotFoundException, IOException, ParseException;
 
     Iterable<LocatableSummary> summarizeEHR(HierObjectID EHR) throws NotFoundException, IOException, ParseException;
+
+    String findMimeTypeForXQuery(String q) throws ParseException;
+
+    void parseXQuery(String q) throws ParseException, UnsupportedQueryException;
 }

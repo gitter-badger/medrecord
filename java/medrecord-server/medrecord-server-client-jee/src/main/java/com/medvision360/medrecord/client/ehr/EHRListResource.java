@@ -62,6 +62,7 @@ Returns the ID of the new EHR wrapped in a JSON document.
         com.medvision360.medrecord.api.exceptions.DuplicateException,
         com.medvision360.medrecord.api.exceptions.ClientParseException,
         com.medvision360.medrecord.api.exceptions.NotSupportedException,
+        com.medvision360.medrecord.api.exceptions.ValidationException,
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
@@ -94,6 +95,7 @@ Returns the ID of the new EHR wrapped in a JSON document.
         com.medvision360.medrecord.api.exceptions.DuplicateException,
         com.medvision360.medrecord.api.exceptions.ClientParseException,
         com.medvision360.medrecord.api.exceptions.NotSupportedException,
+        com.medvision360.medrecord.api.exceptions.ValidationException,
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
@@ -127,6 +129,8 @@ Returns the ID of the new EHR wrapped in a JSON document.
                         throw new com.medvision360.medrecord.api.exceptions.ClientParseException(errorDocument_.getArguments());
                     case "NOT_SUPPORTED_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.NotSupportedException(errorDocument_.getArguments());
+                    case "VALIDATION_EXCEPTION":
+                        throw new com.medvision360.medrecord.api.exceptions.ValidationException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":

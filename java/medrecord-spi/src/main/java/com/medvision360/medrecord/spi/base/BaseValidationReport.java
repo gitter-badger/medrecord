@@ -75,14 +75,21 @@ public class BaseValidationReport implements ValidationReport
     public String toString()
     {
         StringBuilder str = new StringBuilder();
-        str.append("{ValidationReport:");
+        str.append("ValidationReport:");
         str.append(isValid() ? "valid" : "invalid");
         int total = m_list.size();
-        int inValid = Iterables.size(getErrors());
+        Iterable<ValidationResult> errors = getErrors();
+        int inValid = Iterables.size(errors);
         str.append(",total=").append(total);
         str.append(",valid=").append(total-inValid);
         str.append(",invalid=").append(inValid);
-        str.append("}");
+        str.append(",\n");
+        for (ValidationResult result : errors)
+        {
+            str.append("  ");
+            str.append(result);
+            str.append(",\n");
+        }
         return str.toString();
     }
     

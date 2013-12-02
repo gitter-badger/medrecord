@@ -33,7 +33,7 @@ public class QueryEHRServerResource
         implements QueryEHRResource
 {
     @Override
-    public IDList ehrQuery() throws RecordException
+    public IDList ehrQuery() throws RecordException // todo efficient/fully indexed ehrQuery()
     {
         String excludeDeletedString = getQueryValue("excludeDeleted");
         boolean hasDeleted = excludeDeletedString != null;

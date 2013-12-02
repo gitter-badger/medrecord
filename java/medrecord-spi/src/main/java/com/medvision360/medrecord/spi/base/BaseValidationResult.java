@@ -125,11 +125,10 @@ public class BaseValidationResult implements ValidationResult
     public String toString()
     {
         StringBuilder str = new StringBuilder();
-        str.append("{ValidationResult:");
+        str.append("ValidationResult:");
         str.append(isValid() ? "valid" : "invalid");
         str.append(",path=").append(m_path);
         str.append(",message=").append(m_message);
-        str.append("}");
         return str.toString();
     }
 

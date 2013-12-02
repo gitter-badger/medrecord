@@ -16,21 +16,6 @@ import org.restlet.representation.Representation;
 @RunWith(JUnit4.class)
 public class LocatableIT extends AbstractServerTest
 {
-    protected LocatableResource resource(String id) throws Exception
-    {
-        return new LocatableResource(m_resourceConfig, id);
-    }
-    
-    protected void ensureCompositionArchetype() throws Exception
-    {
-        ensureArchetype(COLLECTION, COMPOSITION_ARCHETYPE);
-    }
-    
-    protected void ensureAdminEntryArchetype() throws Exception
-    {
-        ensureArchetype(COLLECTION, ADMIN_ENTRY_ARCHETYPE);
-    }
-    
     @Test
     public void getLocatableWithInvalidNameThrowsInvalidLocatableIDException()
             throws Exception
@@ -38,7 +23,7 @@ public class LocatableIT extends AbstractServerTest
         String id = "invalid locatable id";
         try
         {
-            resource(id).getLocatable();
+            locatableResource(id).getLocatable();
             fail("Exception expected...");
         }
         catch(InvalidLocatableIDException e)
@@ -54,7 +39,7 @@ public class LocatableIT extends AbstractServerTest
         String id = "D2138B66-D181-465E-B744-BB3B33CBD181";
         try
         {
-            resource(id).getLocatable();
+            locatableResource(id).getLocatable();
             fail("Exception expected...");
         }
         catch(NotFoundException e)
@@ -70,7 +55,7 @@ public class LocatableIT extends AbstractServerTest
         String id = "invalid locatable id";
         try
         {
-            resource(id).deleteLocatable();
+            locatableResource(id).deleteLocatable();
             fail("Exception expected...");
         }
         catch(InvalidLocatableIDException e)
@@ -120,7 +105,7 @@ public class LocatableIT extends AbstractServerTest
         String idString = id.getId();
         
         // GET
-        LocatableResource resource = resource(idString);
+        LocatableResource resource = locatableResource(idString);
         result = resource.getLocatable();
         assertNotNull(result);
         Locatable retrieved = fromJsonRequest(result);

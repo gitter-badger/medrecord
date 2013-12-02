@@ -182,6 +182,13 @@ far beyond the scope of this README. However, here's a few pointers:
 - The provided logback configuration uses a MEDvision library called wslog to log on a WebSocket. This is great for
   debugging, but you should disable this functionality for production use.
 
+- The provided API among other things provides the full power of XQuery, essentially allowing a bad actor who has
+  access to the XQuery API to do anything that the web application container can do (including potentially reading
+  and writing files, executing arbitrary code as the web application container user, downloading or destroying all data, 
+  etc). Only trusted actors can be allowed API access. Disabling the XQuery APIs alone may not be enough; we have not
+  audited the underlying BaseX implementation to be safe against XQuery injection, though we also do not know of
+  existence of any specific vulnerability.
+
 - You will obviously need to secure and lock down your tomcat. MEDvision runs tomcat proxied behind apache, accepting
   connections from apache only if apache is using a recognized SSL client certificate. Apache in turns is also
   configured to use SSL only and require SSL client certificates in order to connect. Audit logs are kept noting the

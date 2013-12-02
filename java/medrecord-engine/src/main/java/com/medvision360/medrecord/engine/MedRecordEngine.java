@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.medvision360.medrecord.api.exceptions.UnsupportedQueryException;
 import com.medvision360.medrecord.basex.BaseXArchetypeStore;
 import com.medvision360.medrecord.basex.BaseXEHRStore;
 import com.medvision360.medrecord.basex.BaseXLocatableStore;
@@ -65,6 +66,12 @@ import com.medvision360.medrecord.api.exceptions.StatusException;
 import com.medvision360.medrecord.api.exceptions.TransactionException;
 import com.medvision360.medrecord.api.exceptions.ValidationException;
 import org.basex.core.Context;
+import org.basex.io.serial.SerializerProp;
+import org.basex.query.MainModule;
+import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
+import org.basex.query.QueryParser;
+import org.basex.query.QueryProcessor;
 import org.openehr.build.SystemValue;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.common.generic.PartySelf;
@@ -691,6 +698,71 @@ public class MedRecordEngine implements Engine, AuditService
             throws NotFoundException, IOException, ParseException
     {
         throw new UnsupportedOperationException("todo implement MedRecordServer.summarizeEHR()");
+    }
+
+    @Override
+    public String findMimeTypeForXQuery(String q) throws ParseException
+    {
+        // unfortunately this re-parses the XQuery. There is no reasonable portable xquery object that we can pass 
+        // out of the Engine API without leaking abstractions in a pretty bad way.
+        
+        checkNotNull(q, "q cannot be null");
+        Context ctx = new Context();
+        try
+        {
+            QueryContext qc = new QueryContext(ctx);
+            QueryParser qp;
+            try
+            {
+                qp = new QueryParser(q, null, qc);
+                qp.parseMain();
+            }
+            catch (QueryException e)
+            {
+                throw new ParseException(e.getMessage(), e);
+            }
+            SerializerProp serializerProp = qc.serParams(false);
+            String value = serializerProp.get(SerializerProp.S_MEDIA_TYPE);
+            if (value == null || value.trim().isEmpty())
+            {
+                return null;
+            }
+            return value;
+        }
+        finally
+        {
+            ctx.close();
+        }
+    }
+
+    @Override
+    public void parseXQuery(String q) throws ParseException, UnsupportedQueryException
+    {
+        checkNotNull(q, "q cannot be null");
+        if (QueryProcessor.isLibrary(q))
+        {
+            throw new UnsupportedQueryException("Provided query is a library module which is not supported");
+        }
+        
+        Context ctx = new Context();
+        try
+        {
+            QueryContext qc = new QueryContext(ctx);
+            QueryParser qp;
+            try
+            {
+                qp = new QueryParser(q, null, qc);
+                qp.parseMain();
+            }
+            catch (QueryException e)
+            {
+                throw new ParseException(e.getMessage(), e);
+            }
+        }
+        finally
+        {
+            ctx.close();
+        }
     }
 
     @Override

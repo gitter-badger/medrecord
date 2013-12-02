@@ -20,6 +20,7 @@ import com.medvision360.medrecord.api.exceptions.NotSupportedException;
 import com.medvision360.medrecord.api.exceptions.ParseException;
 import com.medvision360.medrecord.api.exceptions.PatternException;
 import com.medvision360.medrecord.api.exceptions.RecordException;
+import com.medvision360.medrecord.api.exceptions.ValidationException;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -42,7 +43,7 @@ public interface EHRListResource
      */
     @Post("json")
     public ID postEHR(Representation representation)
-            throws DuplicateException, ClientParseException, NotSupportedException,
+            throws DuplicateException, ClientParseException, NotSupportedException, ValidationException,
             RecordException, IORecordException;
 
     /**

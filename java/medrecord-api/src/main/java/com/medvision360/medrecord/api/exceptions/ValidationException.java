@@ -57,6 +57,7 @@ public class ValidationException extends RecordException
 
     public ValidationException(ValidationReport report)
     {
+        super(report == null? null : report.toString());
         this.m_report = report;
     }
 
@@ -74,7 +75,7 @@ public class ValidationException extends RecordException
 
     public ValidationException(Throwable cause, ValidationReport report)
     {
-        super(cause);
+        super(report == null? null : report.toString(), cause);
         m_report = report;
     }
 

@@ -43,9 +43,23 @@ public class ArchetypeUploader
 
     public static void main(String[] args) throws Exception
     {
-        SLF4JBridgeHandler.install();
+        configureLogging();
         log.debug("Upload starting");
-        
+
+        String baseUrl = getBaseUrl();
+
+        ArchetypeUploader instance = new ArchetypeUploader(baseUrl);
+        instance.loadArchetypes();
+    }
+
+    private static void configureLogging()
+    {
+        SLF4JBridgeHandler.install();
+        System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
+    }
+
+    private static String getBaseUrl()
+    {
         String baseUrl = System.getProperty("medrecord.url", "http://medrecord.test.medvision360.org/medrecord");
         if (baseUrl.endsWith("/"))
         {
@@ -55,12 +69,7 @@ public class ArchetypeUploader
         {
             baseUrl = baseUrl.substring(0, baseUrl.length()-3);
         }
-        
-        // unfortunately, this messes with the log category name
-        System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
-
-        ArchetypeUploader instance = new ArchetypeUploader(baseUrl);
-        instance.loadArchetypes();
+        return baseUrl;
     }
 
     private void loadArchetypes() throws IOException, ParseException

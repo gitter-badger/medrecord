@@ -50,10 +50,16 @@ options.
 
 The server implementation makes no attempt to do any processing on the results of your query. Depending on the
 backing implementation and the queries you write, this may expose you to some implementation specifics in the
-query results. It also means that the result may or may not be valid XML, and accordingly, it is returned as a
-string. If you wish to retrieve the results in processed form, like a nested map of path/value
-locatables, you may wish to use the <code>/query/xquery/locatable</code> API instead. That API also allows you
-to limit to a specific EHR.
+query results. It also means that the result may or may not be valid XML, and accordingly,
+by default it is returned as a <code>text/plain</code> string. If you wish to retrieve the results in
+processed form, like a nested map of path/value locatables, you may wish to use the
+<code>/query/xquery/locatable</code> API instead. That API also allows you to limit to a specific EHR. If you
+just wish to set the response mime type, declare it in your query, like so:
+<pre>
+(: set the response media type to xml :)
+declare option output:media-type "application/xml";
+</pre>
+Note that this simply sets the http header; no attempt at data conversion is done.
 
 All kinds of XQuery are supported. You can use XPath expressions such as
 <pre>
@@ -128,10 +134,16 @@ options.
 
 The server implementation makes no attempt to do any processing on the results of your query. Depending on the
 backing implementation and the queries you write, this may expose you to some implementation specifics in the
-query results. It also means that the result may or may not be valid XML, and accordingly, it is returned as a
-string. If you wish to retrieve the results in processed form, like a nested map of path/value
-locatables, you may wish to use the <code>/query/xquery/locatable</code> API instead. That API also allows you
-to limit to a specific EHR.
+query results. It also means that the result may or may not be valid XML, and accordingly,
+by default it is returned as a <code>text/plain</code> string. If you wish to retrieve the results in
+processed form, like a nested map of path/value locatables, you may wish to use the
+<code>/query/xquery/locatable</code> API instead. That API also allows you to limit to a specific EHR. If you
+just wish to set the response mime type, declare it in your query, like so:
+<pre>
+(: set the response media type to xml :)
+declare option output:media-type "application/xml";
+</pre>
+Note that this simply sets the http header; no attempt at data conversion is done.
 
 All kinds of XQuery are supported. You can use XPath expressions such as
 <pre>

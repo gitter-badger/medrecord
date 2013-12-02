@@ -119,6 +119,16 @@ public class ArchetypeListServerResource
             {
                 Pattern pattern = null;
                 q = getQueryValue("q");
+
+                // Just to be quite clear about this: at this point q is a user-provided 'tainted' parameter.
+                // It contains a regular expression. One of the many fun things you can do with regular expressions
+                // is to write one which takes a glacial amount of time to process, and there is no good way to
+                // predict that this may happen. So this is a great place to, for example, try to do a DOS attack
+                // against the server.
+                //
+                // The assumption is that this API is deployed safely behind some kind of AAA similar to what
+                // you would use to secure a web based SSH console or SQL admin console.
+
                 if (q != null && !q.isEmpty())
                 {
                     if (!q.startsWith("^"))

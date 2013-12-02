@@ -15,7 +15,7 @@
 <configuration>
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%d{HH:mm:ss.SSS} %.-5level %class %msg %ex{7}%n</pattern>
+      <pattern>%d{HH:mm:ss.SSS} %.-5level %c %msg %ex{7}%n</pattern>
     </encoder>
   </appender>
 
@@ -23,10 +23,12 @@
   <logger name="org.apache.tomcat" level="INFO"/>
   <logger name="org.apache.catalina" level="INFO"/>
   <logger name="org.springframework" level="ERROR"/>
-  <logger name="org.apache.http" level="INFO"/>
-  <logger name="org.apache.http.impl.conn.Wire" level="INFO"/>
-  <logger name="org.restlet" level="WARN"/>
-  <!--<logger name="com.medvision360.medrecord.engine.ArchetypeLoader" level="INFO"/>-->
+  <logger name="LogService" level="INFO"/>
+  <logger name="org.restlet.Component.MedRecordServerApplication" level="INFO"/>
+  <logger name="org.restlet.Component.ServerRouter" level="INFO"/>
+  <logger name="org.restlet.Component.ClientRouter" level="INFO"/>
+  <logger name="org.restlet.VirtualHost" level="INFO"/>
+  <logger name="com.medvision360.lib.server.filter.JsonStatusFilter" level="WARN"/>
   <!--<logger name="com.medvision360.medrecord.engine" level="TRACE"/>-->
 
   <root level="DEBUG">
