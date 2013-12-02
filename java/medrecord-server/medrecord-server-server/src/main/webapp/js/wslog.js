@@ -141,23 +141,43 @@ var WsLog = (function(log) {
   };
   
   $(function () {
-    var protocol = _.startsWith(window.location.protocol, "https") ?
-            "wss" : "ws",
+//    var protocol = _.startsWith(window.location.protocol, "https") ?
+//            "wss" : "ws",
+    var protocol = "wss",
         host = window.location.hostname,
+//        port = window.location.port === "" ?
+//            (protocol === "wss" ?
+//                ":48123" : ":8123") :
+//            ":" + window.location.port,
         port = window.location.port === "" ?
-            (protocol === "wss" ?
-                ":48123" : ":8123") :
-            ":" + window.location.port,
+            ":8123" : ":" + window.location.port,
         basePath = _.startsWith(window.location.pathname, "/medrecord") ?
             "/medrecord/wslog" : "/wslog",
         baseUrl = _.sprintf("%s://%s%s%s", protocol, host, port, basePath),
         eventUrl = _.sprintf("%s/events", baseUrl),
         logUrl = _.sprintf("%s/logs", baseUrl);
-    console.log(eventUrl);
-    console.log(logUrl);
-    eventUrls["medrecord"] = eventUrl;
-    logUrls["medrecord"] = logUrl;
-    wslog.init();
+
+    if (_.startsWith(window.location.protocol, "https")) {
+      log.log("The websocket log that provides server logging requires direct " +
+          "socket access to tomcat, rather than going through our proxy. However, " +
+          "accessing tomcat directly over SSL requires a client certificate, " +
+          "which you probably do not have in your web browser. Therefore, we cannot " +
+          "provide the logs.\n" +
+          "If you need log access to work here, you can try to use an " +
+          "insecure URL: try replacing the 'https://' in the URL of the current page " +
+          "with 'http://'.\n" +
+          "If insecure access is not available for this medrecord " +
+          "installation, see our SSL documentation at " +
+          "https://zorggemak.atlassian.net/wiki/pages/viewpage.action?pageId=13074565 " +
+          "for help with SSL certificates.\n" +
+          "You'll likely need to connect to port 48123.");
+    } else {
+      console.log(eventUrl);
+      console.log(logUrl);
+      eventUrls["medrecord"] = eventUrl;
+      logUrls["medrecord"] = logUrl;
+      wslog.init();
+    }
   });
 
   return wslog;

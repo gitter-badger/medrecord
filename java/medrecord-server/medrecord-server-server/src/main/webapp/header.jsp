@@ -24,6 +24,6 @@
     <header id="header">
         <img src="<c:url value='/v2/apidocs/images/logo_small.png'/>"/>
         <h1>MEDrecord</h1>
-        <a href="http://medrecord.test.medvision360.org/medrecord/v2/apidocs/">remove frame</a>
+        <a href="//medrecord.test.medvision360.org/medrecord/v2/apidocs/">remove frame</a>
     </header>
     <div id="main">
