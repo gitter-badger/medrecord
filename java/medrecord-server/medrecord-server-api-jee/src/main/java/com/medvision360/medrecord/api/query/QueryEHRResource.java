@@ -14,6 +14,7 @@ package com.medvision360.medrecord.api.query;
 import com.medvision360.medrecord.api.IDList;
 import com.medvision360.medrecord.api.exceptions.IORecordException;
 import com.medvision360.medrecord.api.exceptions.InvalidDateTimeException;
+import com.medvision360.medrecord.api.exceptions.InvalidRangeException;
 import com.medvision360.medrecord.api.exceptions.InvalidSubjectIDException;
 import com.medvision360.medrecord.api.exceptions.InvalidSystemIDException;
 import com.medvision360.medrecord.api.exceptions.RecordException;
@@ -41,11 +42,11 @@ public interface QueryEHRResource
      * other data besides the blood_pressure OBSERVATION). If this is not what you want, 
      * you need to use an advanced query such as <code>/query/xquery</code> or <code>/query/xquery/locatable</code>.
      * 
-     * @apiqueryparam includeDeleted Set to true to include EHRs that have been marked as deleted in the 
-     *   returned list.
+     * @apiqueryparam excludeDeleted Set to true to exclude EHRs that have been marked as deleted in the 
+     *   returned list, to any other value to include them, or omit the parameter to have the implementation choose
+     *   (typically using its most efficient option).
+     * @apiqueryparam excludeEmpty Set to true to exclude EHRs that contain no locatables.
      *   [type=string,single,default=false]
-     * @apiqueryparam includeEmpty Set to false to exclude EHRs that contain no locatables.
-     *   [type=string,single,default=true]
      * @apiqueryparam systemID An OpenEHR HierObjectID value specifying a systemID to search. Specify multiple 
      *   times to search multiple systemIDs, or do not specify to search all systemIDs.
      *   [type=string,default=906C3435-8A06-4688-A9D0-CD233C1B072F]
@@ -62,5 +63,6 @@ public interface QueryEHRResource
     @Get("json")
     public IDList ehrQuery()
             throws InvalidSystemIDException, InvalidSubjectIDException, InvalidDateTimeException,
+            InvalidRangeException,
             RecordException, IORecordException;
 }

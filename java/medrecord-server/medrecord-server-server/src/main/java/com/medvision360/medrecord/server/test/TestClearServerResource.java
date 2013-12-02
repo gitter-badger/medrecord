@@ -55,7 +55,7 @@ public class TestClearServerResource
                         "ALL",
                         "clear",
                         String.format(
-                                "Cleared everything (confirm: %s): %s",
+                                "Cleared everything (confirm: %s)",
                                 confirmation));
             }
             catch (IOException e)

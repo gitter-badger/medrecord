@@ -59,11 +59,11 @@ you need to use an advanced query such as <code>/query/xquery</code> or <code>/q
        method to pass additional query arguments.</p>
 
 
-       @apiqueryparam includeDeleted Set to true to include EHRs that have been marked as deleted in the
-returned list.
+       @apiqueryparam excludeDeleted Set to true to exclude EHRs that have been marked as deleted in the
+returned list, to any other value to include them, or omit the parameter to have the implementation choose
+(typically using its most efficient option).
+@apiqueryparam excludeEmpty Set to true to exclude EHRs that contain no locatables.
 [type=string,single,default=false]
-@apiqueryparam includeEmpty Set to false to exclude EHRs that contain no locatables.
-[type=string,single,default=true]
 @apiqueryparam systemID An OpenEHR HierObjectID value specifying a systemID to search. Specify multiple
 times to search multiple systemIDs, or do not specify to search all systemIDs.
 [type=string,default=906C3435-8A06-4688-A9D0-CD233C1B072F]
@@ -85,6 +85,7 @@ time the EHR was created.
         com.medvision360.medrecord.api.exceptions.InvalidSystemIDException,
         com.medvision360.medrecord.api.exceptions.InvalidSubjectIDException,
         com.medvision360.medrecord.api.exceptions.InvalidDateTimeException,
+        com.medvision360.medrecord.api.exceptions.InvalidRangeException,
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
@@ -113,11 +114,11 @@ you need to use an advanced query such as <code>/query/xquery</code> or <code>/q
 
        @param queryParams_ The query parameters to be added to the request.
 
-       @apiqueryparam includeDeleted Set to true to include EHRs that have been marked as deleted in the
-returned list.
+       @apiqueryparam excludeDeleted Set to true to exclude EHRs that have been marked as deleted in the
+returned list, to any other value to include them, or omit the parameter to have the implementation choose
+(typically using its most efficient option).
+@apiqueryparam excludeEmpty Set to true to exclude EHRs that contain no locatables.
 [type=string,single,default=false]
-@apiqueryparam includeEmpty Set to false to exclude EHRs that contain no locatables.
-[type=string,single,default=true]
 @apiqueryparam systemID An OpenEHR HierObjectID value specifying a systemID to search. Specify multiple
 times to search multiple systemIDs, or do not specify to search all systemIDs.
 [type=string,default=906C3435-8A06-4688-A9D0-CD233C1B072F]
@@ -139,6 +140,7 @@ time the EHR was created.
         com.medvision360.medrecord.api.exceptions.InvalidSystemIDException,
         com.medvision360.medrecord.api.exceptions.InvalidSubjectIDException,
         com.medvision360.medrecord.api.exceptions.InvalidDateTimeException,
+        com.medvision360.medrecord.api.exceptions.InvalidRangeException,
         com.medvision360.medrecord.api.exceptions.RecordException,
         com.medvision360.medrecord.api.exceptions.IORecordException
     {
@@ -171,6 +173,8 @@ time the EHR was created.
                         throw new com.medvision360.medrecord.api.exceptions.InvalidSubjectIDException(errorDocument_.getArguments());
                     case "INVALID_DATE_TIME_ID_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.InvalidDateTimeException(errorDocument_.getArguments());
+                    case "INVALID_RANGE_ID_EXCEPTION":
+                        throw new com.medvision360.medrecord.api.exceptions.InvalidRangeException(errorDocument_.getArguments());
                     case "RECORD_EXCEPTION":
                         throw new com.medvision360.medrecord.api.exceptions.RecordException(errorDocument_.getArguments());
                     case "IO_RECORD_EXCEPTION":
