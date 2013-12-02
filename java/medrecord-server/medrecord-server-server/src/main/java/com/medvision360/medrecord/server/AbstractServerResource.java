@@ -149,6 +149,7 @@ public abstract class AbstractServerResource
         result.setId(ehr.getEhrID().getValue());
         result.setStatusId(ehr.getEhrStatus().getId().getValue());
         result.setSystemId(ehr.getSystemID().getValue());
+        result.setTimeCreated(ehr.getTimeCreated().getValue());
         return result;
     }
 
