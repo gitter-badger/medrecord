@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
 
 import com.medvision360.medrecord.api.exceptions.CannotMaintainSortException;
@@ -173,7 +174,7 @@ public class PVParser extends AbstractPVParser
         for (Node child : indexMap.values())
         {
             Object childValue = parse(child);
-            if (coll instanceof Set && childValue != null && !(childValue instanceof Comparable))
+            if (coll instanceof SortedSet && childValue != null && !(childValue instanceof Comparable))
             {
                 throw new CannotMaintainSortException(String.format(
                         "Collection at %s needs to be a SET, " +
