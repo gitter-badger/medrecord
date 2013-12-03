@@ -25,7 +25,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 @SuppressWarnings("FieldCanBeLocal")
 public class ArchetypeUploader
 {
-    protected static final Logger log = LoggerFactory.getLogger(ArchetypeUploader.class);
+    private static final Logger log = LoggerFactory.getLogger(ArchetypeUploader.class);
 
     protected ArchetypeStore m_archetypeStore;
     protected ArchetypeLoader m_archetypeLoader;
@@ -43,7 +43,7 @@ public class ArchetypeUploader
 
     public static void main(String[] args) throws Exception
     {
-        configureLogging();
+        setupLogging();
         log.debug("Upload starting");
 
         String baseUrl = getBaseUrl();
@@ -52,7 +52,7 @@ public class ArchetypeUploader
         instance.loadArchetypes();
     }
 
-    protected static void configureLogging()
+    public static void setupLogging()
     {
         SLF4JBridgeHandler.install();
         System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");

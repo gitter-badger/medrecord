@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class HelloWorld extends SampleData
 {
-    protected static final Logger log = LoggerFactory.getLogger(ArchetypeUploader.class);
+    private static final Logger log = LoggerFactory.getLogger(ArchetypeUploader.class);
 
     protected ArchetypeLoader m_archetypeLoader;
     
@@ -80,15 +80,15 @@ public class HelloWorld extends SampleData
         instance.listArchetypesInUse(baseUrl);
     }
 
-    protected static void setupLogging()
+    public static void setupLogging()
     {
         SLF4JBridgeHandler.install();
         System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
     }
 
-    protected static String getBaseUrl()
+    public static String getBaseUrl()
     {
-        String baseUrl = System.getProperty("medrecord.url", "http://medrecord.test.medvision360.org/medrecord");
+        String baseUrl = System.getProperty("medrecord.url", "http://medrecord.dev.medvision360.org/medrecord");
         if (baseUrl.endsWith("/"))
         {
             baseUrl = baseUrl.substring(0, baseUrl.length()-1);
