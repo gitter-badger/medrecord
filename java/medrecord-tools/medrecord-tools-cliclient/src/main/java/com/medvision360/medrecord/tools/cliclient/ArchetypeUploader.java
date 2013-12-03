@@ -25,10 +25,10 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 @SuppressWarnings("FieldCanBeLocal")
 public class ArchetypeUploader
 {
-    private static final Logger log = LoggerFactory.getLogger(ArchetypeUploader.class);
+    protected static final Logger log = LoggerFactory.getLogger(ArchetypeUploader.class);
 
-    private ArchetypeStore m_archetypeStore;
-    private ArchetypeLoader m_archetypeLoader;
+    protected ArchetypeStore m_archetypeStore;
+    protected ArchetypeLoader m_archetypeLoader;
     
     public ArchetypeUploader(String baseUrl) throws IOException
     {
@@ -52,13 +52,13 @@ public class ArchetypeUploader
         instance.loadArchetypes();
     }
 
-    private static void configureLogging()
+    protected static void configureLogging()
     {
         SLF4JBridgeHandler.install();
         System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
     }
 
-    private static String getBaseUrl()
+    protected static String getBaseUrl()
     {
         String baseUrl = System.getProperty("medrecord.url", "http://medrecord.test.medvision360.org/medrecord");
         if (baseUrl.endsWith("/"))
@@ -72,12 +72,9 @@ public class ArchetypeUploader
         return baseUrl;
     }
 
-    private void loadArchetypes() throws IOException, ParseException
+    protected void loadArchetypes() throws IOException, ParseException
     {
         m_archetypeLoader.loadAll("openehr");
         m_archetypeLoader.loadAll("unittest");
-        //m_archetypeLoader.loadAll("medfit");
-        //m_archetypeLoader.loadAll("chiron");
-        //m_archetypeLoader.loadAll("mobiguide");
     }
 }

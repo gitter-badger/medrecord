@@ -46,11 +46,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class RemoteArchetypeStore implements ArchetypeStore
 {
-    private String m_name;
-    private ClientResourceConfig m_resourceConfig;
-    private ArchetypeListResource m_archetypeListResource;
-    private ArchetypeParser m_archetypeParser;
-    private ArchetypeSerializer m_archetypeSerializer;
+    protected String m_name;
+    protected ClientResourceConfig m_resourceConfig;
+    protected ArchetypeListResource m_archetypeListResource;
+    protected ArchetypeParser m_archetypeParser;
+    protected ArchetypeSerializer m_archetypeSerializer;
 
     public RemoteArchetypeStore(String name, String baseUrl)
     {
@@ -271,7 +271,7 @@ public class RemoteArchetypeStore implements ArchetypeStore
     {
     }
 
-    private ArchetypeResource resource(String id)
+    protected ArchetypeResource resource(String id)
     {
         return new ArchetypeResource(m_resourceConfig, id);
     }

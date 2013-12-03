@@ -26,9 +26,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class HelloWorld extends SampleData
 {
-    private static final Logger log = LoggerFactory.getLogger(ArchetypeUploader.class);
+    protected static final Logger log = LoggerFactory.getLogger(ArchetypeUploader.class);
 
-    private ArchetypeLoader m_archetypeLoader;
+    protected ArchetypeLoader m_archetypeLoader;
     
     public HelloWorld(String baseUrl) throws IOException
     {
@@ -80,13 +80,13 @@ public class HelloWorld extends SampleData
         instance.listArchetypesInUse(baseUrl);
     }
 
-    private static void setupLogging()
+    protected static void setupLogging()
     {
         SLF4JBridgeHandler.install();
         System.setProperty("org.restlet.engine.loggerFacadeClass", "org.restlet.ext.slf4j.Slf4jLoggerFacade");
     }
 
-    private static String getBaseUrl()
+    protected static String getBaseUrl()
     {
         String baseUrl = System.getProperty("medrecord.url", "http://medrecord.test.medvision360.org/medrecord");
         if (baseUrl.endsWith("/"))
@@ -100,12 +100,12 @@ public class HelloWorld extends SampleData
         return baseUrl;
     }
 
-    private void loadArchetypes() throws IOException, ParseException
+    protected void loadArchetypes() throws IOException, ParseException
     {
         m_archetypeLoader.loadAll("unittest");
     }
     
-    private String createEHRUsingReferenceModel(String baseUrl) throws IOException, RecordException
+    protected String createEHRUsingReferenceModel(String baseUrl) throws IOException, RecordException
     {
         // generate some sample data
         EHRStatus ehrStatus = makeEHRStatus();
@@ -123,7 +123,7 @@ public class HelloWorld extends SampleData
         return idString;
     }
 
-    private String createCompositionUsingReferenceModel(String baseUrl, String ehrID) throws IOException, RecordException
+    protected String createCompositionUsingReferenceModel(String baseUrl, String ehrID) throws IOException, RecordException
     {
         // generate some sample data
         Composition composition = makeComposition();
@@ -141,7 +141,7 @@ public class HelloWorld extends SampleData
         return idString;
     }
 
-    private String createEHRFromPathValue(String baseUrl, String fileName) throws IOException, RecordException
+    protected String createEHRFromPathValue(String baseUrl, String fileName) throws IOException, RecordException
     {
         // get some sample data from the filesystem
         InputStream is = this.getClass().getResourceAsStream(fileName);
@@ -160,7 +160,7 @@ public class HelloWorld extends SampleData
         return idString;
     }
 
-    private String createCompositionFromPathValue(String baseUrl, String ehrID, String fileName)
+    protected String createCompositionFromPathValue(String baseUrl, String ehrID, String fileName)
             throws IOException, RecordException
     {
         // get some sample data from the filesystem
@@ -180,7 +180,7 @@ public class HelloWorld extends SampleData
         return idString;
     }
 
-    private void listArchetypesInUse(String baseUrl) throws IOException, RecordException
+    protected void listArchetypesInUse(String baseUrl) throws IOException, RecordException
     {
         // initialize a restlet client for /v2/query/xquery
         ClientResourceConfig resourceConfig = new ClientResourceConfig(

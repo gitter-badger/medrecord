@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 public class SampleData extends RestletUtil
 {
-    private static final Logger log = LoggerFactory.getLogger(ArchetypeUploader.class);
+    protected static final Logger log = LoggerFactory.getLogger(ArchetypeUploader.class);
 
     /**
      * Helper that uses PVSerializer to turn openehr reference model objects into path/value json.
