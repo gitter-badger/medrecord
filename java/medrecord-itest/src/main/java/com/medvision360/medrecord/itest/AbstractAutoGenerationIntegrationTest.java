@@ -15,115 +15,50 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
-import com.medvision360.medrecord.engine.ArchetypeBasedValidator;
-import com.medvision360.medrecord.engine.ArchetypeLoader;
-import com.medvision360.medrecord.engine.MedRecordEngine;
-import com.medvision360.medrecord.engine.UIDGenerator;
-import com.medvision360.medrecord.memstore.MemLocatableStore;
-import com.medvision360.medrecord.spi.ArchetypeStore;
-import com.medvision360.medrecord.spi.CompositeStore;
-import com.medvision360.medrecord.spi.CompositeTransformer;
-import com.medvision360.medrecord.spi.LocatableSerializer;
-import com.medvision360.medrecord.spi.LocatableStore;
-import com.medvision360.medrecord.spi.LocatableValidator;
-import com.medvision360.medrecord.spi.TransformingLocatableStore;
 import com.medvision360.medrecord.api.ValidationReport;
 import com.medvision360.medrecord.api.ValidationResult;
-import com.medvision360.medrecord.spi.WrappedArchetype;
 import com.medvision360.medrecord.api.exceptions.NotFoundException;
 import com.medvision360.medrecord.api.exceptions.NotSupportedException;
 import com.medvision360.medrecord.api.exceptions.ParseException;
 import com.medvision360.medrecord.api.exceptions.SerializeException;
-import com.medvision360.medrecord.spi.tck.RMTestBase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.medvision360.medrecord.spi.WrappedArchetype;
 import org.openehr.am.archetype.Archetype;
-import org.openehr.build.SystemValue;
 import org.openehr.rm.common.archetyped.Archetyped;
 import org.openehr.rm.common.archetyped.Locatable;
 import org.openehr.rm.ehr.EHR;
 import org.openehr.rm.ehr.EHRStatus;
 import org.openehr.rm.support.identification.ArchetypeID;
 import org.openehr.rm.support.identification.HierObjectID;
-import org.openehr.rm.support.measurement.MeasurementService;
-import org.openehr.rm.support.terminology.TerminologyService;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 
-@SuppressWarnings("FieldCanBeLocal")
-public class IntegrationTest extends RMTestBase
+public abstract class AbstractAutoGenerationIntegrationTest extends AbstractIntegrationTest
 {
-    private final static Log log = LogFactory.getLog(IntegrationTest.class);
-    
     public final static Set<String> archetypesToSkip;
     static {
         archetypesToSkip = new HashSet<>();
-        archetypesToSkip.addAll(Arrays.asList(
-                // recursion requiring an instance of themselves as content...
-                "openEHR-EHR-ACTION.follow_up.v1",
-                "openEHR-EHR-ACTION.imaging.v1",
-                "openEHR-EHR-ACTION.intravenous_fluid_administration.v1",
-                
-                // requires openEHR-EHR-SECTION.medications.v1 which we don't have
-                "openEHR-EHR-COMPOSITION.prescription.v1"
-        ));
     }
     
-    private MedRecordEngine m_engine;
-
-    private TerminologyService m_terminologyService;
-    private MeasurementService m_measurementService;
-
-    private ArchetypeStore m_archetypeStore;
-    private ResourcePatternResolver m_resolver;
-    private String m_archetypeLoaderBasePath;
-    private boolean m_adlMissingLanguageCompatible;
-    private boolean m_adlEmptyPurposeCompatible;
-    private ArchetypeLoader m_archetypeLoader;
-
-    private StringGenerator m_stringGenerator;
-    private RandomSupport m_randomSupport;
-    private AssertionSupport m_assertionSupport;
-    private ValueGenerator m_valueGenerator;
-    private RMAdapter m_rmAdapter;
-
-    private LocatableGenerator m_locatableGenerator;
-
-    LocatableSerializer m_pvSerializer;
-
-    String m_locatableStoreName = "IntegrationTest";
-    LocatableStore m_locatableStore;
-    LocatableStore m_fallbackStore;
-    
-    LocatableValidator m_locatableValidator;
-
     int skipped = 0;
     int generated = 0;
     int creationFailed = 0;
     int creationUnsupported = 0;
     int inserted = 0;
-
     int totalIDs = 0;
     int retrieved = 0;
     int serializeFailed = 0;
     int internalUIDs = 0;
     int serialized = 0;
-    
     int validated = 0;
     int notValidated = 0;
     int valid = 0;
     int invalid = 0;
     int validRule = 0;
     int invalidRule = 0;
-
     long generatedNs = 0;
     long insertedNs = 0;
     long retrievedNs = 0;
@@ -159,70 +94,6 @@ public class IntegrationTest extends RMTestBase
         retrievedNs = 0;
         serializedNs = 0;
         validatedNs = 0;
-        
-        m_engine = new MedRecordEngine();
-        m_engine.setName("IntegrationTest");
-        m_engine.setStoreValidation(false); // so we can split insert-able vs validate-able
-        m_engine.initialize();
-        
-        m_terminologyService = m_engine.getTerminologyService();
-        m_measurementService = m_engine.getMeasurementService();
-        m_archetypeStore = m_engine.getArchetypeStore();
-    
-        m_resolver = new PathMatchingResourcePatternResolver();
-        m_archetypeLoaderBasePath = "archetypes";
-        m_adlEmptyPurposeCompatible = true;
-        m_adlMissingLanguageCompatible = true;
-        m_archetypeLoader = new ArchetypeLoader(m_archetypeStore, m_resolver, m_archetypeLoaderBasePath,
-                m_adlMissingLanguageCompatible, m_adlEmptyPurposeCompatible);
-
-        m_randomSupport = new RandomSupport();
-        m_assertionSupport = new AssertionSupport();
-        m_stringGenerator = new StringGenerator();
-        m_valueGenerator = new ValueGenerator(m_randomSupport, m_stringGenerator, m_terminologyService,
-                m_measurementService);
-        m_rmAdapter = new RMAdapter(m_valueGenerator);
-        
-        Map<SystemValue, Object> systemValues = m_engine.getSystemValues();
-
-        m_locatableGenerator = new LocatableGenerator(m_archetypeStore, m_randomSupport, m_assertionSupport,
-                m_valueGenerator, m_rmAdapter, systemValues);
-
-        m_pvSerializer = m_engine.getLocatableSerializer("application/json", null);
-
-        m_locatableStore = getLocatableStore();
-
-        m_locatableValidator = new ArchetypeBasedValidator(m_archetypeStore, systemValues);
-    }
-
-    @Override
-    public void tearDown() throws Exception
-    {
-        super.tearDown();
-        m_engine.dispose();
-    }
-
-    protected LocatableStore getLocatableStore() throws Exception
-    {
-        CompositeStore store = new CompositeStore(m_locatableStoreName);
-
-        LocatableStore base = m_engine.getLocatableStore();
-        store.addDelegate(base);
-
-        MemLocatableStore memStore = new MemLocatableStore("IntegrationTestMEMORY");
-        UIDGenerator uidGenerator = new UIDGenerator();
-        CompositeTransformer transformer = new CompositeTransformer();
-        transformer.addDelegate(uidGenerator);
-        TransformingLocatableStore transformingStore = new TransformingLocatableStore("IntegrationTestMEMORY", memStore, 
-                transformer);
-        m_fallbackStore = transformingStore;
-
-        store.addDelegate(m_fallbackStore);
-
-        store.clear();
-        store.initialize();
-
-        return store;
     }
 
     public void testEverything() throws Exception
@@ -242,20 +113,16 @@ public class IntegrationTest extends RMTestBase
         assertEquals("No failures", 0, creationFailed);
     }
 
-    private void loadAll() throws Exception
-    {
-        m_archetypeStore.clear();
-        m_archetypeLoader.loadAll("openehr");
-        m_archetypeLoader.loadAll("unittest");
-        //m_archetypeLoader.loadAll("medfit");
-        //m_archetypeLoader.loadAll("chiron");
-        //m_archetypeLoader.loadAll("mobiguide");
-    }
+    /**
+     * Override this to populate {@link #m_archetypeStore} with archetypes, perhaps using {@link #m_archetypeLoader} 
+     * to do so. 
+     */
+    protected abstract void loadAll() throws Exception;
 
-    private void generateAll() throws Exception
+    protected void generateAll() throws Exception
     {
         subject = subject();
-        Archetyped arch = new Archetyped(new ArchetypeID("unittest-EHR-EHRSTATUS.ehrstatus.v1"), "1.0.2");
+        Archetyped arch = new Archetyped(new ArchetypeID(EHRSTATUS_ARCHETYPE), "1.0.2");
         EHRStatus status = new EHRStatus(makeUID(), "at0001", text("EHR Status"),
                 arch, null, null, null, subject, true, true, null);
 
@@ -292,7 +159,7 @@ public class IntegrationTest extends RMTestBase
         }
     }
 
-    private Locatable generate(Archetype archetype) throws Exception
+    protected Locatable generate(Archetype archetype) throws Exception
     {
         long ct;
         
@@ -327,8 +194,8 @@ public class IntegrationTest extends RMTestBase
         
         return instance;
     }
-    
-    private Locatable insert(EHR EHR, Locatable instance) throws Exception
+
+    protected Locatable insert(EHR EHR, Locatable instance) throws Exception
     {
         long ct = System.nanoTime();
         Locatable insertedInstance = m_locatableStore.insert(EHR, instance);
@@ -343,7 +210,7 @@ public class IntegrationTest extends RMTestBase
         return insertedInstance;
     }
 
-    private void serializeAll() throws IOException
+    protected void serializeAll() throws IOException
     {
         Iterable<HierObjectID> allIDs = m_locatableStore.list();
         File base = new File("build" + File.separatorChar + "ser");
@@ -357,7 +224,7 @@ public class IntegrationTest extends RMTestBase
         }
     }
 
-    private void serialize(File base, HierObjectID hierObjectID)
+    protected void serialize(File base, HierObjectID hierObjectID)
     {
         totalIDs++;
         String id = null;
@@ -395,7 +262,7 @@ public class IntegrationTest extends RMTestBase
         }
     }
 
-    private void validateAll() throws IOException, ParseException, NotSupportedException
+    protected void validateAll() throws IOException, ParseException, NotSupportedException
     {
         long ct = System.nanoTime();
         for (HierObjectID hierObjectID : m_locatableStore.list())
@@ -422,7 +289,7 @@ public class IntegrationTest extends RMTestBase
         validatedNs += System.nanoTime() - ct;
     }
 
-    private void validate(Locatable locatable) throws NotSupportedException
+    protected void validate(Locatable locatable) throws NotSupportedException
     {
         ValidationReport report = m_locatableValidator.validate(locatable);
         validated++;
@@ -464,8 +331,8 @@ public class IntegrationTest extends RMTestBase
             valid++;
         }
     }
-    
-    private void useEngineApi() throws Exception
+
+    protected void useEngineApi() throws Exception
     {
         Iterable<HierObjectID> ehrIDs = m_engine.getEHRStore().list();
         for (HierObjectID ehrID : ehrIDs)
@@ -502,7 +369,7 @@ public class IntegrationTest extends RMTestBase
         }
     }
 
-    private void report() throws IOException
+    protected void report() throws IOException
     {
         int storedInMemory = Iterables.size(m_fallbackStore.list());
 
@@ -525,5 +392,4 @@ public class IntegrationTest extends RMTestBase
                 serialized/(serializedNs/10E8)
                 ));
     }
-
 }
