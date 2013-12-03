@@ -15,22 +15,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 
+import com.medvision360.medrecord.api.exceptions.CannotMaintainSortException;
 import com.medvision360.medrecord.rmutil.Node;
 import com.medvision360.medrecord.spi.LocatableParser;
 import com.medvision360.medrecord.api.exceptions.ParseException;
 import org.openehr.rm.common.archetyped.Locatable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("rawtypes")
 public abstract class AbstractPVParser extends PVReader implements LocatableParser
 {
+    private static final Logger log = LoggerFactory.getLogger(AbstractPVParser.class);
+
     protected String m_encoding;
 
     public AbstractPVParser(String encoding)
@@ -295,8 +302,17 @@ public abstract class AbstractPVParser extends PVReader implements LocatablePars
         }
         else if ("SET".equalsIgnoreCase(collectionType))
         {
-            SortedSet<Object> set = new TreeSet<>();
-            parseCollection(node, set); // recurse!
+            Set<Object> set = new TreeSet<>();
+            try
+            {
+                parseCollection(node, set); // recurse!
+            }
+            catch (CannotMaintainSortException e)
+            {
+                log.warn("Cannot created a sorted set, falling back to unsorted set", e);
+                set = new HashSet<>();
+                parseCollection(node, set); // recurse!
+            }
             return set;
         }
         else if ("ARRAY".equalsIgnoreCase(collectionType))

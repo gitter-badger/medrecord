@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -170,6 +171,19 @@ public class PVParser extends AbstractPVParser
 
         for (Node child : indexMap.values())
         {
+            Object childValue = parse(child);
+            if (coll instanceof Set && childValue != null && !(childValue instanceof Comparable))
+            {
+                throw new CannotMaintainSortException(String.format(
+                        "Collection at %s needs to be a SET, " +
+                        "but value at path %s is of type %s which is not Comparable " +
+                        "so it cannot be put into a set. Either change the collection " +
+                        "to be a list or add only Comparable entities into it.",
+                        node.getPath(),
+                        child.getPath(),
+                        childValue.getClass().getSimpleName()
+                ));
+            }
             coll.add(parse(child));
         }
     }
