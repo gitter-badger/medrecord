@@ -20,16 +20,6 @@ This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAl
 * http://creativecommons.org/licenses/by-nc-sa/4.0/
 
 
-Why creative commons?
----------------------
-We want a well-recognized, simple to understand, internationally validated license that simply, freely and safely
-allows academic research and standards compatibility testing, while not allowing commercial use of any kind. 
-Though creative commons licenses are not ideal for software, there is unfortunately no open source license or open 
-source licensing model that satisfies our needs.
-
-Contact us if you're interested in commercial use of medrecord.
-
-
 Building and running
 ====================
 MEDrecord is built with gradle. It makes use of some custom MEDvision build plugins and library dependencies that you
