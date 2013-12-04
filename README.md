@@ -4,7 +4,7 @@ This is the implementation of MEDrecord and its tools.
 
 Useful links
 ------------
-* Website: https://www.medrecord.nl
+* Website: https://www.medrecord.nl/en
 * Online demo: http://medrecord.test.medvision360.org/medrecord/ (feel free to experiment here!)
 * Group for discussing the implementation: https://groups.google.com/a/medrecord.nl/d/forum/dev
 * Overview documentation: https://zorggemak.atlassian.net/wiki/display/DOC/MEDrecord
