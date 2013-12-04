@@ -1,15 +1,14 @@
 MEDrecord
 =========
-This is the implementation of MEDrecord and its tools. See http://medrecord.medvision360.org/ for general information,
-and https://zorggemak.atlassian.net/wiki/display/DOC/MEDrecord for overview documentation.
+This is the implementation of MEDrecord and its tools. 
 
-Online demo
------------
-Visit
-
-* http://medrecord.test.medvision360.org/medrecord/
-
-for a live demo version of medrecord. Feel free to experiment with this installation: that's what it's for!
+Useful links
+------------
+* Website: https://www.medrecord.nl
+* Online demo: http://medrecord.test.medvision360.org/medrecord/ (feel free to experiment here!)
+* Group for discussing the implementation: https://groups.google.com/a/medrecord.nl/d/forum/dev
+* Overview documentation: https://zorggemak.atlassian.net/wiki/display/DOC/MEDrecord
+* Javadocs for the Java client: http://repo.medvision360.org/javadoc/medrecord-server-client-jee
 
 
 License
