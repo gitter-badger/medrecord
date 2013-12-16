@@ -3,9 +3,6 @@
 //   gradle run -Pargs="-i <adlfile>"
 //
 
-// some standard settings for Java applications (language level etc)
-apply plugin: 'medvision-java'
-
 // add the 'run' task for running the artifact
 apply plugin: 'application'
 mainClassName = "com.medvision360.medrecord.tools.dumpadl.Dumper";

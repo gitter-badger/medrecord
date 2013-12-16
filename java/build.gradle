@@ -1,31 +1,22 @@
 buildscript {
     repositories {
-        maven {
-            url "http://repo.medvision360.org/release/"
-        }
-        
-        maven {
-            url "http://repo.medvision360.org/snapshot/"
-        }
-
         mavenLocal()
-
         mavenCentral()
     }
     dependencies {
-        // this is the medvision buildlib
-        classpath 'com.medvision360.buildlib:buildlib:latest.integration'
-
         // plugin for updating the license headers
         classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.5.0'
     }
 }
 
-// The IDEA plugin picks up sourceCompatibility from the Java plugin so
-// make sure the root project has a proper Java configuration.
-apply plugin: 'medvision-java'
-
 allprojects {
+    // The IDEA plugin picks up sourceCompatibility from the Java plugin so
+    // make sure the root project has a proper Java configuration.
+    apply plugin: 'java'
+
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+
     // Gradle can generate IDEA project files.
     // Run 'gradle idea' and open the project file in IDEA.
     apply plugin: 'idea'
@@ -54,16 +45,8 @@ allprojects {
 
 subprojects {
     group = 'com.medvision360.medrecord'
-    version = '2.0.0'
+    version = '2.0.0-SNAPSHOT'
     description = 'MEDvision360 MEDrecord, an openEHR based medical record server'
-
-    // Change version based on the build location.
-    // When build locally it adds '-SNAPSHOT' when build on Cloudbees it adds
-    // the build number.
-    apply plugin: 'medvision-version'
-
-    // Use the MEDvision360 repos (cloudbees, repo.medvision360.org)
-    apply plugin: 'medvision-repo'
 
     // make sure all projects get the right basex & restlet
     repositories {
@@ -75,7 +58,6 @@ subprojects {
         }
 
         mavenLocal()
-
         mavenCentral()
 
         maven {
@@ -127,7 +109,7 @@ subprojects {
                 jstl                : '1.2',
                 junit               : '4.11',
                 logback             : '1.0.13',
-                medvisionlib        : 'latest.integration',
+                medvisionlib        : '2.1.1.+',
                 openEhr             : '1.0.6-SNAPSHOT',
                 postgresql          : '9.2-1003-jdbc4',
                 restlet             : '2.2-M1',

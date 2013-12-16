@@ -1,5 +1,3 @@
-apply plugin: 'medvision-java'
-
 description = 'MEDvision360 MEDrecord Application Programming Interface'
 
 dependencies {

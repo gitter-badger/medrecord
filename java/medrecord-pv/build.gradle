@@ -1,6 +1,3 @@
-// some standard settings for Java applications (language level etc)
-apply plugin: 'medvision-java'
-
 description = 'MEDvision360 MEDrecord Path/Value parsing and serializing'
 
 // do not update the license on code which we do not own

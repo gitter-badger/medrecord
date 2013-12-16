@@ -1,6 +1,3 @@
-// some standard settings for Java applications (language level etc)
-apply plugin: 'medvision-java'
-
 // do not update the license on code which we do not own
 import nl.javadude.gradle.plugins.license.License
 
@@ -14,7 +11,7 @@ apply plugin: 'idea'
 
 idea.module.iml {
     whenMerged { module ->
-        
+
         // add module dependencies for vendor libraries
         def toModuleDependencies = [
                 'adl-parser',
@@ -33,11 +30,11 @@ idea.module.iml {
                 //'rm-skeleton',
                 'xml-binding',
                 'xml-serializer',
-                
+
                 'libs-api-jee',
-                'libs-common-jee'                
+                'libs-common-jee'
         ]
-        
+
         toModuleDependencies.each { dependencyName ->
             module.dependencies += new ModuleDependency(dependencyName, 'COMPILE')
         }

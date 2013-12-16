@@ -1,58 +1,106 @@
-apply plugin: 'medvision-java'
-apply plugin: 'medvision-apidoc'
-apply plugin: 'medvision-clientdoclet'
-apply plugin: 'medvision-javadoc'
-apply plugin: 'static-analysis'
-
 description += ' API'
-
-configurations {
-    xslt
-}
-
-//
-// artifacts to be uploaded
-//
-
-apply plugin: 'medvision-publish'
-artifacts {
-    // only the artifacts listed below will be uploaded to the public repo
-    publicArchives jar
-}
-
 
 dependencies {
     compile project(":medrecord-api")
     compile "com.medvision360.lib:libs-api-jee:${ext.version.medvisionlib}"
     compile "com.medvision360.lib:libs-common-jee:${ext.version.medvisionlib}"
     compile "org.restlet.jee:org.restlet:${ext.version.restlet}"
-    xslt "net.sf.saxon:Saxon-HE:${ext.version.saxon}"
 }
 
-generateClientSource {
-    // todo: the client should run the clientdoclet themselves
-    configure(options) {
-        destinationDir = file("../medrecord-server-client-jee/src/main/java")
+/*
+
+This is some gradle stuff for generating the client API and swagger documentation.
+It is disabled for now because it is not publicly available.
+
+configurations {
+    clientdoclet
+    apidoclet
+    xslt
+    additionalDoclet
+}
+
+dependencies {
+    clientdoclet "com.medvision360.lib:clientdoclet:latest.integration"
+    apidoclet "com.medvision360.lib:apidoclet:1.+"
+    xslt "net.sf.saxon:Saxon-HE:9.5.1-1"
+}
+
+task(
+        'generateClientSource',
+        type: Javadoc,
+        description: "Generate the source for the client library."
+) {
+    outputs.file file("../medrecord-server-client-jee/src/main/java")
+    source = sourceSets.main.allJava
+    destinationDir = file("../medrecord-server-client-jee/src/main/java")
+    options.docletpath = configurations.clientdoclet.files.asType(List)
+    options.doclet = "com.medvision360.lib.clientdoclet.ClientDoclet"
+    classpath = configurations.compile
+}
+
+task(
+        'generateRestApiDocs',
+        type: Javadoc,
+        description: "Generate the API documentation."
+) {
+    outputs.file project.reporting.file("apidoc/apidoc.xml")
+    project.logger.info("Writing apidoc.xml to " + outputs.files.asPath)
+    source = {
+        def result = project.sourceSets.main.allJava
+        project.configurations.additionalDoclet.each {
+            file -> result += project.zipTree(file)
+        }
+        return result
+    }
+    destinationDir = project.reporting.file("apidoc")
+    options.docletpath = project.configurations.apidoclet.files.asType(List)
+    options.doclet = "com.medvision360.lib.apidoclet.ApiDoclet"
+    classpath = project.configurations.compile
+}
+.doFirst {
+    options.addStringOption("apiversion", project.version.toString())
+}
+
+task(
+        'generateSwaggerDocs'
+)
+        {
+            inputs.file project.reporting.file("apidoc/apidoc.xml")
+            dependsOn 'generateRestApiDocs'
+            dependsOn project.sourceSets.main.java
+        } << {
+    def outputDir = file("../medrecord-server-server/src/main/webapp/apidocs")
+    outputDir.mkdirs()
+
+    ant.xslt(
+            in: "$project.buildDir/reports/apidoc/apidoc.xml",
+            out: "$project.buildDir/reports/apidoc/dummy",
+            style: "/home/ralph/work/apidoclet2swagger.xslt",
+
+            // make sure we use an xslt-2.0 processor
+            classpath: project.configurations.xslt.asPath
+    ) {
+        param(name: 'outputDir', expression: outputDir.toString())
     }
 }
 
-tasks.javadoc {
-    // MEDcore codeset2 javadoc issue collector
-    options.footer += "<script type=\"text/javascript\" src=\"https://zorggemak.atlassian.net/s/d41d8cd98f00b204e9800998ecf8427e/en_US-fra9ft-1988229788/6204/110/1.4.0-m8/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=c797e8f6\"></script>"
-}
+
+
+/** END ********/
+
 
 import org.gradle.plugins.ide.idea.model.*
 apply plugin: 'idea'
 
 idea.module.iml {
     whenMerged { module ->
-        
+
         // add module dependencies for medvision common libraries
         def toModuleDependencies = [
                 'libs-api-jee',
                 'libs-common-jee',
         ]
-        
+
         toModuleDependencies.each { dependencyName ->
             module.dependencies += new ModuleDependency(dependencyName, 'COMPILE')
         }

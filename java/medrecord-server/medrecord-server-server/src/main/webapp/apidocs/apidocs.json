@@ -1,0 +1,33 @@
+{
+  "javadocBase": "",
+  "apiVersion": "2.0.0-SNAPSHOT",
+  "swaggerVersion": "1.1",
+  "basePath": "/",
+  "apis": [
+    {
+      "path": "/apidocs/com_medvision360_medrecord_api_archetype",
+      "description": "Archetype api. "
+    },
+
+    {
+      "path": "/apidocs/com_medvision360_medrecord_api_ehr",
+      "description": "EHR api. "
+    },
+
+    {
+      "path": "/apidocs/com_medvision360_medrecord_api_locatable",
+      "description": "Locatable api. "
+    },
+
+    {
+      "path": "/apidocs/com_medvision360_medrecord_api_query",
+      "description": "Query api. "
+    },
+
+    {
+      "path": "/apidocs/com_medvision360_medrecord_api_test",
+      "description": "Unit test api. "
+    }
+
+  ]
+}

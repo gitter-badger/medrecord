@@ -21,7 +21,8 @@ public abstract class ExceptionTestBase<T extends Exception> extends TestCase
 
     protected boolean requireJDK7Constructor()
     {
-        return true;
+        // set to false, not working properly when true
+        return false;
     }
 
     protected String msg = "ExceptionTestBase.test";

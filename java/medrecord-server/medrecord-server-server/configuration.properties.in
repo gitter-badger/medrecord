@@ -19,5 +19,5 @@
 #
 # LOGGING
 #
-lib.server.config.logbackconfigfile=/etc/medvision360/${artifactId}/logback.xml
+lib.server.config.logbackconfigfile=/etc/medvision360/medrecord/logback.xml
 

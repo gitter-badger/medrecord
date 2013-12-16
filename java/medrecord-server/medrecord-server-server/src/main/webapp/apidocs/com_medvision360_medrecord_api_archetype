@@ -1,0 +1,257 @@
+{
+  "apiVersion": "2.0.0-SNAPSHOT",
+  "swaggerVersion": "1.2",
+  "resourcePath": "/archetype",
+  "apis": [
+    {
+      "path": "/archetype",
+      "operations": [
+
+        {
+          "notes": "Retrieve a list of archetype IDs known to the server encapsulated in JSON.\n",
+          "methodName": "com.medvision360.medrecord.api.archetype.ArchetypeListResource#listArchetypes()",
+          "httpMethod": "Get",
+          "nickname": "com_medvision360_medrecord_api_archetype_m_listArchetypes",
+          "summary": "List archetype resources. ",
+          "responseClass": "com.medvision360.medrecord.api.IDList",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "openEHR-EHR.*",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "q",
+              "description": "A regular expression to limit the returned archetypes by their name.",
+              "required": false
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (PATTERN_EXCEPTION)",
+              "reason": "Invalid regular expression: {0}"            }
+,
+            {
+              "code": "500 (PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      ,
+
+        {
+          "notes": "Store an archetype from an ADL string (plain text). Will result in DUPLICATE_EXCEPTION if the archetype\nalready exists. If you want to update an archetype that's unused, you can delete it first and then re-upload\nit. Updating archetypes once they are in use is not possible.\n<br/>&nbsp;<br/>Note that for non-web-based tools, simply using the plain text API is probably much easier, i.e. something like\n<code>curl -X POST -T foo.adl -H \"Content-Type: text/plain\" $URL/medrecord/v2/archetype</code>\nworks fine.\n",
+          "methodName": "com.medvision360.medrecord.api.archetype.ArchetypeListResource#postArchetype(com.medvision360.medrecord.api.archetype.ArchetypeRequest)",
+          "httpMethod": "Post",
+          "nickname": "com_medvision360_medrecord_api_archetype_m_postArchetype",
+          "summary": "Create archetype resource. ",
+          "responseClass": "",
+    
+          "produces": ["application/json",
+    "text/plain"],
+    
+          "parameters": [            {
+                            "defaultValue": "",
+              "paramType":              "body",
+              "dataType": "com.medvision360.medrecord.api.archetype.ArchetypeRequest",
+              "name": "body",
+              "description": "",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (CLIENT_PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "400 (MISSING_PARAMETER_EXCEPTION)",
+              "reason": "The required parameter is missing: {0}"            }
+,
+            {
+              "code": "409 (DUPLICATE_EXCEPTION)",
+              "reason": "Resource already exists: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    },
+    {
+      "path": "/archetype/{id}",
+      "operations": [
+
+        {
+          "notes": "Delete a stored archetype.\n",
+          "methodName": "com.medvision360.medrecord.api.archetype.ArchetypeResource#deleteArchetype()",
+          "httpMethod": "Delete",
+          "nickname": "com_medvision360_medrecord_api_archetype_m_deleteArchetype",
+          "summary": "Delete archetype resource. ",
+          "responseClass": "",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "openEHR-EHR-OBSERVATION.blood_pressure.v1",
+              "paramType":              "path",
+              "dataType": "string",
+              "name": "id",
+              "description": "An OpenEHR ArchetypeID value",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (IN_USE_EXCEPTION)",
+              "reason": "Resource is in use: {0}"            }
+,
+            {
+              "code": "400 (INVALID_ARCHETYPE_ID_EXCEPTION)",
+              "reason": "Not a valid archetype ID: {0}"            }
+,
+            {
+              "code": "404 (NOT_FOUND_EXCEPTION)",
+              "reason": "Resource not found: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      ,
+
+        {
+          "notes": "Retrieve an archetype encapsulated in JSON.\n",
+          "methodName": "com.medvision360.medrecord.api.archetype.ArchetypeResource#getArchetype()",
+          "httpMethod": "Get",
+          "nickname": "com_medvision360_medrecord_api_archetype_m_getArchetype",
+          "summary": "Retrieve archetype resource. ",
+          "responseClass": "com.medvision360.medrecord.api.archetype.ArchetypeResult",
+    
+          "produces": ["application/json",
+    "text/plain"],
+    
+          "parameters": [            {
+                            "defaultValue": "openEHR-EHR-OBSERVATION.blood_pressure.v1",
+              "paramType":              "path",
+              "dataType": "string",
+              "name": "id",
+              "description": "An OpenEHR ArchetypeID value",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (INVALID_ARCHETYPE_ID_EXCEPTION)",
+              "reason": "Not a valid archetype ID: {0}"            }
+,
+            {
+              "code": "404 (NOT_FOUND_EXCEPTION)",
+              "reason": "Resource not found: {0}"            }
+,
+            {
+              "code": "500 (PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    }
+
+  ],
+  "models": {
+    "com.medvision360.medrecord.api.IDList": {
+      "properties": {
+        "ids": {
+
+          "required": true,
+                    "description": "",
+          "type": "Array",
+          "items": {
+            "$ref": "string"
+          }
+        }
+      }
+    },
+    "com.medvision360.medrecord.api.archetype.ArchetypeRequest": {
+      "properties": {
+        "adl": {
+
+          "required": true,
+                    "defaultValue": "archetype (adl_version=1.4) openEHR-EHR-OBSERVATION.blood_pressure.v1\n concept\n [at0000]\n language\n original_language = ....",
+          "description": "The openEHR Archetype as an ADL string. ",
+          "type": "string"
+        }
+      }
+    },
+    "com.medvision360.medrecord.api.archetype.ArchetypeResult": {
+      "properties": {
+        "adl": {
+
+          "required": true,
+                    "defaultValue": "archetype (adl_version=1.4) openEHR-EHR-OBSERVATION.blood_pressure.v1\n concept\n [at0000]\n language\n original_language = ....",
+          "description": "The openEHR Archetype as an ADL string. ",
+          "type": "string"
+        },
+        "archetypeId": {
+
+          "required": true,
+                    "defaultValue": "openEHR-EHR-OBSERVATION.blood_pressure.v1",
+          "description": "The openEHR ArchetypeID value for the retrieved archetype. ",
+          "type": "string"
+        }
+      }
+    }
+,
+    "com.medvision360.lib.common.MetaContent": {
+      "properties": {
+        "created": {
+          "required": false,
+          "defaultValue": "20130512T12:34:55Z",
+          "description": "The date/time on which the entry was created or null when not available.",
+          "type": "string"
+        },
+        "lastModified": {
+          "required": false,
+          "defaultValue": "20130512T12:34:55Z",
+          "description": "The date/time on which the entry was modified or null when not available.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,450 @@
+{
+  "apiVersion": "2.0.0-SNAPSHOT",
+  "swaggerVersion": "1.2",
+  "resourcePath": "/ehr",
+  "apis": [
+    {
+      "path": "/ehr",
+      "operations": [
+
+        {
+          "notes": "Retrieve a list of HierObjectIDs (typically UUIDs, but not always) for all EHRs known to the server\nencapsulated in JSON. This API call is of limited use in most practical scenarios, because the result can become\nvery large, and because typically you will want to constrain the results by some kind of selection or query,\nlike looking only for particular subjects and their EHRs. Use the <code>/query</code> API for that.\n<br/>&nbsp;<br/>However, this API call is provided nonetheless, for API consistency, completeness and ease of testing.\n",
+          "methodName": "com.medvision360.medrecord.api.ehr.EHRListResource#listEHRs()",
+          "httpMethod": "Get",
+          "nickname": "com_medvision360_medrecord_api_ehr_m_listEHRs",
+          "summary": "List EHR resources. ",
+          "responseClass": "com.medvision360.medrecord.api.IDList",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "false",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "excludeDeleted",
+              "description": "Set to true to exclude EHRs that have been marked as deleted in the returned list, to any other value to include them, or omit the parameter to have the implementation choose (typically using its most efficient option).",
+              "required": false
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (PATTERN_EXCEPTION)",
+              "reason": "Invalid regular expression: {0}"            }
+,
+            {
+              "code": "500 (PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      ,
+
+        {
+          "notes": "Creates a new EHR along with an EHRStatus from a path/value JSON document. The provided EHR and EHRStatus do\nnot need unique identifiers; if those are not provided they will be added by the server. If you do provide an\nidentifier, it will result in DUPLICATE_EXCEPTION if the EHR and/or EHRStatus already exists (use PUT on the\n<code>/locatable</code> API to update an existing EHRStatus).\n<br/>&nbsp;<br/>Returns the ID of the new EHR wrapped in a JSON document.\n",
+          "methodName": "com.medvision360.medrecord.api.ehr.EHRListResource#postEHR(org.restlet.representation.Representation)",
+          "httpMethod": "Post",
+          "nickname": "com_medvision360_medrecord_api_ehr_m_postEHR",
+          "summary": "Create EHR resource. ",
+          "responseClass": "com.medvision360.medrecord.api.ID",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "",
+              "paramType":              "body",
+              "dataType": "org.restlet.representation.Representation",
+              "name": "body",
+              "description": "",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (CLIENT_PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "400 (NOT_SUPPORTED_EXCEPTION)",
+              "reason": "Resource not supported: {0}"            }
+,
+            {
+              "code": "400 (VALIDATION_EXCEPTION)",
+              "reason": "Problem validating resource: {0}"            }
+,
+            {
+              "code": "409 (DUPLICATE_EXCEPTION)",
+              "reason": "Resource already exists: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    },
+    {
+      "path": "/ehr/{id}",
+      "operations": [
+
+        {
+          "notes": "Delete a stored EHR. Fully deleting the entire EHR record is not possible. Rather, when deleting an EHR,\nit is simply marked as deleted. This also does not delete the contents of an EHR. In OpenEHR,\nactually deleting information in bulk is quite uncommon and it is not currently supported through this API.\n<br/>&nbsp;<br/>The main reason to do actual erasure is in response to some kind of data protection request,\nand such purge actions should not be taken lightly. To erase all information for a particular subject from the\nserver:\n<ul>\n<li>fetch their EHR record and mark it as deleted</li>\n<li>iterate over all the locatables in their record and delete those</li>\n<li>delete the EHRStatus associated with the EHR record</li>\n<li>delete the Directory associated with the EHR record, if any</li>\n<li>query for all demographic locatables of or about the subject and delete those</li>\n</ul>\n<br/>&nbsp;<br/>This will leave behind only an anonymous, flagged-as-deleted EHR record, which can be used by the system to\ndetermine \"there was information here but it has been erased\".\n<br/>&nbsp;<br/>Built-in API support for such a purge operation may be provided in the future.\n",
+          "methodName": "com.medvision360.medrecord.api.ehr.EHRResource#deleteEHR()",
+          "httpMethod": "Delete",
+          "nickname": "com_medvision360_medrecord_api_ehr_m_deleteEHR",
+          "summary": "Soft-delete EHR resource. ",
+          "responseClass": "",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "71350448-25BA-4395-B354-19B9CA9D5096",
+              "paramType":              "path",
+              "dataType": "string",
+              "name": "id",
+              "description": "An OpenEHR HierObjectID value identifying an EHR",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (INVALID_EHR_ID_EXCEPTION)",
+              "reason": "Not a valid EHR ID: {0}"            }
+,
+            {
+              "code": "404 (NOT_FOUND_EXCEPTION)",
+              "reason": "Resource not found: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      ,
+
+        {
+          "notes": "Retrieve basic info about an EHR as a JSON structure.\n",
+          "methodName": "com.medvision360.medrecord.api.ehr.EHRResource#getEHR()",
+          "httpMethod": "Get",
+          "nickname": "com_medvision360_medrecord_api_ehr_m_getEHR",
+          "summary": "Retrieve EHR resource. ",
+          "responseClass": "com.medvision360.medrecord.api.EHR",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "71350448-25BA-4395-B354-19B9CA9D5096",
+              "paramType":              "path",
+              "dataType": "string",
+              "name": "id",
+              "description": "An OpenEHR HierObjectID value identifying an EHR",
+              "required": true
+            }
+,
+            {
+                            "defaultValue": "false",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "ignoreDeleted",
+              "description": "Set to true to return the info even if the EHR has been marked as deleted.",
+              "required": false
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (INVALID_EHR_ID_EXCEPTION)",
+              "reason": "Not a valid EHR ID: {0}"            }
+,
+            {
+              "code": "404 (NOT_FOUND_EXCEPTION)",
+              "reason": "Resource not found: {0}"            }
+,
+            {
+              "code": "404 (DELETED_EXCEPTION)",
+              "reason": "Resource deleted: {0}"            }
+,
+            {
+              "code": "500 (PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    },
+    {
+      "path": "/ehr/{id}/locatable",
+      "operations": [
+
+        {
+          "notes": "Retrieve a list of all locatable IDs known to the server that are part of the specified EHR, encapsulated in\nJSON. This API call is of limited use in most practical scenarios, because the result can become very large, and\nbecause typically you will want to constrain the results by some kind of selection or query, like looking only\nfor locatables of a particular type. Use the <code>/query</code> API for that.\n<br/>&nbsp;<br/>However, this API call is provided nonetheless, for API consistency, completeness and ease of testing.\n",
+          "methodName": "com.medvision360.medrecord.api.ehr.EHRLocatableListResource#listLocatables()",
+          "httpMethod": "Get",
+          "nickname": "com_medvision360_medrecord_api_ehr_m_listLocatables",
+          "summary": "List locatable resources in this EHR. ",
+          "responseClass": "com.medvision360.medrecord.api.IDList",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "71350448-25BA-4395-B354-19B9CA9D5096",
+              "paramType":              "path",
+              "dataType": "string",
+              "name": "id",
+              "description": "An OpenEHR HierObjectID value identifying an EHR",
+              "required": true
+            }
+,
+            {
+                            "defaultValue": "false",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "ignoreDeleted",
+              "description": "Set to true to return the info even if the EHR has been marked as deleted.",
+              "required": false
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "500 (PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      ,
+
+        {
+          "notes": "Store a new locatable into the specified EHR from a path/value JSON document. The provided locatable does not\nneed unique identifiers; if those are not provided they will be added by the server. If you do provide an\nidentifier, it will result in DUPLICATE_EXCEPTION if the locatable already exists (use PUT to update an\nexisting locatable).\n",
+          "methodName": "com.medvision360.medrecord.api.ehr.EHRLocatableListResource#postLocatable(org.restlet.representation.Representation)",
+          "httpMethod": "Post",
+          "nickname": "com_medvision360_medrecord_api_ehr_m_postLocatable",
+          "summary": "Create locatable resource in this EHR. ",
+          "responseClass": "com.medvision360.medrecord.api.ID",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "71350448-25BA-4395-B354-19B9CA9D5096",
+              "paramType":              "path",
+              "dataType": "string",
+              "name": "id",
+              "description": "An OpenEHR HierObjectID value identifying an EHR",
+              "required": true
+            }
+,
+            {
+                            "defaultValue": "",
+              "paramType":              "body",
+              "dataType": "org.restlet.representation.Representation",
+              "name": "body",
+              "description": "",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (CLIENT_PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "400 (NOT_SUPPORTED_EXCEPTION)",
+              "reason": "Resource not supported: {0}"            }
+,
+            {
+              "code": "400 (VALIDATION_EXCEPTION)",
+              "reason": "Problem validating resource: {0}"            }
+,
+            {
+              "code": "409 (DUPLICATE_EXCEPTION)",
+              "reason": "Resource already exists: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    },
+    {
+      "path": "/ehr/{id}/undelete",
+      "operations": [
+
+        {
+          "notes": "Restores an existing EHR that has been deleted. Basically this removes the 'deleted' flag from the EHR record\nthat was put there by a previous <code>DELETE /ehr/{id}</code>.\n",
+          "methodName": "com.medvision360.medrecord.api.ehr.EHRUndeleteResource#undeleteEHR()",
+          "httpMethod": "Post",
+          "nickname": "com_medvision360_medrecord_api_ehr_m_undeleteEHR",
+          "summary": "Undelete EHR resource. ",
+          "responseClass": "",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "71350448-25BA-4395-B354-19B9CA9D5096",
+              "paramType":              "path",
+              "dataType": "string",
+              "name": "id",
+              "description": "An OpenEHR HierObjectID value identifying an EHR",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (CLIENT_PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "404 (NOT_FOUND_EXCEPTION)",
+              "reason": "Resource not found: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    }
+
+  ],
+  "models": {
+    "com.medvision360.medrecord.api.EHR": {
+      "properties": {
+        "deleted": {
+
+          "required": true,
+                    "description": "",
+          "type": "boolean"
+        },
+        "directoryId": {
+
+          "required": true,
+                    "defaultValue": "A14C2AE8-BA46-4EF8-AFC8-889963DA2BA5",
+          "description": "An openEHR UIDBasedID value identifying the Directory for this EHR, if any. Often but not always a UUID. ",
+          "type": "string"
+        },
+        "id": {
+
+          "required": true,
+                    "defaultValue": "0F0A7A96-25ED-44AA-B4BD-D6A7F32877F7",
+          "description": "An openEHR HierObjectID value identifying this EHR. Often but not always a UUID. ",
+          "type": "string"
+        },
+        "statusId": {
+
+          "required": true,
+                    "defaultValue": "DC82E362-75AE-443F-9617-C9235A28F69D",
+          "description": "An openEHR UIDBasedID value identifying the EHRStatus for this EHR. Often but not always a UUID. ",
+          "type": "string"
+        },
+        "systemId": {
+
+          "required": true,
+                    "defaultValue": "B55B6AE8-5DFC-4D0D-82DA-392E331417FB",
+          "description": "An openEHR HierObjectID value identifying the system that is the origin of this EHR. Often but not always a UUID. ",
+          "type": "string"
+        },
+        "timeCreated": {
+
+          "required": true,
+                    "defaultValue": "2013-11-23T17:13:53Z",
+          "description": "An ISO8601 timestamp identifying when this EHR was created. ",
+          "type": "string"
+        }
+      }
+    },
+    "com.medvision360.medrecord.api.ID": {
+      "properties": {
+        "id": {
+
+          "required": true,
+                    "defaultValue": "A660D3C2-50C4-44AA-8663-83FEEB22ADF1",
+          "description": "An openEHR ObjectID value. Often but not always a UUID. ",
+          "type": "string"
+        }
+      }
+    },
+    "com.medvision360.medrecord.api.IDList": {
+      "properties": {
+        "ids": {
+
+          "required": true,
+                    "description": "",
+          "type": "Array",
+          "items": {
+            "$ref": "string"
+          }
+        }
+      }
+    }
+,
+    "com.medvision360.lib.common.MetaContent": {
+      "properties": {
+        "created": {
+          "required": false,
+          "defaultValue": "20130512T12:34:55Z",
+          "description": "The date/time on which the entry was created or null when not available.",
+          "type": "string"
+        },
+        "lastModified": {
+          "required": false,
+          "defaultValue": "20130512T12:34:55Z",
+          "description": "The date/time on which the entry was modified or null when not available.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

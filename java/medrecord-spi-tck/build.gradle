@@ -1,6 +1,3 @@
-// some standard settings for Java applications (language level etc)
-apply plugin: 'medvision-java'
-
 // do not update the license on code which we do not own
 import nl.javadude.gradle.plugins.license.License
 

@@ -1,9 +1,0 @@
-apply plugin: 'medvision-version'
-apply plugin: 'medvision-server-debian'
-
-dependencies {
-  packageWar project(path: ':medrecord-server-server', configuration: 'archives')
-//  packageFlyway project(path: ':sql', configuration: 'archives')
-}
-
-

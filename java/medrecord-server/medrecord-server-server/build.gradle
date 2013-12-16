@@ -1,89 +1,130 @@
-apply plugin: 'medvision-server'
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        // plugin for updating the license headers
+        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.5.0'
+        classpath 'org.gradle.api.plugins:gradle-tomcat-plugin:0.9.8'
+    }
+}
+
+
+archivesBaseName = 'medrecord'
+
+
+apply plugin: 'war'
+apply plugin: 'tomcat'
+
+def tomcatVersion = '7.0.34'
+project.dependencies {
+    tomcat("org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}") {
+        exclude group:'commons-logging', module:'commons-logging'
+        exclude group:'log4j', module:'log4j'
+    }
+    // we use this with log4j-over-slf4j.jar to log to logback efficiently...
+    tomcat("org.apache.tomcat.embed:tomcat-embed-logging-log4j:${tomcatVersion}") {
+        exclude group:'commons-logging', module:'commons-logging'
+        exclude group:'log4j', module:'log4j'
+    }
+    tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}") {
+        exclude group:'commons-logging', module:'commons-logging'
+        exclude group:'log4j', module:'log4j'
+        exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
+    }
+    tomcat "ch.qos.logback:logback-classic:1.0.13"
+    tomcat group: 'org.slf4j', name: 'slf4j-api', version:'1.7.5'
+    tomcat group: 'org.slf4j', name: 'log4j-over-slf4j', version:'1.7.5'
+    tomcat group: 'org.slf4j', name: 'jul-to-slf4j', version:'1.7.5'
+    tomcat group: 'org.slf4j', name: 'jcl-over-slf4j', version:'1.7.5'
+
+    tomcat "javax.servlet:jstl:1.2"
+}
 
 configurations {
   all*.exclude group:'commons-logging', module:'commons-logging'
 }
 
+configurations {
+    provided
+}
+
 dependencies {
-  compile(project(":medrecord-engine")) {
-    exclude group:'commons-logging', module:'commons-logging'
-  }
-  compile project(":medrecord-server-api-jee")
-  compile(project(":medrecord-server-middleware")) {
-    exclude group:'commons-logging', module:'commons-logging'
-  }
+    compile "com.medvision360.lib:libs-server:${ext.version.medvisionlib}"
 
-  compile "ch.qos.logback:logback-classic:${ext.version.logback}"
-  compile group: 'org.slf4j', name: 'slf4j-api', version:"${ext.version.slf4j}"
-  compile group: 'org.slf4j', name: 'log4j-over-slf4j', version:"${ext.version.slf4j}"
-  compile group: 'org.slf4j', name: 'jul-to-slf4j', version:"${ext.version.slf4j}"
-  compile group: 'org.slf4j', name: 'jcl-over-slf4j', version:"${ext.version.slf4j}"
+    compile(project(":medrecord-engine")) {
+        exclude group:'commons-logging', module:'commons-logging'
+    }
+    compile(project(":medrecord-server-api-jee")) {
+        exclude group:'commons-logging', module:'commons-logging'
+    }
 
-  testCompile "junit:junit:${ext.version.junit}"
-  testCompile "org.restlet.jee:org.restlet.ext.httpclient:${ext.version.restlet}"
-  testCompile project(":medrecord-server-client-jee")
-  testCompile project(':medrecord-itest')
-    
+    compile "com.medvision360.wslog:wslog:latest.integration"
+    compile "ch.qos.logback:logback-classic:${ext.version.logback}"
+    compile group: 'org.slf4j', name: 'slf4j-api', version:"${ext.version.slf4j}"
+    compile group: 'org.slf4j', name: 'log4j-over-slf4j', version:"${ext.version.slf4j}"
+    compile group: 'org.slf4j', name: 'jul-to-slf4j', version:"${ext.version.slf4j}"
+    compile group: 'org.slf4j', name: 'jcl-over-slf4j', version:"${ext.version.slf4j}"
 
-  // the artifact containing the swagger docs
-  swagger project(path: ":medrecord-server-api-jee", configuration: "swaggerArtifacts")
-  swagger "com.medvision360.lib.web:swagger:+:swaggerTool@zip"
+    provided "javax.servlet:javax.servlet-api:3.1.0"
 
-    //jsonSchema project(path: ":medrecord-server-api-jee", configuration: "jsonSchemaArtifacts")
+    testCompile "junit:junit:${ext.version.junit}"
+    testCompile "org.restlet.jee:org.restlet.ext.httpclient:${ext.version.restlet}"
+    testCompile project(":medrecord-server-client-jee")
+    testCompile project(':medrecord-itest')
 }
 
-prepareTomcat {
-  // TODO: make sure a special logback config is added to the debian package
-  logbackConfig = project.file("logback-test.xml")
-}
+sourceSets.main.compileClasspath += configurations.provided
+javadoc.classpath += configurations.provided
 
 tomcatRunWar {
-  httpPort = 8100
-  stopPort = 8101
+    httpPort = 8100
+    stopPort = 8101
 }
 
-// merge the old middleware into this server, and add in custom config
-// https://github.com/wadahiro/gradle-samples/blob/master/war-samples/merge-war-sample/build.gradle
-import org.apache.tools.ant.filters.ReplaceTokens
+System.setProperty(
+        'com.medvision360.lib.server.config.configfile',
+        file("configuration.properties.in").toString()
+)
+System.setProperty(
+        'com.medvision360.lib.server.config.logbackconfig',
+        file("logback-test.xml").toString()
+)
 
-// apply medvision-server plugin standard filter to local webapp resources
-task filterLocalWarResources(type: Copy) {
-  def displayName = project.ext.server.displayName
-  def applicationClass = project.ext.server.applicationClass
-  def projectId = project.ext.server.projectId
 
-  from project.webAppDirName
-  into new File(project.buildDir, "filtered")
-  filter(
-    ReplaceTokens,
-    tokens:[
-      displayName: displayName,
-      servletName: project.group + '.' + project.name,
-      applicationClass: applicationClass,
-      agent: displayName + '/' + project.version,
-      configfile: '/etc/medvision360/' + projectId + '/configuration.properties',
-      version: project.version
-    ]
-  )
+task(
+        'integrationTest',
+        type: Test,
+        description: 'Run the integration tests.'
+) {
+    include '**/*IT.*'
+
+    doFirst {
+        tasks.tomcatRunWar {
+            daemon = true
+            httpPort = 9080
+            stopPort = 9081
+            stopKey = 'stopKey'
+        }
+        tasks.tomcatStop {
+            stopPort = 9081
+            stopKey = 'stopKey'
+        }
+        tasks.tomcatRunWar.execute()
+    }
+
+    doLast {
+        tasks.tomcatStop.execute()
+    }
+
+    dependsOn 'war'
+
+    systemProperties.put('integrationtest.service.url', 'http://localhost:9080/' + project.ext.server.projectId)
 }
 
-// disable merging in the middleware
-//war.dependsOn(':medrecord-server-middleware:war')
-war.dependsOn filterLocalWarResources
-war << {
-//  // add middleware but don't override anything
-//  ant.zip(destfile: war.archivePath, update: true, keepcompression: true, duplicate: 'preserve') {
-//    zipfileset (src: project(':medrecord-server-middleware').war.archivePath)
-//  }
-    
-  // add our own local webapp stuff, do override
-  // http://stackoverflow.com/questions/2210041/updating-files-inside-an-existing-war-file
-  ant.touch {
-    fileset(dir: "$project.buildDir/filtered")
-  }
-  ant.zip(destfile: war.archivePath, update: true, keepcompression: true, duplicate: 'add') {
-    fileset(dir: "$project.buildDir/filtered")
-  }
+project.tasks.test {
+    exclude '**/*IT.*'
 }
 
 import org.gradle.plugins.ide.idea.model.*
@@ -91,7 +132,7 @@ apply plugin: 'idea'
 
 idea.module.iml {
     whenMerged { module ->
-        
+
         // add module dependencies for medvision common libraries
         def toModuleDependencies = [
                 'libs-api-jee',
@@ -99,7 +140,7 @@ idea.module.iml {
                 'libs-common-jee',
                 'libs-server'
         ]
-        
+
         toModuleDependencies.each { dependencyName ->
             module.dependencies += new ModuleDependency(dependencyName, 'COMPILE')
         }

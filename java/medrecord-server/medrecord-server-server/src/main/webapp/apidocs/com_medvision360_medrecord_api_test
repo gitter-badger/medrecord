@@ -1,0 +1,53 @@
+{
+  "apiVersion": "2.0.0-SNAPSHOT",
+  "swaggerVersion": "1.2",
+  "resourcePath": "/test",
+  "apis": [
+    {
+      "path": "/test/clear",
+      "operations": [
+
+        {
+          "notes": "Empty out the server databases completely, removing all locatables,  all archetypes, all EHRs,\nand any other stored data. This is a <strong>very</strong> destructive method intended for use with\n(unit) testing only.\n",
+          "methodName": "com.medvision360.medrecord.api.test.TestClearResource#clear()",
+          "httpMethod": "Post",
+          "nickname": "com_medvision360_medrecord_api_test_m_clear",
+          "summary": "Clear all databases. ",
+          "responseClass": "",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [
+          ],
+          "errorResponses": [            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    }
+
+  ],
+  "models": {
+
+    "com.medvision360.lib.common.MetaContent": {
+      "properties": {
+        "created": {
+          "required": false,
+          "defaultValue": "20130512T12:34:55Z",
+          "description": "The date/time on which the entry was created or null when not available.",
+          "type": "string"
+        },
+        "lastModified": {
+          "required": false,
+          "defaultValue": "20130512T12:34:55Z",
+          "description": "The date/time on which the entry was modified or null when not available.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

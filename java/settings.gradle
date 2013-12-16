@@ -9,20 +9,18 @@ include(
         'medrecord-rmutil',
         'medrecord-spi',
         'medrecord-spi-tck',
-        'medrecord-tools-cliclient',
+//        'medrecord-tools-cliclient',
         'medrecord-tools-dumpadl',
         'medrecord-server-api-jee',
         'medrecord-server-client-jee',
-        'medrecord-server-deb',
-        'medrecord-server-server',
-        'medrecord-server-middleware'
+        'medrecord-server-server'
 )
 
-project(':medrecord-tools-cliclient').projectDir = new File(rootDir, 'medrecord-tools/medrecord-tools-cliclient')
+//project(':medrecord-tools-cliclient').projectDir = new File(rootDir, 'medrecord-tools/medrecord-tools-cliclient')
 project(':medrecord-tools-dumpadl').projectDir = new File(rootDir, 'medrecord-tools/medrecord-tools-dumpadl')
+
 
 project(':medrecord-server-api-jee').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-api-jee')
 project(':medrecord-server-client-jee').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-client-jee')
-project(':medrecord-server-deb').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-deb')
 project(':medrecord-server-server').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-server')
-project(':medrecord-server-middleware').projectDir = new File(rootDir, 'medrecord-server/medrecord-server-middleware')
+

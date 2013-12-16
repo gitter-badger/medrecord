@@ -1,0 +1,440 @@
+{
+  "apiVersion": "2.0.0-SNAPSHOT",
+  "swaggerVersion": "1.2",
+  "resourcePath": "/locatable",
+  "apis": [
+    {
+      "path": "/locatable",
+      "operations": [
+
+        {
+          "notes": "Retrieve a list of all locatable IDs known to the server encapsulated in JSON. This API call is of very limited\nuse in most practical scenarios, because the result can become very large, and because typically you will want\nto constrain the results by some kind of selection or query, like looking only for locatables associated with a\nparticular patient or caregiver. Use the <code>/ehr/{id}/locatable</code> API to constrain the list to a\nparticular EHR, or use the <code>/query</code> API for more complex queries.\n<br/>&nbsp;<br/>However, this API call is provided nonetheless, for API consistency, completeness and ease of testing.\n",
+          "methodName": "com.medvision360.medrecord.api.locatable.LocatableListResource#listLocatables()",
+          "httpMethod": "Get",
+          "nickname": "com_medvision360_medrecord_api_locatable_m_listLocatables",
+          "summary": "List locatable resources. ",
+          "responseClass": "com.medvision360.medrecord.api.IDList",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [
+          ],
+          "errorResponses": [            {
+              "code": "500 (PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      ,
+
+        {
+          "notes": "Store a new locatable from a path/value JSON document. The provided locatable does not need unique identifiers;\nif those are not provided they will be added by the server. If you do provide an identifier, it will result in\nDUPLICATE_EXCEPTION if the locatable already exists (use PUT to update an existing locatable).\n<br/>&nbsp;<br/>This API call will not associated the locatable with any EHR record. This may be appropriate,\nespecially for demographics information, but for most locatables, you should use\n<code>/ehr/{id}/locatable</code> to store a locatable inside of an EHR record. Note it is not possible to\nassociate a locatable with an EHR after it has been created.\n",
+          "methodName": "com.medvision360.medrecord.api.locatable.LocatableListResource#postLocatable(org.restlet.representation.Representation)",
+          "httpMethod": "Post",
+          "nickname": "com_medvision360_medrecord_api_locatable_m_postLocatable",
+          "summary": "Create locatable resource outside EHR. ",
+          "responseClass": "com.medvision360.medrecord.api.ID",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "",
+              "paramType":              "body",
+              "dataType": "org.restlet.representation.Representation",
+              "name": "body",
+              "description": "",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (CLIENT_PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "400 (NOT_SUPPORTED_EXCEPTION)",
+              "reason": "Resource not supported: {0}"            }
+,
+            {
+              "code": "400 (VALIDATION_EXCEPTION)",
+              "reason": "Problem validating resource: {0}"            }
+,
+            {
+              "code": "409 (DUPLICATE_EXCEPTION)",
+              "reason": "Resource already exists: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    },
+    {
+      "path": "/locatable/{id}",
+      "operations": [
+
+        {
+          "notes": "Delete a stored locatable. While deleting locatables is supported by this API, it should be an extremely rare\nevent to actually do such a deletion outside of testing. In OpenEHR, locatables are typically not deleted but\ninstead updated with new information, perhaps setting them to a different lifecycle state such as \"suspended\"\nor \"expired\".\n",
+          "methodName": "com.medvision360.medrecord.api.locatable.LocatableResource#deleteLocatable()",
+          "httpMethod": "Delete",
+          "nickname": "com_medvision360_medrecord_api_locatable_m_deleteLocatable",
+          "summary": "Delete locatable resource. ",
+          "responseClass": "",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "71350448-25BA-4395-B354-19B9CA9D5096",
+              "paramType":              "path",
+              "dataType": "string",
+              "name": "id",
+              "description": "An OpenEHR UIDBasedID value identifying a Locatable",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (INVALID_LOCATABLE_ID_EXCEPTION)",
+              "reason": "Not a valid locatable ID: {0}"            }
+,
+            {
+              "code": "404 (NOT_FOUND_EXCEPTION)",
+              "reason": "Resource not found: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      ,
+
+        {
+          "notes": "Retrieve a locatable as a path/value JSON structure.\n",
+          "methodName": "com.medvision360.medrecord.api.locatable.LocatableResource#getLocatable()",
+          "httpMethod": "Get",
+          "nickname": "com_medvision360_medrecord_api_locatable_m_getLocatable",
+          "summary": "Retrieve locatable resource. ",
+          "responseClass": "org.restlet.representation.Representation",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "71350448-25BA-4395-B354-19B9CA9D5096",
+              "paramType":              "path",
+              "dataType": "string",
+              "name": "id",
+              "description": "An OpenEHR UIDBasedID value identifying a Locatable",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (INVALID_LOCATABLE_ID_EXCEPTION)",
+              "reason": "Not a valid locatable ID: {0}"            }
+,
+            {
+              "code": "404 (NOT_FOUND_EXCEPTION)",
+              "reason": "Resource not found: {0}"            }
+,
+            {
+              "code": "500 (PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      ,
+
+        {
+          "notes": "Add new path/value contents to an existing locatable from a JSON document. This API call serializes a\nlocatable into path/value pairs, then merges the newly supplied paths into that document,\nparses the merged JSON back into a locatable, and stores that locatable again on the server. Because this\noperation occurs on the server side and does not remove unknown paths, the risk of inadvertent removal of\ninformation in the case of multiple concurrent writes is much <em>lower</em> but it is <em>still there</em>.\n<br/>&nbsp;<br/>Support for safer concurrent requests using conditional puts and the locatable versioning model is planned but\nnot currently available.\n",
+          "methodName": "com.medvision360.medrecord.api.locatable.LocatableResource#patchLocatable(org.restlet.representation.Representation)",
+          "httpMethod": "Patch",
+          "nickname": "com_medvision360_medrecord_api_locatable_m_patchLocatable",
+          "summary": "Append to locatable resource. ",
+          "responseClass": "",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "71350448-25BA-4395-B354-19B9CA9D5096",
+              "paramType":              "path",
+              "dataType": "string",
+              "name": "id",
+              "description": "An OpenEHR UIDBasedID value identifying a Locatable",
+              "required": true
+            }
+,
+            {
+                            "defaultValue": "",
+              "paramType":              "body",
+              "dataType": "org.restlet.representation.Representation",
+              "name": "body",
+              "description": "",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (CLIENT_PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "400 (NOT_SUPPORTED_EXCEPTION)",
+              "reason": "Resource not supported: {0}"            }
+,
+            {
+              "code": "400 (VALIDATION_EXCEPTION)",
+              "reason": "Problem validating resource: {0}"            }
+,
+            {
+              "code": "404 (NOT_FOUND_EXCEPTION)",
+              "reason": "Resource not found: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      ,
+
+        {
+          "notes": "Replace the contents of an existing locatable from a path/value JSON document. PUT cannot be used to create\nnew locatables; you need to use POST for that, instead. Note that any paths that were present in a previous\nversion of the locatable but are not present in the new JSON document result in removal of that information!\nAccordingly, like with all REST APIs, it is important to be careful with concurrent updates of locatables from\nmultiple concurrent parties.\n<br/>&nbsp;<br/>If there is a practical risk of multiple concurrent updates for a locatable, and you are only adding data,\nyou may wish to use the PATCH version of this API call which keeps the non-mentioned path/value pairs intact\nand then only adds new information.\n<br/>&nbsp;<br/>Support for safer concurrent requests using conditional puts and the locatable versioning model is planned but\nnot currently available.\n",
+          "methodName": "com.medvision360.medrecord.api.locatable.LocatableResource#putLocatable(org.restlet.representation.Representation)",
+          "httpMethod": "Put",
+          "nickname": "com_medvision360_medrecord_api_locatable_m_putLocatable",
+          "summary": "Update locatable resource. ",
+          "responseClass": "",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "71350448-25BA-4395-B354-19B9CA9D5096",
+              "paramType":              "path",
+              "dataType": "string",
+              "name": "id",
+              "description": "An OpenEHR UIDBasedID value identifying a Locatable",
+              "required": true
+            }
+,
+            {
+                            "defaultValue": "",
+              "paramType":              "body",
+              "dataType": "org.restlet.representation.Representation",
+              "name": "body",
+              "description": "",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (CLIENT_PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "400 (NOT_SUPPORTED_EXCEPTION)",
+              "reason": "Resource not supported: {0}"            }
+,
+            {
+              "code": "400 (VALIDATION_EXCEPTION)",
+              "reason": "Problem validating resource: {0}"            }
+,
+            {
+              "code": "404 (NOT_FOUND_EXCEPTION)",
+              "reason": "Resource not found: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    },
+    {
+      "path": "/locatable/{id}/ehr",
+      "operations": [
+
+        {
+          "notes": "Retrieve basic info about the EHR containing this locatable as a JSON structure.\n",
+          "methodName": "com.medvision360.medrecord.api.locatable.LocatableEHRResource#getEHRForLocatable()",
+          "httpMethod": "Get",
+          "nickname": "com_medvision360_medrecord_api_locatable_m_getEHRForLocatable",
+          "summary": "Retrieve locatable its EHR resource. ",
+          "responseClass": "com.medvision360.medrecord.api.EHR",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "71350448-25BA-4395-B354-19B9CA9D5096",
+              "paramType":              "path",
+              "dataType": "string",
+              "name": "id",
+              "description": "An OpenEHR UIDBasedID value identifying a Locatable",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (INVALID_LOCATABLE_ID_EXCEPTION)",
+              "reason": "Not a valid locatable ID: {0}"            }
+,
+            {
+              "code": "404 (NOT_FOUND_EXCEPTION)",
+              "reason": "Resource not found: {0}"            }
+,
+            {
+              "code": "404 (LOCATABLE_HAS_NO_EHR_EXCEPTION)",
+              "reason": "Locatable has no EHR: {0}"            }
+,
+            {
+              "code": "500 (PARSE_EXCEPTION)",
+              "reason": "Problem parsing the resource: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    }
+
+  ],
+  "models": {
+    "com.medvision360.medrecord.api.EHR": {
+      "properties": {
+        "deleted": {
+
+          "required": true,
+                    "description": "",
+          "type": "boolean"
+        },
+        "directoryId": {
+
+          "required": true,
+                    "defaultValue": "A14C2AE8-BA46-4EF8-AFC8-889963DA2BA5",
+          "description": "An openEHR UIDBasedID value identifying the Directory for this EHR, if any. Often but not always a UUID. ",
+          "type": "string"
+        },
+        "id": {
+
+          "required": true,
+                    "defaultValue": "0F0A7A96-25ED-44AA-B4BD-D6A7F32877F7",
+          "description": "An openEHR HierObjectID value identifying this EHR. Often but not always a UUID. ",
+          "type": "string"
+        },
+        "statusId": {
+
+          "required": true,
+                    "defaultValue": "DC82E362-75AE-443F-9617-C9235A28F69D",
+          "description": "An openEHR UIDBasedID value identifying the EHRStatus for this EHR. Often but not always a UUID. ",
+          "type": "string"
+        },
+        "systemId": {
+
+          "required": true,
+                    "defaultValue": "B55B6AE8-5DFC-4D0D-82DA-392E331417FB",
+          "description": "An openEHR HierObjectID value identifying the system that is the origin of this EHR. Often but not always a UUID. ",
+          "type": "string"
+        },
+        "timeCreated": {
+
+          "required": true,
+                    "defaultValue": "2013-11-23T17:13:53Z",
+          "description": "An ISO8601 timestamp identifying when this EHR was created. ",
+          "type": "string"
+        }
+      }
+    },
+    "com.medvision360.medrecord.api.ID": {
+      "properties": {
+        "id": {
+
+          "required": true,
+                    "defaultValue": "A660D3C2-50C4-44AA-8663-83FEEB22ADF1",
+          "description": "An openEHR ObjectID value. Often but not always a UUID. ",
+          "type": "string"
+        }
+      }
+    },
+    "com.medvision360.medrecord.api.IDList": {
+      "properties": {
+        "ids": {
+
+          "required": true,
+                    "description": "",
+          "type": "Array",
+          "items": {
+            "$ref": "string"
+          }
+        }
+      }
+    }
+,
+    "com.medvision360.lib.common.MetaContent": {
+      "properties": {
+        "created": {
+          "required": false,
+          "defaultValue": "20130512T12:34:55Z",
+          "description": "The date/time on which the entry was created or null when not available.",
+          "type": "string"
+        },
+        "lastModified": {
+          "required": false,
+          "defaultValue": "20130512T12:34:55Z",
+          "description": "The date/time on which the entry was modified or null when not available.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

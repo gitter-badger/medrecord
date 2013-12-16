@@ -1,0 +1,324 @@
+{
+  "apiVersion": "2.0.0-SNAPSHOT",
+  "swaggerVersion": "1.2",
+  "resourcePath": "/query",
+  "apis": [
+    {
+      "path": "/query/ehr",
+      "operations": [
+
+        {
+          "notes": "Retrieve a list of EHR IDs known to the server encapsulated in JSON, matching the constraints that are\nexpressed as query parameters. All the query parameter types are AND-ed together. This means that a query like\n<code>archetype=openEHR-EHR-OBSERVATION.blood_pressure.v1&archetypeQ=DEMOGRAPHIC</code> is guaranteed to never\nreturn any results. However, when repeating the same parameter type multiple times, those are OR-ed together.\nThat means a query like <code>archetypeQ=body_weight&archetypeQ=blood_pressure</code> returns all locatables\nthat are either body weights or blood pressures.\n<br/>&nbsp;<br/>The query parameters are matched against the root locatable <em>or</em> any of its contents.\nSo if you have a COMPOSITION containing a blood_pressure OBSERVATION, then a query\n<code>archetypeQ=blood_pressure</code> will return that entire COMPOSITION (including, perhaps,\nother data besides the blood_pressure OBSERVATION). If this is not what you want,\nyou need to use an advanced query such as <code>/query/xquery</code> or <code>/query/xquery/locatable</code>.\n",
+          "methodName": "com.medvision360.medrecord.api.query.QueryEHRResource#ehrQuery()",
+          "httpMethod": "Get",
+          "nickname": "com_medvision360_medrecord_api_query_m_ehrQuery",
+          "summary": "Query EHR resources. ",
+          "responseClass": "com.medvision360.medrecord.api.IDList",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "",
+              "paramType":              "query",
+              "dataType": "",
+              "name": "excludeDeleted",
+              "description": "Set to true to exclude EHRs that have been marked as deleted in the returned list, to any other value to include them, or omit the parameter to have the implementation choose (typically using its most efficient option).",
+              "required": false
+            },
+            {
+                            "defaultValue": "false",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "excludeEmpty",
+              "description": "Set to true to exclude EHRs that contain no locatables.",
+              "required": false
+            },
+            {
+                            "defaultValue": "906C3435-8A06-4688-A9D0-CD233C1B072F",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "systemID",
+              "description": "An OpenEHR HierObjectID value specifying a systemID to search. Specify multiple times to search multiple systemIDs, or do not specify to search all systemIDs.",
+              "required": false
+            },
+            {
+                            "defaultValue": "0AC32288-684C-4D86-B7E6-6C21E18E4390",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "subject",
+              "description": "An OpenEHR UIDBasedID value specifying a subject constraint on the EHRStatus associated with the EHR.",
+              "required": false
+            },
+            {
+                            "defaultValue": "20140101T00:00:00Z",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "createdBefore",
+              "description": "An ISO8601 DateTime value specifying a constraint on the maximum value of the time the EHR was created.",
+              "required": false
+            },
+            {
+                            "defaultValue": "20130101T00:00:00Z",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "createdAfter",
+              "description": "An ISO8601 DateTime value specifying a constraint on the minimum value of the time the EHR was created.",
+              "required": false
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (INVALID_SYSTEM_ID_EXCEPTION)",
+              "reason": "Not a valid system ID: {0}"            }
+,
+            {
+              "code": "400 (INVALID_SUBJECT_ID_EXCEPTION)",
+              "reason": "Not a valid subject ID: {0}"            }
+,
+            {
+              "code": "400 (INVALID_DATE_TIME_ID_EXCEPTION)",
+              "reason": "Not a valid DateTime: {0}"            }
+,
+            {
+              "code": "400 (INVALID_RANGE_ID_EXCEPTION)",
+              "reason": "Not a valid range: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    },
+    {
+      "path": "/query/locatable",
+      "operations": [
+
+        {
+          "notes": "Retrieve a list of locatable IDs known to the server encapsulated in JSON, matching the constraints that are\nexpressed as query parameters. All the query parameter types are AND-ed together. This means that a query like\n<code>archetype=openEHR-EHR-OBSERVATION.blood_pressure.v1&archetypeQ=DEMOGRAPHIC</code> is guaranteed to never\nreturn any results. However, when repeating the same parameter type multiple times, those are OR-ed together.\nThat means a query like <code>archetypeQ=body_weight&archetypeQ=blood_pressure</code> returns all locatables\nthat are either body weights or blood pressures.\n<br/>&nbsp;<br/>The query parameters are matched against the root locatable <em>or</em> any of its contents.\nSo if you have a COMPOSITION containing a blood_pressure OBSERVATION, then a query\n<code>archetypeQ=blood_pressure</code> will return that entire COMPOSITION (including, perhaps,\nother data besides the blood_pressure OBSERVATION). If this is not what you want,\nyou need to use an advanced query such as <code>/query/xquery</code> or <code>/query/xquery/locatable</code>.\n",
+          "methodName": "com.medvision360.medrecord.api.query.QueryLocatableResource#locatableQuery()",
+          "httpMethod": "Get",
+          "nickname": "com_medvision360_medrecord_api_query_m_locatableQuery",
+          "summary": "Query locatable resources. ",
+          "responseClass": "com.medvision360.medrecord.api.IDList",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "DC3BE110-DCF8-40C4-A8E3-AA1ADF78A959",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "ehr",
+              "description": "An OpenEHR HierObjectID value specifying an EHR to search. Specify multiple times to search multiple EHRs, or do not specify to search all EHRs.",
+              "required": false
+            },
+            {
+                            "defaultValue": "openEHR",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "rmOriginator",
+              "description": "A string specifying a reference model originator (such as \"openEHR\") to constrain results to. The provided parameter is compared against the archetype ID of the locatable and any nested locatable contents. Specify multiple times to allow multiple rm originators, or do not specify to not constrain the results at all.",
+              "required": false
+            },
+            {
+                            "defaultValue": "EHR",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "rmName",
+              "description": "A string specifying a reference model name (such as \"EHR\" or \"DEMOGRAPHIC\") to constrain results to. The provided parameter is compared against the archetype ID of the locatable and any nested locatable contents. Specify multiple times to allow multiple rm names, or do not specify to not constrain the results at all.",
+              "required": false
+            },
+            {
+                            "defaultValue": "blood_pressure",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "conceptName",
+              "description": "A string specifying a reference model concept (such as \"lab_test\", \"medication\" or \"person) to constrain results to. The provided parameter is compared against the archetype ID of the locatable and any nested locatable contents. Specify multiple times to allow multiple rm concepts, or do not specify to not constrain the results at all.",
+              "required": false
+            },
+            {
+                            "defaultValue": "openEHR-EHR-OBSERVATION.blood_pressure.v1",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "archetype",
+              "description": "A string specifying an archetype name to constrain results to. The provided parameter is compared against the archetype ID of the locatable and any nested locatable contents. Specify multiple times to allow multiple archetypes, or do not specify to not constrain the results at all.",
+              "required": false
+            },
+            {
+                            "defaultValue": "openEHR-EHR-OBSERVATION.blood_pressure.v1",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "archetypeQ",
+              "description": "A regular expression qualifying archetype names to constrain results to. The provided parameter is compared against the archetype ID of the locatable.",
+              "required": false
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (INVALID_ARCHETYPE_ID_EXCEPTION)",
+              "reason": "Not a valid archetype ID: {0}"            }
+,
+            {
+              "code": "400 (ILLEGAL_ARGUMENT_EXCEPTION)",
+              "reason": "Illegal argument: {0}"            }
+,
+            {
+              "code": "400 (PATTERN_EXCEPTION)",
+              "reason": "Invalid regular expression: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    },
+    {
+      "path": "/query/xquery",
+      "operations": [
+
+        {
+          "notes": "Executes the provided XQuery against all XQuery-capable storage mechanisms for locatables on the server\n(depending on the server configuration, some locatables may be stored in non-xquery-capable stores) and\nreturns the result.\n<br/>&nbsp;<br/>XQuery is a powerful query language, and accordingly this API provides a very advanced and powerful query\nmechanism, but it is important to realize that the trade-off in using it is that writing the queries and\ninterpreting the results may be harder, and that performance may be lower than for some of the simpler query\noptions.\n<br/>&nbsp;<br/>The server implementation makes no attempt to do any processing on the results of your query. Depending on the\nbacking implementation and the queries you write, this may expose you to some implementation specifics in the\nquery results. It also means that the result may or may not be valid XML, and accordingly,\nby default it is returned as a <code>text/plain</code> string. If you wish to retrieve the results in\nprocessed form, like a nested map of path/value locatables, you may wish to use the\n<code>/query/xquery/locatable</code> API instead. That API also allows you to limit to a specific EHR. If you\njust wish to set the response mime type, declare it in your query, like so:\n<pre>\n(: set the response media type to xml :)\ndeclare option output:media-type \"application/xml\";\n</pre>\nNote that this simply sets the http header; no attempt at data conversion is done.\n<br/>&nbsp;<br/>All kinds of XQuery are supported. You can use XPath expressions such as\n<pre>\ndeclare default element namespace \"http://schemas.openehr.org/v1\";\n(: find all archetypes that are in use :)\ndistinct-values(//archetype_details/archetype_id/value/text()[concat(., ' ')])\n</pre>\n<br/>&nbsp;<br/>Or you can use FLWOR queries such as\n<pre>\ndeclare default element namespace \"http://schemas.openehr.org/v1\";\n(: dump all compositions (probably will cause OOM) :)\nfor $x in collection()/composition\nreturn $x\n</pre>\n<br/>&nbsp;<br/>or perhaps\n<pre>\ndeclare default element namespace \"http://schemas.openehr.org/v1\";\ndeclare namespace openehr = \"http://schemas.openehr.org/v1\";\ndeclare namespace xsi = \"http://www.w3.org/2001/XMLSchema-instance\";\n(: dump all observations (probably will cause OOM) :)\nfor $x in collection()//*[contains(@xsi:type,\"OBSERVATION\")] return $x\n</pre>\n<br/>&nbsp;<br/>If you do not specify a default element namespace in your query, it is set to \"http://schemas.openehr.org/v1\".\nThe xsi and openehr namespaces are also declared for you unless you have declared them yourself. This means\nthat the following query has the same result as the one above:\n<pre>\nfor $x in collection()//openehr:*[contains(@xsi:type,\"OBSERVATION\")] return $x\n</pre>\n",
+          "methodName": "com.medvision360.medrecord.api.query.XQueryResource#xQuery()",
+          "httpMethod": "Get",
+          "nickname": "com_medvision360_medrecord_api_query_m_xQuery",
+          "summary": "XQuery locatable resources. ",
+          "responseClass": "org.restlet.representation.Representation",
+    
+          "produces": ["text/plain"],
+    
+          "parameters": [            {
+                            "defaultValue": "//archetype_details/archetype_id/value/text()",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "q",
+              "description": "An XQuery, written to run against (a) collection(s) that contains openEHR XML data",
+              "required": true
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (INVALID_QUERY_EXCEPTION)",
+              "reason": "Not a valid query: {0}"            }
+,
+            {
+              "code": "500 (UNSUPPORTED_QUERY_EXCEPTION)",
+              "reason": "Query not supported: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    },
+    {
+      "path": "/query/xquery/locatable",
+      "operations": [
+
+        {
+          "notes": "Executes the provided XQuery against all XQuery-capable storage mechanisms for locatables on the server\n(depending on the server configuration, some locatables may be stored in non-xquery-capable stores) and\nreturns the result.\n<br/>&nbsp;<br/>XQuery is a powerful query language, and accordingly this API provides a very advanced and powerful query\nmechanism, but it is important to realize that the trade-off in using it is that writing the queries and\ninterpreting the results may be harder, and that performance may be lower than for some of the simpler query\noptions.\n<br/>&nbsp;<br/>Roughly the same queries as supported by <code>/query/xquery</code> are supported,\nwith one additional constraint: you must ensure that the results of your query are processable as a list\nof locatable, that is, the result should have a structure like\n<br/>&nbsp;<br/><pre>\n&lt;composition&gt;...&lt;/composition&gt;\n&lt;composition&gt;...&lt;/composition&gt;\n&lt;composition&gt;...&lt;/composition&gt;\n...\n</pre>\n<br/>&nbsp;<br/>or perhaps\n<br/>&nbsp;<br/><pre>\n&lt;content xsi:type=\"v1:OBSERVATION\"&gt;...&lt;/content&gt;\n&lt;content xsi:type=\"v1:OBSERVATION\"&gt;...&lt;/content&gt;\n&lt;content xsi:type=\"v1:OBSERVATION\"&gt;...&lt;/content&gt;\n...\n</pre>\n<br/>&nbsp;<br/>A good way to ensure this is the case is to do a specific query and then look for the nearest acceptable\nancestor. For example,\n<br/>&nbsp;<br/><pre>\ndeclare default element namespace \"http://schemas.openehr.org/v1\";\n(: look for all compositions that contain blood_pressure measurements :)\narchetype_details/archetype_id/value/text()[contains(.,\"blood_pressure\")]/ancestor::*[self::composition]\n</pre>\n<br/>&nbsp;<br/>If you do not specify a default element namespace in your query, it is set to \"http://schemas.openehr.org/v1\".\nThe xsi and openehr namespaces are also declared for you unless you have declared them yourself.\n",
+          "methodName": "com.medvision360.medrecord.api.query.XQueryLocatableResource#locatableXQuery()",
+          "httpMethod": "Get",
+          "nickname": "com_medvision360_medrecord_api_query_m_locatableXQuery",
+          "summary": "XQuery locatable resources. ",
+          "responseClass": "org.restlet.representation.Representation",
+    
+          "produces": ["application/json"],
+    
+          "parameters": [            {
+                            "defaultValue": "",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "q",
+              "description": "An XQuery, written to run against (a) collection(s) that contains openEHR XML data and to return a list of xml fragments that can be parsed as locatables",
+              "required": true
+            },
+            {
+                            "defaultValue": "DC3BE110-DCF8-40C4-A8E3-AA1ADF78A959",
+              "paramType":              "query",
+              "dataType": "string",
+              "name": "ehr",
+              "description": "An OpenEHR HierObjectID value specifying an EHR to search. Specify multiple times to search multiple EHRs, or do not specify to search all EHRs. Note that the nature of combining XQuery and non-XQuery constraints may mean that the OR-ing of this constraint with the XQuery constraint may not be very efficient or performant, depending on the server storage implementation(s) in use.",
+              "required": false
+            }
+
+          ],
+          "errorResponses": [            {
+              "code": "400 (INVALID_QUERY_EXCEPTION)",
+              "reason": "Not a valid query: {0}"            }
+,
+            {
+              "code": "500 (UNSUPPORTED_QUERY_EXCEPTION)",
+              "reason": "Query not supported: {0}"            }
+,
+            {
+              "code": "500 (RECORD_EXCEPTION)",
+              "reason": "Generic error in server: {0}"            }
+,
+            {
+              "code": "500 (IO_RECORD_EXCEPTION)",
+              "reason": "Generic IO error in server: {0}"            }
+
+
+          ]
+        }
+      
+      ]
+    }
+
+  ],
+  "models": {
+    "com.medvision360.medrecord.api.IDList": {
+      "properties": {
+        "ids": {
+
+          "required": true,
+                    "description": "",
+          "type": "Array",
+          "items": {
+            "$ref": "string"
+          }
+        }
+      }
+    }
+,
+    "com.medvision360.lib.common.MetaContent": {
+      "properties": {
+        "created": {
+          "required": false,
+          "defaultValue": "20130512T12:34:55Z",
+          "description": "The date/time on which the entry was created or null when not available.",
+          "type": "string"
+        },
+        "lastModified": {
+          "required": false,
+          "defaultValue": "20130512T12:34:55Z",
+          "description": "The date/time on which the entry was modified or null when not available.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

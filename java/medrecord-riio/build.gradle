@@ -1,6 +1,3 @@
-// some standard settings for Java applications (language level etc)
-apply plugin: 'medvision-java'
-
 description = 'MEDvision360 MEDrecord reference implementation IO adapters'
 
 // do not update the license on code which we do not own

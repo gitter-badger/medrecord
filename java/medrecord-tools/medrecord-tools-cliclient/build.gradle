@@ -2,9 +2,6 @@
 //   gradle run -Dmedrecord.url=http://medrecord.dev.medvision360.org/medrecord
 //
 
-// some standard settings for Java applications (language level etc)
-apply plugin: 'medvision-java'
-
 // add the 'run' task for running the artifact
 apply plugin: 'application'
 mainClassName = "com.medvision360.medrecord.tools.cliclient.ArchetypeUploader";
@@ -25,7 +22,7 @@ dependencies {
     compile project(":medrecord-server-api-jee")
     compile project(":medrecord-server-client-jee")
 
-    
+
     compile "com.medvision360.archetypes:openehr-archetypes:${ext.version.archetypes}"
     compile "com.medvision360.archetypes:openehr-archetypes-unittest:${ext.version.archetypes}"
 
