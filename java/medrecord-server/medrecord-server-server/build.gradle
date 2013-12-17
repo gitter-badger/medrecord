@@ -140,7 +140,7 @@ else
 
         dependsOn 'war'
 
-        systemProperties.put('integrationtest.service.url', 'http://localhost:9080/' + project.ext.server.projectId)
+        systemProperties.put('integrationtest.service.url', 'http://localhost:9080/medrecord')
     }
 
     project.tasks.test {
