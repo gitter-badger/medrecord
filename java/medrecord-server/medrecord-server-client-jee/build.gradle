@@ -6,6 +6,39 @@ dependencies {
     compile project(":medrecord-server-api-jee")
 }
 
+if (ext.has('medvision')) {
+    // these take care of publishing the jars and docs on repo.medvision360.org
+    apply plugin: 'mv-java-clientlib'
+    apply plugin: 'mv-public'
+
+
+    //
+    // store the generated sources so they can be compiled without the tools
+    //
+
+    dependencies {
+        clientSource project(path: ":medrecord-server-api-jee", configuration: 'generatedClient')
+    }
+
+    def t = task copyGeneratedSource(type: Copy) {
+        from 'generated-client-src/client'
+        into 'src/main/java'
+    }
+    t.dependsOn('unzipGeneratedClientSource')
+
+    tasks.compileJava.dependsOn('copyGeneratedSource')
+
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = [ "src/main/java" ]
+            }
+        }
+    }
+}
+
+
 import org.gradle.plugins.ide.idea.model.*
 apply plugin: 'idea'
 

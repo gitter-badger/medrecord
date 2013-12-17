@@ -1,53 +1,152 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
     }
     dependencies {
-        // plugin for updating the license headers
-        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.5.0'
         classpath 'org.gradle.api.plugins:gradle-tomcat-plugin:0.9.8'
     }
 }
 
-
-archivesBaseName = 'medrecord'
-
-
-apply plugin: 'war'
-apply plugin: 'tomcat'
-
-def tomcatVersion = '7.0.34'
-project.dependencies {
-    tomcat("org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}") {
-        exclude group:'commons-logging', module:'commons-logging'
-        exclude group:'log4j', module:'log4j'
-    }
-    // we use this with log4j-over-slf4j.jar to log to logback efficiently...
-    tomcat("org.apache.tomcat.embed:tomcat-embed-logging-log4j:${tomcatVersion}") {
-        exclude group:'commons-logging', module:'commons-logging'
-        exclude group:'log4j', module:'log4j'
-    }
-    tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}") {
-        exclude group:'commons-logging', module:'commons-logging'
-        exclude group:'log4j', module:'log4j'
-        exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
-    }
-    tomcat "ch.qos.logback:logback-classic:1.0.13"
-    tomcat group: 'org.slf4j', name: 'slf4j-api', version:'1.7.5'
-    tomcat group: 'org.slf4j', name: 'log4j-over-slf4j', version:'1.7.5'
-    tomcat group: 'org.slf4j', name: 'jul-to-slf4j', version:'1.7.5'
-    tomcat group: 'org.slf4j', name: 'jcl-over-slf4j', version:'1.7.5'
-
-    tomcat "javax.servlet:jstl:1.2"
-}
-
-configurations {
-  all*.exclude group:'commons-logging', module:'commons-logging'
-}
-
 configurations {
     provided
+}
+
+dependencies {
+    provided "javax.servlet:javax.servlet-api:3.1.0"
+}
+
+sourceSets.main.compileClasspath += configurations.provided
+javadoc.classpath += configurations.provided
+
+if(ext.has('medvision')) {
+    // these take care of publishing the jars and deploying to our servers
+    apply plugin: 'mv-server'
+
+    war {
+        exclude 'apidocs'
+    }
+
+    mvServer {
+        tomcatTestPort = 8100
+        serverName = 'medrecord'
+        serverClass = 'com.medvision360.medrecord.server.MedRecordServerApplication'
+        generateWebInf = false
+    }
+
+    dependencies {
+        // the artifact containing the swagger docs
+        swagger    project(path: ":medrecord-server-api-jee", configuration: "swaggerArtifacts")
+    }
+
+
+    //
+    // make the generated api docs available without tools
+    //
+
+    task copyGeneratedApiDocs(type: Copy) {
+        dependsOn project.configurations.swagger
+        from { project.configurations.swagger.files.collect { project.zipTree(it) } } {
+            into 'apidocs'
+            exclude 'index.html.in'
+        }
+        from { project.configurations.swagger.files.collect { project.zipTree(it) } } {
+            into 'apidocs'
+            include 'index.html.in'
+            filter ReplaceTokens, tokens: [ title: project.description,
+                    jiraCollector: '' ]
+            rename 'index.html.in', 'index.html'
+        }
+        into "src/main/webapp"
+    }
+
+    tasks.war.dependsOn('copyGeneratedApiDocs')
+}
+else
+{
+    archivesBaseName = 'medrecord'
+
+    apply plugin: 'war'
+    apply plugin: 'tomcat'
+
+    def tomcatVersion = '7.0.34'
+    project.dependencies {
+        tomcat("org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}") {
+            exclude group:'commons-logging', module:'commons-logging'
+            exclude group:'log4j', module:'log4j'
+        }
+        // we use this with log4j-over-slf4j.jar to log to logback efficiently...
+        tomcat("org.apache.tomcat.embed:tomcat-embed-logging-log4j:${tomcatVersion}") {
+            exclude group:'commons-logging', module:'commons-logging'
+            exclude group:'log4j', module:'log4j'
+        }
+        tomcat("org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}") {
+            exclude group:'commons-logging', module:'commons-logging'
+            exclude group:'log4j', module:'log4j'
+            exclude group: 'org.eclipse.jdt.core.compiler', module: 'ecj'
+        }
+        tomcat "ch.qos.logback:logback-classic:1.0.13"
+        tomcat group: 'org.slf4j', name: 'slf4j-api', version:'1.7.5'
+        tomcat group: 'org.slf4j', name: 'log4j-over-slf4j', version:'1.7.5'
+        tomcat group: 'org.slf4j', name: 'jul-to-slf4j', version:'1.7.5'
+        tomcat group: 'org.slf4j', name: 'jcl-over-slf4j', version:'1.7.5'
+    }
+
+    configurations {
+        all*.exclude group:'commons-logging', module:'commons-logging'
+    }
+
+    tomcatRunWar {
+        httpPort = 8100
+        stopPort = 8101
+    }
+
+    System.setProperty(
+            'com.medvision360.lib.server.config.configfile',
+            file("configuration.properties.in").toString()
+    )
+    System.setProperty(
+            'com.medvision360.lib.server.config.logbackconfig',
+            file("logback-test.xml").toString()
+    )
+
+
+    task(
+            'integrationTest',
+            type: Test,
+            description: 'Run the integration tests.'
+    ) {
+        include '**/*IT.*'
+
+        doFirst {
+            tasks.tomcatRunWar {
+                daemon = true
+                httpPort = 9080
+                stopPort = 9081
+                stopKey = 'stopKey'
+            }
+            tasks.tomcatStop {
+                stopPort = 9081
+                stopKey = 'stopKey'
+            }
+            tasks.tomcatRunWar.execute()
+        }
+
+        doLast {
+            tasks.tomcatStop.execute()
+        }
+
+        dependsOn 'war'
+
+        systemProperties.put('integrationtest.service.url', 'http://localhost:9080/' + project.ext.server.projectId)
+    }
+
+    project.tasks.test {
+        exclude '**/*IT.*'
+    }
+
 }
 
 dependencies {
@@ -66,66 +165,16 @@ dependencies {
     compile group: 'org.slf4j', name: 'log4j-over-slf4j', version:"${ext.version.slf4j}"
     compile group: 'org.slf4j', name: 'jul-to-slf4j', version:"${ext.version.slf4j}"
     compile group: 'org.slf4j', name: 'jcl-over-slf4j', version:"${ext.version.slf4j}"
-
-    provided "javax.servlet:javax.servlet-api:3.1.0"
+    compile "javax.servlet:jstl:1.2"
 
     testCompile "junit:junit:${ext.version.junit}"
     testCompile "org.restlet.jee:org.restlet.ext.httpclient:${ext.version.restlet}"
     testCompile project(":medrecord-server-client-jee")
     testCompile project(':medrecord-itest')
+
+
 }
 
-sourceSets.main.compileClasspath += configurations.provided
-javadoc.classpath += configurations.provided
-
-tomcatRunWar {
-    httpPort = 8100
-    stopPort = 8101
-}
-
-System.setProperty(
-        'com.medvision360.lib.server.config.configfile',
-        file("configuration.properties.in").toString()
-)
-System.setProperty(
-        'com.medvision360.lib.server.config.logbackconfig',
-        file("logback-test.xml").toString()
-)
-
-
-task(
-        'integrationTest',
-        type: Test,
-        description: 'Run the integration tests.'
-) {
-    include '**/*IT.*'
-
-    doFirst {
-        tasks.tomcatRunWar {
-            daemon = true
-            httpPort = 9080
-            stopPort = 9081
-            stopKey = 'stopKey'
-        }
-        tasks.tomcatStop {
-            stopPort = 9081
-            stopKey = 'stopKey'
-        }
-        tasks.tomcatRunWar.execute()
-    }
-
-    doLast {
-        tasks.tomcatStop.execute()
-    }
-
-    dependsOn 'war'
-
-    systemProperties.put('integrationtest.service.url', 'http://localhost:9080/' + project.ext.server.projectId)
-}
-
-project.tasks.test {
-    exclude '**/*IT.*'
-}
 
 import org.gradle.plugins.ide.idea.model.*
 apply plugin: 'idea'

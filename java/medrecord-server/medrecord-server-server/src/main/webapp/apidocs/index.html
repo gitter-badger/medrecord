@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MEDrecord</title>
+    <title>MEDvision360 MEDrecord, an openEHR based medical record server</title>
     <link href='https://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
     <link href='css/hightlight.default.css' media='screen' rel='stylesheet' type='text/css'/>
     <link href='css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
@@ -16,26 +16,26 @@
     <script src='swagger-ui.js' type='text/javascript'></script>
     <script src='lib/highlight.7.3.pack.js' type='text/javascript'></script>
     <script type='text/javascript'>
-    function googleAuthInit() {
-        gapi.auth.init();
+    function googleAuthInit() { 
+        gapi.auth.init(); 
     }
 
     function getGoogleToken(id) {
-        var config = {
-            'client_id' : '329626321271-foot3f7jmlmcmeofmp6526iv8t0v5lm1.apps.googleusercontent.com',
+        var config = {   
+            'client_id' : '329626321271-foot3f7jmlmcmeofmp6526iv8t0v5lm1.apps.googleusercontent.com', 
             'scope' : 'https://www.googleapis.com/auth/userinfo.email',
-            'immediate' : false,
-            'authuser': -1
-        };
+            'immediate' : false, 
+            'authuser': -1 
+        };  
 
         // TODO: make token and accountId flexible
-        gapi.auth.authorize(
-            config,
+        gapi.auth.authorize(  
+            config,   
             function(result) {
                 $("#" + id + " [name='token']").val(result.access_token);
                 gapi.client.load(
-                    'oauth2',
-                    'v2',
+                    'oauth2', 
+                    'v2', 
                     function() {
                         var request = gapi.client.oauth2.userinfo.get();
                         request.execute(
@@ -47,7 +47,7 @@
                 );
             }
         );
-    }
+    }            
 
 	$(function () {
         var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
@@ -61,7 +61,7 @@
         var url = window.location.href;
         if (url.indexOf('#') != -1) {
           url = url.substr(0, url.indexOf('#'));
-        }
+        }                                 
         url = url.substr(0, url.lastIndexOf('/')) + "/apidocs.json";
 
 	    window.swaggerUi = new SwaggerUi({
@@ -86,12 +86,13 @@
             },
             docExpansion: "none"
         });
-
+        
         window.swaggerUi.load();
       });
-
+      
     </script>
     <script src="https://apis.google.com/js/client.js?onload=googleAuthInit" type="text/javascript"></script>
+    
 </head>
 
 <body>
@@ -107,7 +108,7 @@
         </form><br/>
         <div class="explain">Use this page to explore and <b>try</b> various API functions. Some functions require login. See <a href="https://zorggemak.atlassian.net/wiki/x/GoD-">this page</a> for more information.</div>
     </div>
-
+    
 </div>
 
 <div id="message-bar" class="swagger-ui-wrap">

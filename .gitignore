@@ -13,3 +13,6 @@ java/out
 *.iml
 *.iws
 *.ipr
+
+# generated sources
+generated-client-src/

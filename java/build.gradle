@@ -4,8 +4,53 @@ buildscript {
         mavenCentral()
     }
     dependencies {
+        if(ext.has('medvision')) {
+            classpath 'com.medvision360.buildlib:buildlib:latest.integration'
+        }
+
         // plugin for updating the license headers
         classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.5.0'
+    }
+}
+
+if(ext.has('medvision')) {
+    // mv-rootproject sets up internal repos and adds the build number to the version
+    apply plugin: 'mv-rootproject'
+
+    mvversion {
+        major = 2
+        minor = 0
+        revision = 0
+    }
+}
+else {
+    allprojects {
+        version = '2.0.0-SNAPSHOT'
+
+        repositories {
+            maven {
+                url "http://repo.medvision360.org/release/"
+            }
+            maven {
+                url "http://repo.medvision360.org/snapshot/"
+            }
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'maven'
+    repositories {
+        mavenCentral()
+        maven {
+            url 'http://maven.restlet.org'
+        }
+        maven {
+            url 'http://files.basex.org/maven'
+        }
+
+        // order matters...
+        mavenLocal()
     }
 }
 
@@ -45,29 +90,8 @@ allprojects {
 
 subprojects {
     group = 'com.medvision360.medrecord'
-    version = '2.0.0-SNAPSHOT'
+
     description = 'MEDvision360 MEDrecord, an openEHR based medical record server'
-
-    // make sure all projects get the right basex & restlet
-    repositories {
-        maven {
-            url "http://repo.medvision360.org/release/"
-        }
-        maven {
-            url "http://repo.medvision360.org/snapshot/"
-        }
-
-        mavenLocal()
-        mavenCentral()
-
-        maven {
-            url 'http://files.basex.org/maven'
-        }
-
-        maven {
-          url 'http://maven.restlet.org'
-        }
-    }
 
     // Update the license header on all files
     // run 'gradle licenseFormatMain' to update the license headers
@@ -81,13 +105,6 @@ subprojects {
     }
 
     ext {
-        // some settings used by the Restlet server
-        server = [
-                displayName     : 'MEDrecord Server',
-                applicationClass: 'com.medvision360.medrecord.server.MedRecordServerApplication',
-                projectId       : 'medrecord'
-        ]
-
         // Version numbers of dependencies.
         version = [
                 archetypes          : '2.0.0',
@@ -109,7 +126,7 @@ subprojects {
                 jstl                : '1.2',
                 junit               : '4.11',
                 logback             : '1.0.13',
-                medvisionlib        : '2.1.1.+',
+                medvisionlib        : 'latest.integration',
                 openEhr             : '1.0.6-SNAPSHOT',
                 postgresql          : '9.2-1003-jdbc4',
                 restlet             : '2.2-M1',

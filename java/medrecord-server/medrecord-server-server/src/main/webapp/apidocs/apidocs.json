@@ -1,5 +1,5 @@
 {
-  "javadocBase": "",
+  "javadocBase": "http://repo.medvision360.org/javadoc/medrecord-server-api-jee-2.0.0/medrecord-server-api-jee-2.0.0-SNAPSHOT",
   "apiVersion": "2.0.0-SNAPSHOT",
   "swaggerVersion": "1.1",
   "basePath": "/",
