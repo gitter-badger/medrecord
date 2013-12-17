@@ -25,6 +25,16 @@ Building and running
 MEDrecord is built with gradle. It makes use of some custom MEDvision build plugins and library dependencies that you
  can find at http://repo.medvision360.org/ .
 
+Branches
+--------
+We are following [a successful Git branching model](http://nvie.com/posts/a-successful-git-branching-model).
+
+Development will be done on the develop branch. The version on this branch will be automatically installed on
+http://medrecord.dev.medvision360.org/medrecord after each commit.
+
+Currently there are no release branches and the master branch is unused.
+
+
 Submodules
 ----------
 If you cloned this repository like so:
