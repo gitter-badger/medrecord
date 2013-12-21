@@ -70,9 +70,13 @@ Prerequisites
 - install the latest stable version of
   [JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html).
 
-- install the latest stable version of [gradle](http://www.gradle.org/). Make sure gradle is using JDK 7.
-  The easiest way to do that is to point `JAVA_HOME` to JDK 7, and add its `/bin` directory to your `PATH`.
+- make sure maven is installed, on Debian or Ubuntu you can install maven with `apt-get install maven`
 
+- MEDrecord uses Gradle to build the project. The included `gradlew` script, which downloads
+  Gradle automatically, can be used. It is also possible to install Gradle manually from http://www.gradle.org/ 
+  add the `gradle/bin` directory to the PATH. To use a manually installed Gradle, replace `./gradlew` in the commands
+  below with `gradle`
+  MEDrecord needs Gradle 1.7 or newer.
 
 Building with gradle
 --------------------
@@ -84,23 +88,23 @@ Building with gradle
 - build our version of the openehr reference implementation
 
         cd ../java
-        gradle vendor
+        ./gradlew vendor
 
   you don't need to do this every time you build; only if a `git submodule update` indicated there's
   changes to the reference implementation.
 
 - build medrecord itself:
 
-        gradle build
+        ./gradlew build
 
 - you can run the integration tests:
 
-        gradle integrationTest
+        ./gradlew integrationTest
 
 
 Run the server
 --------------
-        gradle tomcatRunWar
+        ./gradlew tomcatRunWar
 
 Now point your browser to http://localhost:8100/medrecord . This should look something like:
 
@@ -111,7 +115,7 @@ Generate IDEA project files
 ---------------------------
 At MEDvision, we are using IntelliJ to develop medrecord. Gradle can be used to generate an IntelliJ project for you:
 
-- run: `gradle idea`
+- run: `./gradlew idea`
 - open the generated `java.ipr` with IntelliJ
 - navigate to `medrecord-vendor/pom.xml` in the project explorer and add it as a maven project:
   ![Screenshot of IntelliJ add-as-maven-project](../docs/add_as_maven_project.jpg)
