@@ -23,7 +23,7 @@ Getting started
 ===============
 Clone the repository using:
 
-    git clone --recursive git@github.com:ZorgGemak/medrecord.git
+    git clone --recursive https://github.com:MEDvision/medrecord.git
 
 
 The java server
