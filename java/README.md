@@ -67,15 +67,16 @@ to also get new code for the submodules.
 
 Prerequisites
 -------------
-- install the latest stable version of
-  [JDK 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html).
+- MEDrecord needs Java 7, it might work with openJDK-7 but using Oracle JDK is recommended.
+  To install Oracle JDK on Debian please see https://wiki.debian.org/JavaPackage .
+  To install Oracle JDK on Ubuntu please see https://help.ubuntu.com/community/Java#Oracle_Java_7
 
 - make sure maven is installed, on Debian or Ubuntu you can install maven with `apt-get install maven`
 
 - MEDrecord uses Gradle to build the project. The included `gradlew` script, which downloads
   Gradle automatically, can be used. It is also possible to install Gradle manually from http://www.gradle.org/ 
-  add the `gradle/bin` directory to the PATH. To use a manually installed Gradle, replace `./gradlew` in the commands
-  below with `gradle`
+  and then add the `gradle/bin` directory to the PATH. 
+  To use a manually installed Gradle, replace `./gradlew` in the commands below with `gradle`.
   MEDrecord needs Gradle 1.7 or newer.
 
 Building with gradle
