@@ -1,13 +1,26 @@
 buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
-    dependencies {
-        if(ext.has('medvision')) {
+    if(ext.has('medvision')) {
+        repositories {
+            // need this to fetch buildlib when building on MEDvision CI
+            maven {
+                url "https://repository-zorggemak.forge.cloudbees.com/release/"
+                credentials {
+                    username project.cloudbeesUser
+                    password project.cloudbeesPassword
+                }
+            }
+        }
+        dependencies {
             classpath 'com.medvision360.buildlib:buildlib:latest.integration'
         }
+    }
 
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
         // plugin for updating the license headers
         classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.5.0'
     }
@@ -26,15 +39,6 @@ if(ext.has('medvision')) {
 else {
     allprojects {
         version = '2.0.0-SNAPSHOT'
-
-        repositories {
-            maven {
-                url "http://repo.medvision360.org/release/"
-            }
-            maven {
-                url "http://repo.medvision360.org/snapshot/"
-            }
-        }
     }
 }
 
@@ -47,6 +51,12 @@ subprojects {
         }
         maven {
             url 'http://files.basex.org/maven'
+        }
+        maven {
+            url "http://repo.medvision360.org/release/"
+        }
+        maven {
+            url "http://repo.medvision360.org/snapshot/"
         }
 
         // order matters...
