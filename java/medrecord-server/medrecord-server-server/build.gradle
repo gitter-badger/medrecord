@@ -105,11 +105,11 @@ else
 
     System.setProperty(
             'com.medvision360.lib.server.config.configfile',
-            file("configuration.properties.in").toString()
+            file("src/main/mvserver/configuration.properties.in").toString()
     )
     System.setProperty(
             'com.medvision360.lib.server.config.logbackconfig',
-            file("logback-test.xml").toString()
+            file("src/main/mvserver/logback-test.xml").toString()
     )
 
 
@@ -142,6 +142,8 @@ else
 
         systemProperties.put('integrationtest.service.url', 'http://localhost:9080/medrecord')
     }
+
+    project.tasks.build.dependsOn('integrationTest')
 
     project.tasks.test {
         exclude '**/*IT.*'
