@@ -136,7 +136,7 @@ subprojects {
                 jstl                : '1.2',
                 junit               : '4.11',
                 logback             : '1.0.13',
-                medvisionlib        : 'latest.integration',
+                medvisionlib        : '2.1.1.136',
                 openEhr             : '1.0.6-SNAPSHOT',
                 postgresql          : '9.2-1003-jdbc4',
                 restlet             : '2.2-M1',
